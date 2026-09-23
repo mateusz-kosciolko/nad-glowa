@@ -16,6 +16,8 @@ Astro 7 SSR app (React 19 islands, Tailwind 4, shadcn/ui) with Supabase Auth, de
 - `npm run lint` / `npm run lint:fix` — ESLint strict type-checked rules plus Prettier (@eslint.config.js).
 - `npx astro sync && npx astro check` — type check, run by CI after lint.
 - `npm run build` — SSR build for Cloudflare.
+- `npx wrangler deploy` — the only supported deploy command (Workers with Static Assets). Never `wrangler pages deploy` or any other `wrangler pages *` command: they ignore `wrangler.jsonc`, so the deploy silently loses `nodejs_compat` and any cron triggers.
+- There is no separate `wrangler dev` step. With `@astrojs/cloudflare` v14, `npm run dev` already runs workerd inside Vite; tutorials recommending `wrangler pages dev ./dist` are obsolete for these pins.
 - `npm run smoke` — HTTP auth-flow test against a running server (`BASE_URL`, default `http://localhost:4321`); needs Supabase with email confirmation disabled.
 
 No unit test runner is configured; `smoke` is the only automated test.
