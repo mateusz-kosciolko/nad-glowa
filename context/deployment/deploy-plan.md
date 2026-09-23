@@ -5,7 +5,7 @@ platform: Cloudflare Workers (Static Assets)
 worker_name: nad-glowa
 production_url: https://nad-glowa.mateusz-kosciolko-321.workers.dev
 version_id: 99a7916d-2871-4dc9-85fe-f80f13c5d9c9
-status: deployed
+status: deployed-and-verified
 ---
 
 # Deploy plan — pierwsze wdrożenie na produkcję
@@ -91,6 +91,11 @@ dowodzi, że `src/middleware.ts` i `@supabase/ssr` wystartowały na workerd. To 
 klasa błędu _„dynamic require of stream is not supported"_, i to na deployu, nie na buildzie.
 
 Logi: `npx wrangler tail --format pretty` (`observability.enabled: true` jest ustawione).
+
+Wynik z 2026-09-23: `/` → 200, `/dashboard` (anonim) → 302 na `/auth/signin`, `/auth/signin` i `/auth/signup` → 200,
+static assets → 200, baner „Supabase nie jest skonfigurowany" nieobecny, edge `cf-ray: …-WAW`.
+Ręcznie w przeglądarce potwierdzone logowanie kontem z panelu Supabase i wyrenderowany `/dashboard` —
+czyli `@supabase/ssr` przechodzi na workerd pełny round-trip cookies, nie tylko start.
 
 **Nie uruchamiaj `npm run smoke` przeciwko produkcji.** Skrypt rejestruje prawdziwe konto
 `smoke-<timestamp>@example.com` i zakłada wyłączone potwierdzanie e-maila. Smoke zostaje testem
