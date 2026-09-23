@@ -16,7 +16,6 @@ allowed-tools:
   - TaskCreate
   - TaskUpdate
 ---
-
 # Ocena stosu: ewaluacja istniejącego stosu pod kątem przyjazności dla agentów
 
 Ta umiejętność jest odpowiednikiem `/10x-tech-stack-selector` dla środowisk brownfield. Tam, gdzie tech-stack-selector pomaga użytkownikom greenfield **wybrać** stos, stack-assess pomaga użytkownikom brownfield **ocenić** ich stos. Ponownie wykorzystuje te same cztery bramki jakości przyjaznej agentom (`references/agent-friendly-criteria.md`), ale stosuje je jako perspektywę ewaluacyjną, a nie filtr wyboru.
@@ -81,16 +80,16 @@ Odczytaj pliki projektu, aby zidentyfikować stos. Wykrywanie jest oparte na pli
 
 **Źródła wykrywania według rodziny języków:**
 
-| Rodzina języków | Pliki znaczników                                                                                                                                                                                                                      | Co wyodrębnić                                                                                                                                                                                                                                  |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| JS/TS           | `package.json`, `tsconfig.json`, `next.config.*`, `astro.config.*`, `vite.config.*`, `svelte.config.*`, `nuxt.config.*`, `angular.json`, `.eslintrc*`, `prettier.config.*`, `jest.config.*`, `vitest.config.*`, `playwright.config.*` | Język (JS vs TS — obecność `tsconfig.json`), framework, narzędzie budowania, runner testów, linter, formatter, menedżer pakietów (z pliku lockfile: `package-lock.json` → npm, `yarn.lock` → yarn, `pnpm-lock.yaml` → pnpm, `bun.lockb` → bun) |
-| Python          | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements.txt`, `Pipfile`, `poetry.lock`, `uv.lock`                                                                                                                                    | Framework (Django, FastAPI, Flask — z zależności), sprawdzanie typów (mypy/pyright w zależnościach lub konfiguracji), runner testów (pytest/unittest), menedżer pakietów                                                                       |
-| Rust            | `Cargo.toml`                                                                                                                                                                                                                          | Edycja, zależności frameworka webowego (Actix, Axum, Rocket), framework testowy                                                                                                                                                                |
-| Go              | `go.mod`                                                                                                                                                                                                                              | Wersja Go, framework webowy (Gin, Echo, Fiber, Chi, stdlib), framework testowy                                                                                                                                                                 |
-| Ruby            | `Gemfile`                                                                                                                                                                                                                             | Framework (Rails, Sinatra), wersja Ruby, sprawdzanie typów (Sorbet/RBS), framework testowy (RSpec, Minitest)                                                                                                                                   |
-| PHP             | `composer.json`                                                                                                                                                                                                                       | Framework (Laravel, Symfony), wersja PHP, sprawdzanie typów (PHPStan/Psalm), framework testowy (PHPUnit, Pest)                                                                                                                                 |
-| .NET            | `*.csproj`, `*.sln`                                                                                                                                                                                                                   | Framework (wersja .NET, ASP.NET), język (C#/F#), framework testowy (xUnit, NUnit)                                                                                                                                                              |
-| Dart            | `pubspec.yaml`                                                                                                                                                                                                                        | Framework (Flutter, serwer Dart), framework testowy                                                                                                                                                                                            |
+| Rodzina języków | Pliki znaczników | Co wyodrębnić |
+|---|---|---|
+| JS/TS | `package.json`, `tsconfig.json`, `next.config.*`, `astro.config.*`, `vite.config.*`, `svelte.config.*`, `nuxt.config.*`, `angular.json`, `.eslintrc*`, `prettier.config.*`, `jest.config.*`, `vitest.config.*`, `playwright.config.*` | Język (JS vs TS — obecność `tsconfig.json`), framework, narzędzie budowania, runner testów, linter, formatter, menedżer pakietów (z pliku lockfile: `package-lock.json` → npm, `yarn.lock` → yarn, `pnpm-lock.yaml` → pnpm, `bun.lockb` → bun) |
+| Python | `pyproject.toml`, `setup.py`, `setup.cfg`, `requirements.txt`, `Pipfile`, `poetry.lock`, `uv.lock` | Framework (Django, FastAPI, Flask — z zależności), sprawdzanie typów (mypy/pyright w zależnościach lub konfiguracji), runner testów (pytest/unittest), menedżer pakietów |
+| Rust | `Cargo.toml` | Edycja, zależności frameworka webowego (Actix, Axum, Rocket), framework testowy |
+| Go | `go.mod` | Wersja Go, framework webowy (Gin, Echo, Fiber, Chi, stdlib), framework testowy |
+| Ruby | `Gemfile` | Framework (Rails, Sinatra), wersja Ruby, sprawdzanie typów (Sorbet/RBS), framework testowy (RSpec, Minitest) |
+| PHP | `composer.json` | Framework (Laravel, Symfony), wersja PHP, sprawdzanie typów (PHPStan/Psalm), framework testowy (PHPUnit, Pest) |
+| .NET | `*.csproj`, `*.sln` | Framework (wersja .NET, ASP.NET), język (C#/F#), framework testowy (xUnit, NUnit) |
+| Dart | `pubspec.yaml` | Framework (Flutter, serwer Dart), framework testowy |
 
 **Dodatkowe sygnały do sprawdzenia:**
 
@@ -116,7 +115,6 @@ Detected stack:
 Poproś o potwierdzenie:
 
 AskUserQuestion:
-
 - question: "Czy to wykrywanie jest poprawne? Czy czegoś brakuje lub coś jest błędne?"
   header: "Stos"
   options:
@@ -124,7 +122,7 @@ AskUserQuestion:
     description: "Kontynuuj z tym wykrytym stosem."
   - label: "Popraw coś"
     description: "Poprawię wykrywanie przed oceną."
-    multiSelect: false
+  multiSelect: false
 
 Jeśli wybrano „Popraw coś”: zapytaj, który komponent poprawić, zastosuj nadpisanie w pamięci, kontynuuj.
 
@@ -184,28 +182,24 @@ Dla każdej niespełnionej bramki utwórz konkretną strategię kompensacyjną. 
 **Szablony kompensacji według niespełnionej bramki:**
 
 **Typowany: niespełniona** →
-
 - Dodaj do CLAUDE.md konwencję jawnych adnotacji typów („All new code must include type annotations at function boundaries”)
 - Dodaj regułę walidacji na granicach („Use Zod/Pydantic/JSON Schema at API boundaries”)
 - Jeśli Python: dodaj rekomendację konfiguracji mypy
 - Jeśli JS: dodaj ścieżkę migracji do TypeScript lub wskazówki typów JSDoc
 
 **Oparty na konwencjach: niespełniona** →
-
 - Udokumentuj konwencje struktury folderów w CLAUDE.md („Routes live in src/routes/, middleware in src/middleware/, ...”)
 - Udokumentuj konwencje nazewnictwa („Files: kebab-case, exports: PascalCase for components, camelCase for functions”)
 - Udokumentuj kolejność rejestracji middleware/pluginów
 - Udokumentuj wzorzec obsługi błędów
 
 **Popularny w danych treningowych: niespełniona** →
-
 - Dodaj do CLAUDE.md przykłady idiomów specyficznych dla frameworka
 - Umieść odnośnik do oficjalnej dokumentacji w pliku instrukcji
 - Dodaj reguły „preferuj wzorzec X zamiast Y” dla wyborów specyficznych dla frameworka
 - Zaznacz, że agent może potrzebować więcej wskazówek przy tym frameworku
 
 **Dobrze udokumentowany: niespełniona** →
-
 - Przypnij wersję frameworka w pliku instrukcji
 - Dodaj odnośniki do najlepszej dostępnej dokumentacji
 - Uwzględnij wbudowane przykłady typowych wzorców
@@ -234,7 +228,6 @@ test -f context/foundation/stack-assessment.md
 Jeśli plik istnieje, zapytaj:
 
 AskUserQuestion:
-
 - question: "context/foundation/stack-assessment.md już istnieje. Jak chcesz kontynuować?"
   header: "Kolizja"
   options:
@@ -244,7 +237,7 @@ AskUserQuestion:
     description: "Zachowaj historię. Nowa ocena trafi do kolejnego dostępnego slotu wersji."
   - label: "Przerwij"
     description: "Zakończ bez zapisywania. Ocena z rozmowy pozostanie zachowana wyłącznie na czacie."
-    multiSelect: false
+  multiSelect: false
 
 Zbuduj plik wyjściowy:
 

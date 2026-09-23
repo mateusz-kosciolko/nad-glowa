@@ -8,7 +8,6 @@ allowed-tools:
   - Bash
   - AskUserQuestion
 ---
-
 # /10x-lesson — Utrwal powtarzającą się regułę
 
 Dodaj pojedynczy wpis do `context/foundation/lessons.md`, aby przyszłe uruchomienia `/10x-frame`, `/10x-research`, `/10x-plan`, `/10x-plan-review`, `/10x-implement` i `/10x-impl-review` ponownie odczytywały go jako wcześniejszą wskazówkę. To proaktywny odpowiednik opcji triage „Accept as recurring rule” w `/10x-impl-review` — wywołaj go inline, gdy zauważysz wzorzec wart uwidocznienia bez czekania na ustrukturyzowany przegląd.

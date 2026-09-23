@@ -17,7 +17,6 @@ allowed-tools:
   - TaskCreate
   - TaskUpdate
 ---
-
 # Bootstrapper: Od stosu technologicznego do projektu ze szkieletem
 
 Ta umiejętność jest końcowym ogniwem sekwencji bootstrapowania (`/10x-shape → /10x-prd → /10x-tech-stack-selector → 10x-bootstrapper`). Jej jedynym zadaniem jest przekształcenie zapisanego przekazania stosu technologicznego w projekt ze szkieletem w bieżącym katalogu roboczym, z ustaleniami weryfikacyjnymi zapisanymi do przeglądu przez użytkownika.
@@ -109,7 +108,6 @@ Przekazanie otrzymane:
 Zadaj jedno pytanie potwierdzające:
 
 AskUserQuestion:
-
 - question: "Kontynuować z tym przekazaniem, czy najpierw coś poprawić?"
   header: "Przekazanie"
   options:
@@ -119,7 +117,7 @@ AskUserQuestion:
     description: "Zapytam, które pole nadpisać dla tego uruchomienia; plik na dysku pozostanie bez zmian."
   - label: "Zatrzymaj — najpierw popraw przekazanie"
     description: "Zakończ. Uruchom ponownie /10x-tech-stack-selector, aby zaktualizować tech-stack.md, a następnie wywołaj ponownie."
-    multiSelect: false
+  multiSelect: false
 
 Jeśli wybrano „Popraw wartość”: zapytaj, które pole, przechwyć nadpisanie, kontynuuj z nadpisaniem zastosowanym tylko dla tej sesji. Następnie uruchom ochronę przed zapełnionym cwd z `references/refusal-protocol.md` (ostrzeż i poproś o potwierdzenie, jeśli cwd już zawiera odcisk projektu ze szkieletem, taki jak `package.json`, `Cargo.toml`, `Gemfile`, `pyproject.toml` itd.).
 
