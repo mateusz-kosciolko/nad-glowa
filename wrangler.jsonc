@@ -4,6 +4,9 @@
   "main": "@astrojs/cloudflare/entrypoints/server",
   "compatibility_date": "2026-05-08",
   "compatibility_flags": ["nodejs_compat"],
+  // Preview URLs są publicznie dostępne; PRD traktuje przybliżoną lokalizację domową
+  // jako dane wrażliwe, więc produkcja wystawia wyłącznie trasę workers.dev.
+  "preview_urls": false,
   "assets": {
     "binding": "ASSETS",
     "directory": "./dist",

@@ -4,7 +4,7 @@ deployed_at: 2026-09-23
 platform: Cloudflare Workers (Static Assets)
 worker_name: nad-glowa
 production_url: https://nad-glowa.mateusz-kosciolko-321.workers.dev
-version_id: 99a7916d-2871-4dc9-85fe-f80f13c5d9c9
+version_id: 146f9abe-61c7-42b3-a3a7-98fd104e45fd
 status: deployed-and-verified
 ---
 
@@ -24,7 +24,7 @@ Aplikacja w stanie ze scaffoldu: strona główna, rejestracja/logowanie Supabase
 | Platforma           | Cloudflare Workers with Static Assets (**nie** Pages)              |
 | Nazwa Workera       | `nad-glowa`                                                        |
 | URL produkcyjny     | https://nad-glowa.mateusz-kosciolko-321.workers.dev                |
-| Aktywny Version ID  | `99a7916d-2871-4dc9-85fe-f80f13c5d9c9`                             |
+| Aktywny Version ID  | `146f9abe-61c7-42b3-a3a7-98fd104e45fd`                             |
 | Konto Cloudflare    | `mateusz.kosciolko@gmail.com` (`321276ecf944b4a3f73a126d4bbaa3b0`) |
 | Plan Cloudflare     | Free                                                               |
 | Projekt Supabase    | `nwphfexokrngshgmhucf`, region EU                                  |
@@ -63,8 +63,9 @@ npx wrangler versions deploy <version-id>      # konkretna wersja
 npx wrangler deployments list                  # historia
 ```
 
-Poniżej minuty, bez rebuildu — wersje są niezmiennymi uploadami. To pierwsze wdrożenie, więc wersji
-poprzedniej nie ma; punktem odniesienia jest `99a7916d-2871-4dc9-85fe-f80f13c5d9c9`.
+Poniżej minuty, bez rebuildu — wersje są niezmiennymi uploadami. Aktywna jest
+`146f9abe-61c7-42b3-a3a7-98fd104e45fd`; poprzednia sprawna wersja to `99a7916d-2871-4dc9-85fe-f80f13c5d9c9`
+(pierwsze wdrożenie, jeszcze z włączonymi Preview URLs).
 
 **Czego rollback NIE cofa**: migracji Supabase ani wysłanych powiadomień. Migracje pisz addytywnie —
 destrukcyjne dopiero wtedy, gdy Worker już nie odwołuje się do kolumny.
@@ -103,11 +104,11 @@ lokalnym i CI-owym przeciwko lokalnej Supabase.
 
 ## Czego NIE wdrożono
 
-| Element                                        | Dlaczego nie teraz                                                                                                                                                                                                        |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cron Trigger `* * * * *` + handler `scheduled` | W repo nie ma jeszcze pollera ADS-B. Cron bez handlera to błąd co minutę. Wejdzie razem z logiką alertów — **wtedy wymagany Workers Paid $5/mo**, bo free capuje crony na 10 ms CPU                                       |
-| Auto-deploy z GitHub Actions                   | Repo nie ma remote'a. Wymaga repozytorium GitHub i scoped `CLOUDFLARE_API_TOKEN` (Workers Scripts:Edit tylko dla tego projektu, bez DNS i bez rozliczeń)                                                                  |
-| Cloudflare Access przed preview URL-ami        | Deploy włączył Preview URLs domyślnie i są publiczne. Do zamknięcia, zanim na produkcji pojawią się prawdziwe lokalizacje domowe — dziś aplikacja ich nie zbiera. Alternatywa: `"preview_urls": false` w `wrangler.jsonc` |
-| Migracje Supabase / RLS                        | Brak `supabase/migrations`. Schemat powstaje razem z logiką alertów; RLS jest warunkiem koniecznym, bo klucz `anon` jest publiczny                                                                                        |
-| `site` w `astro.config.mjs`                    | Build ostrzega, że integracja sitemap jest pomijana. Uzupełnić produkcyjnym URL-em                                                                                                                                        |
-| Własna domena                                  | Na starcie `*.workers.dev`                                                                                                                                                                                                |
+| Element                                        | Dlaczego nie teraz                                                                                                                                                                                              |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cron Trigger `* * * * *` + handler `scheduled` | W repo nie ma jeszcze pollera ADS-B. Cron bez handlera to błąd co minutę. Wejdzie razem z logiką alertów — **wtedy wymagany Workers Paid $5/mo**, bo free capuje crony na 10 ms CPU                             |
+| Auto-deploy z GitHub Actions                   | Repo nie ma remote'a. Wymaga repozytorium GitHub i scoped `CLOUDFLARE_API_TOKEN` (Workers Scripts:Edit tylko dla tego projektu, bez DNS i bez rozliczeń)                                                        |
+| ~~Publiczne Preview URLs~~                     | **Zamknięte 2026-09-23**: `"preview_urls": false` w `wrangler.jsonc`. Worker wystawia wyłącznie trasę workers.dev. Konsekwencja: weryfikacja przed promocją odbywa się lokalnie, nie przez publiczny URL wersji |
+| Migracje Supabase / RLS                        | Brak `supabase/migrations`. Schemat powstaje razem z logiką alertów; RLS jest warunkiem koniecznym, bo klucz `anon` jest publiczny                                                                              |
+| `site` w `astro.config.mjs`                    | Build ostrzega, że integracja sitemap jest pomijana. Uzupełnić produkcyjnym URL-em                                                                                                                              |
+| Własna domena                                  | Na starcie `*.workers.dev`                                                                                                                                                                                      |
