@@ -371,10 +371,10 @@ Brak zmian w bazie. Rollback Workera (`wrangler rollback`) usuwa sondę i stopk�
 
 #### Automated
 
-- [x] 3.1 Wdrożenie przechodzi: `npm run build && npx wrangler deploy`
-- [x] 3.2 Produkcja: anonim dostaje 302 na `/auth/signin` z `/api/adsb/probe`, a `/` zwraca 200
+- [x] 3.1 Wdrożenie przechodzi: `npm run build && npx wrangler deploy` — 0899a8a
+- [x] 3.2 Produkcja: anonim dostaje 302 na `/auth/signin` z `/api/adsb/probe`, a `/` zwraca 200 — 0899a8a
 
 #### Manual
 
 - [ ] 3.3 Na produkcji sonda zwraca `ok: true` i `total > 0` dla adsb.fi i adsb.lol
-- [x] 3.4 `adsb-source.md`, `deploy-plan.md` i roadmapa zaktualizowane, decyzja zaakceptowana
+- [x] 3.4 `adsb-source.md`, `deploy-plan.md` i roadmapa zaktualizowane, decyzja zaakceptowana — 0899a8a

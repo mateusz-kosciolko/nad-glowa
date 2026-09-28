@@ -1,7 +1,7 @@
 ---
 change_id: adsb-source-verified
 title: Adsb source verified
-status: implementing
+status: implemented
 created: 2026-09-28
 updated: 2026-09-28
 archived_at: null
