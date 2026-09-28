@@ -24,7 +24,7 @@ milestone_status: open
 
 - **Intent:** Zaproszony użytkownik ustawia lokalizację domu, promień i typy samolotów, a potem dostaje powiadomienie co najmniej 2 minuty przed przelotem pasującego samolotu. Powiadomienie przychodzi raz na maszynę i da się je wstrzymać. Kamień milowy obejmuje całą ścieżkę wymagań, które PRD oznacza jako must-have.
 - **Source materials:** `context/foundation/prd.md` (v1)
-- **Done when:** każdy F-NN i S-NN poniżej ma status `done`.
+- **Done when:** każdy F-NN i S-NN poniżej ma status `done`. Pobieranie ADS-B i zadanie cykliczne wystarczy uruchomić lokalnie, z sieci użytkownika; wdrożenie ich na serwer nie jest warunkiem zamknięcia (decyzja 2026-09-28, Open Roadmap Question 10).
 - **Scope anchors:** FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-009, FR-010; US-01; NFR (powiadomienie < 60 s); Access Control. Poza zakresem są FR-007, FR-008 i FR-011 (zob. `## Parked`).
 
 ## Vision recap
@@ -39,17 +39,17 @@ Obserwator z balkonu dowiaduje się o nietypowym samolocie (wojskowym, ciężkim
 
 ## At a glance
 
-| ID   | Change ID             | Outcome (user can …)                                                                       | Prerequisites    | PRD refs                               | Status   |
-| ---- | --------------------- | ------------------------------------------------------------------------------------------ | ---------------- | -------------------------------------- | -------- |
-| F-01 | adsb-source-verified  | (foundation) wybrane darmowe źródło ADS-B potwierdzone jako dające typ, pozycję i kurs     | —                | Open Question 2, Business Logic        | done     |
-| F-02 | minute-cron-heartbeat | (foundation) zadanie cykliczne działa co minutę na produkcji i zostawia ślad każdego biegu | —                | NFR (< 60 s)                           | ready    |
-| S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie                   | —                | FR-001, Access Control                 | ready    |
-| S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                      | —                | FR-003, FR-004, FR-005, Access Control | done     |
-| S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                           | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | blocked  |
-| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji                | S-03             | FR-010, US-01                          | blocked  |
-| S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                                 | S-03             | FR-006                                 | proposed |
-| S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście               | F-01, S-02       | FR-002, FR-005                         | proposed |
-| S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                                  | S-03             | FR-009, US-01                          | proposed |
+| ID   | Change ID             | Outcome (user can …)                                                                   | Prerequisites    | PRD refs                               | Status      |
+| ---- | --------------------- | -------------------------------------------------------------------------------------- | ---------------- | -------------------------------------- | ----------- |
+| F-01 | adsb-source-verified  | (foundation) wybrane darmowe źródło ADS-B potwierdzone jako dające typ, pozycję i kurs | —                | Open Question 2, Business Logic        | done        |
+| F-02 | minute-cron-heartbeat | (foundation) zadanie cykliczne działa co minutę lokalnie i zostawia ślad każdego biegu | —                | NFR (< 60 s)                           | in-progress |
+| S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie               | —                | FR-001, Access Control                 | ready       |
+| S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                  | —                | FR-003, FR-004, FR-005, Access Control | done        |
+| S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                       | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | blocked     |
+| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji            | S-03             | FR-010, US-01                          | blocked     |
+| S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                             | S-03             | FR-006                                 | proposed    |
+| S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście           | F-01, S-02       | FR-002, FR-005                         | proposed    |
+| S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                              | S-03             | FR-009, US-01                          | proposed    |
 
 ## Streams
 
@@ -91,16 +91,16 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 
 ### F-02: Zadanie cykliczne co minutę z heartbeatem
 
-- **Outcome:** (foundation) zadanie cykliczne uruchamia się co minutę na produkcji i przy każdym biegu, także pustym, zapisuje ślad (czas biegu), więc cisza „brak ciekawych samolotów” jest odróżnialna od ciszy „zadanie przestało działać”.
+- **Outcome:** (foundation) zadanie cykliczne uruchamia się co minutę lokalnie, z sieci użytkownika (tam źródła ADS-B odpowiadają), i przy każdym biegu, także pustym, zapisuje ślad (czas biegu), więc cisza „brak ciekawych samolotów” jest odróżnialna od ciszy „zadanie przestało działać”.
 - **Change ID:** minute-cron-heartbeat
 - **PRD refs:** NFR (< 60 s)
 - **Unlocks:** S-03 (ścieżka weryfikacji: dowód, że zadanie żyje, zanim zaczniemy ufać braku alertów)
 - **Prerequisites:** —
 - **Parallel with:** F-01, S-01, S-02
-- **Blockers:** Włączenie planu Cloudflare Workers Paid (5 USD/mies.) — decyzja rozliczeniowa wykonywana ręcznie przez człowieka, zgodnie z granicą dostępu z `infrastructure.md`.
+- **Blockers:** — (plan Cloudflare Workers Paid był potrzebny tylko dla crona na produkcji; odłożony razem z nim, zob. `## Parked`)
 - **Unknowns:** —
-- **Risk:** Rejestr ryzyk w `infrastructure.md` ocenia cichą awarię crona na M/H; heartbeat jest najtańszym zabezpieczeniem i musi istnieć, zanim pierwszy alert stanie się sygnałem, na którym polegamy.
-- **Status:** ready
+- **Risk:** Rejestr ryzyk w `infrastructure.md` ocenia cichą awarię crona na M/H; heartbeat jest najtańszym zabezpieczeniem i musi istnieć, zanim pierwszy alert stanie się sygnałem, na którym polegamy. Lokalnie zadanie działa tylko, gdy komputer użytkownika jest włączony, więc heartbeat odróżnia też „komputer był wyłączony” od „brak samolotów”.
+- **Status:** in-progress
 
 ## Slices
 
@@ -138,7 +138,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **PRD refs:** US-01, FR-009, NFR (< 60 s)
 - **Prerequisites:** F-01, F-02, S-02
 - **Parallel with:** S-01, S-06
-- **Blockers:** Miejsce pobierania danych ADS-B (Open Roadmap Question 10) — oba darmowe źródła odmawiają żądań z Cloudflare Workers (`context/foundation/adsb-source.md`).
+- **Blockers:** — (miejsce pobierania danych ADS-B rozstrzygnięte 2026-09-28: lokalnie, z sieci użytkownika; Open Roadmap Question 10)
 - **Unknowns:**
   - Kanał powiadomień: Telegram czy e-mail (Open Roadmap Question 3)? — Owner: user. Block: yes. `infrastructure.md` wskazuje Telegram (jedno wywołanie HTTPS; środowisko nie ma SMTP).
 - **Risk:** Bez S-04 ta sama maszyna może wywoływać alert przy każdym biegu zadania, więc S-03 służy do walidacji, a nie do codziennego używania. S-04 musi wejść zaraz po nim.
@@ -197,17 +197,17 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 
 ## Backlog Handoff
 
-| Roadmap ID | Change ID             | Suggested issue title                            | Ready for `/10x-plan` | Notes                                                                                                      |
-| ---------- | --------------------- | ------------------------------------------------ | --------------------- | ---------------------------------------------------------------------------------------------------------- |
-| F-01       | adsb-source-verified  | Zweryfikuj darmowe źródło ADS-B z typem samolotu | yes                   | Run `/10x-plan adsb-source-verified`                                                                       |
-| F-02       | minute-cron-heartbeat | Uruchom zadanie co minutę z heartbeatem          | yes                   | Wymaga ręcznego włączenia Workers Paid; granica klucza serwisowego z planu `511ba0a` (Task 2) należy tutaj |
-| S-01       | invite-only-access    | Zamknij rejestrację i chroń wszystkie trasy      | yes                   | Run `/10x-plan invite-only-access`; zastąp ścieżkę testu smoke                                             |
-| S-02       | alert-settings-basic  | Ustawienia alertów: dom, promień, typy           | yes                   | Część danych pokrywają spec `aba254e` i plan `511ba0a` (Task 1); rozszerzyć o ekran ustawień               |
-| S-03       | first-advance-alert   | Pierwszy alert przed przelotem nad domem         | no                    | Blokuje wybór kanału (Q3) oraz F-01, F-02, S-02                                                            |
-| S-04       | no-repeat-alerts      | Deduplikacja alertów po maszynie                 | no                    | Blokuje długość okna (Q4) oraz S-03                                                                        |
-| S-05       | pause-resume-alerts   | Pauza i wznowienie alertów                       | no                    | Czeka na S-03                                                                                              |
-| S-06       | aircraft-type-picker  | Wybór typów z czytelnymi nazwami i wyszukiwaniem | no                    | Czeka na F-01 i S-02                                                                                       |
-| S-07       | route-in-alerts       | Trasa (skąd/dokąd) w alercie                     | no                    | Czeka na S-03; źródło trasy wyjaśnia F-01                                                                  |
+| Roadmap ID | Change ID             | Suggested issue title                            | Ready for `/10x-plan` | Notes                                                                                                                                 |
+| ---------- | --------------------- | ------------------------------------------------ | --------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| F-01       | adsb-source-verified  | Zweryfikuj darmowe źródło ADS-B z typem samolotu | yes                   | Run `/10x-plan adsb-source-verified`                                                                                                  |
+| F-02       | minute-cron-heartbeat | Uruchom zadanie co minutę z heartbeatem          | yes                   | Run `/10x-plan minute-cron-heartbeat`; lokalnie, bez Workers Paid; granica klucza serwisowego z planu `511ba0a` (Task 2) należy tutaj |
+| S-01       | invite-only-access    | Zamknij rejestrację i chroń wszystkie trasy      | yes                   | Run `/10x-plan invite-only-access`; zastąp ścieżkę testu smoke                                                                        |
+| S-02       | alert-settings-basic  | Ustawienia alertów: dom, promień, typy           | yes                   | Część danych pokrywają spec `aba254e` i plan `511ba0a` (Task 1); rozszerzyć o ekran ustawień                                          |
+| S-03       | first-advance-alert   | Pierwszy alert przed przelotem nad domem         | no                    | Blokuje wybór kanału (Q3) oraz F-02; pobieranie ADS-B lokalnie (Q10)                                                                  |
+| S-04       | no-repeat-alerts      | Deduplikacja alertów po maszynie                 | no                    | Blokuje długość okna (Q4) oraz S-03                                                                                                   |
+| S-05       | pause-resume-alerts   | Pauza i wznowienie alertów                       | no                    | Czeka na S-03                                                                                                                         |
+| S-06       | aircraft-type-picker  | Wybór typów z czytelnymi nazwami i wyszukiwaniem | no                    | Czeka na F-01 i S-02                                                                                                                  |
+| S-07       | route-in-alerts       | Trasa (skąd/dokąd) w alercie                     | no                    | Czeka na S-03; źródło trasy wyjaśnia F-01                                                                                             |
 
 ## Open Roadmap Questions
 
@@ -220,7 +220,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 7. **Skala docelowa: wolumen zapytań i danych?** — Owner: user. Block: — (wpływa na budżet zapytań na jeden bieg zadania, ryzyko z `infrastructure.md`).
 8. **Czy dziennik obserwacji jest zapisywany w MVP, choć jego przeglądanie (FR-011) jest odłożone?** — Owner: user. Block: — w tym kamieniu milowym; od odpowiedzi zależy drugorzędne kryterium sukcesu.
 9. **Czy MVP ma zawierać kolekcję rekordów zarządzaną przez użytkownika?** — Owner: user. Block: — w tym kamieniu milowym (kandydaci FR-008, FR-011 są odłożeni).
-10. **Gdzie działa pobieranie danych ADS-B (poller), skoro oba darmowe źródła odmawiają żądań z Cloudflare Workers?** — Owner: user. Block: S-03; dotyczy też F-02, którego cron jest zaplanowany na Workerach. Z produkcji adsb.fi zwraca 403, a adsb.lol 429; z sieci lokalnej ten sam kod działa. Kierunki do oceny i dowody: `context/foundation/adsb-source.md`.
+10. **Gdzie działa pobieranie danych ADS-B (poller), skoro oba darmowe źródła odmawiają żądań z Cloudflare Workers?** — Owner: user. Block: — (rozstrzygnięte). **Odpowiedź (2026-09-28):** na razie lokalnie, z sieci użytkownika; pobieranie i zadanie cykliczne nie są wdrażane na serwer w M-1. Research innych źródeł nie dał darmowego źródła działającego z Workerów (szczegóły: `context/foundation/adsb-source.md`, „Research alternatyw”). Wdrożenie produkcyjne czeka w `## Parked`.
 
 ## Parked
 
@@ -229,6 +229,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Przeglądanie dziennika obserwacji (FR-011)** — Why parked: PRD Non-Goals, nice-to-have; kandydat na kolejny kamień milowy razem z pytaniem 8.
 - **Wybór kanału powiadomień przez użytkownika** — Why parked: PRD Non-Goals, jeden stały kanał w MVP.
 - **Własny odbiornik ADS-B, funkcje dla spotterów, gwarancja kompletności, tryb „wszystkie samoloty”** — Why parked: PRD Non-Goals.
+- **Pobieranie ADS-B i zadanie cykliczne na serwerze** — Why parked: decyzja użytkownika 2026-09-28 (Open Roadmap Question 10); lokalnie wystarcza do walidacji. Kierunki na później: poller poza Cloudflare (Railway, Fly.io, VPS) zapisujący do Supabase albo zgoda adsb.fi / airplanes.live na dostęp. Plan Workers Paid dopiero wtedy.
 - **Auto-deploy z GitHub Actions** — Why parked: repo nie ma remote'a (`deploy-plan.md`); przy celu `speed` ręczny `wrangler deploy` wystarcza.
 - **Własna domena i pole `site`** — Why parked: `deploy-plan.md`, nie wpływa na żaden wymóg PRD.
 - **Śledzenie błędów poza heartbeatem** — Why parked: cel `speed`; heartbeat z F-02 pokrywa ryzyko cichej awarii, a Workers Logs resztę.

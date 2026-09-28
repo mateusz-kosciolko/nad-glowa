@@ -4,7 +4,8 @@ change_id: adsb-source-verified
 primary: adsb.fi
 fallback: adsb.lol
 reachable_from_cloudflare_workers: false
-status: blocked-on-platform
+status: local-only
+runtime: local
 ---
 
 # Źródło danych ADS-B
@@ -139,6 +140,31 @@ Zmiana `DEFAULT_ADSB_SOURCE` na adsb.lol (reguła zapasowa z planu) nic nie daje
 | airplanes.live  | HTTP 403; dostęp tylko po zgodzie mailowej                                                                   |
 | ADS-B Exchange  | brak darmowego API od 2025-03                                                                                |
 
+## Research alternatyw (2026-09-28)
+
+Szukane: źródło, które działa z Cloudflare Workers i daje typ samolotu przy biegu co minutę (~43 200 zapytań
+miesięcznie). Testy curlem szły z sieci lokalnej, nie z Workera.
+
+| Źródło                       | Wynik / warunki                                                                                           | Werdykt                                                    |
+| ---------------------------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| OpenSky Network              | lokalnie HTTP 200 anonimowo (400 kredytów/dzień; z kontem OAuth2 4000, mały obszar = 1 kredyt); brak typu | celowo blokuje adresy chmurowe, bez wyjątków; tylko z domu |
+| adsb.one                     | HTTP 403 (strona blokady Cloudflare) także lokalnie                                                       | odpada                                                     |
+| theairtraffic                | `api.theairtraffic.com` nie rozwiązuje się w DNS                                                          | odpada                                                     |
+| airplanes.live               | HTTP 403 z prośbą o maila z opisem projektu                                                               | możliwe po zgodzie mailowej                                |
+| ADSB IQ                      | API zgodne z adsb.lol, ale tylko dla feederów (autoryzacja po IP feedera)                                 | wymaga własnego odbiornika (PRD Non-Goals)                 |
+| ADS-B Exchange (RapidAPI)    | 10 USD/mies., 10 000 zapytań, niekomercyjnie                                                              | starcza na bieg co ~5 min, co łamie NFR < 60 s             |
+| Flightradar24 API (Explorer) | 9 USD/mies., 30 000 kredytów; 6 kredytów za każdy zwrócony samolot                                        | ~250 zapytań/mies. przy ~20 samolotach; odpada             |
+| AirLabs                      | darmowo 1000 zapytań/mies.; 10 tys. za 19 USD; opóźnienie danych nieudokumentowane                        | limit za mały                                              |
+| adsbdb `/v0/aircraft/{hex}`  | działa, ale zna tylko część maszyn (`48ad10` → „unknown aircraft”)                                        | tylko uzupełnianie braków typu                             |
+
+- Blokada dotyczy Cloudflare, nie hostingu w ogóle: zgłoszenie
+  `github.com/georgekobaidze/metal-birds-watch/issues/98` opisuje przejście z OpenSky na adsb.fi / adsb.lol /
+  airplanes.live z backendu na Railway.
+- adsb.fi (`github.com/adsbfi/opendata`) zaprasza do kontaktu przy wyższych wymaganiach co do limitu.
+
+**Decyzja (2026-09-28):** na razie pobieranie ADS-B i zadanie cykliczne działają lokalnie, z sieci
+użytkownika, na adsb.fi (zapas adsb.lol). Wdrożenie na serwer jest odłożone (`## Parked` w roadmapie).
+
 ## Trasy (odpowiedź dla S-07)
 
 - Żadne ze źródeł z F-01 nie daje trasy w odpowiedzi `point`.
@@ -151,8 +177,8 @@ Zmiana `DEFAULT_ADSB_SOURCE` na adsb.lol (reguła zapasowa z planu) nic nie daje
 
 ## Wskazówki dla S-03
 
-- **Pobieranie musi iść spoza Cloudflare.** Z Workera oba źródła odmawiają. Dopóki Open Roadmap Question 10 nie
-  jest rozstrzygnięte, S-03 nie ma skąd pobierać danych.
+- **Pobieranie idzie lokalnie, z sieci użytkownika.** Z Workera oba źródła odmawiają; Open Roadmap Question 10
+  rozstrzygnięte 2026-09-28 na korzyść uruchamiania lokalnego.
 - Jedno zapytanie na użytkownika na bieg. Limit adsb.fi to 1 req/s, więc przy wielu użytkownikach zapytania idą
   sekwencyjnie albo łączą się w jedno większe koło.
 - Nie generować odpowiedzi 4xx (błędne URL-e, powtórki po odmowie). U adsb.fi grożą blokadą IP.
@@ -179,9 +205,8 @@ Zmiana `DEFAULT_ADSB_SOURCE` na adsb.lol (reguła zapasowa z planu) nic nie daje
 
 ## Co dalej
 
-- Pytanie o miejsce pobierania danych ADS-B idzie do `/10x-roadmap` (Open Roadmap Question 10). Blokuje S-03
-  i dotyczy F-02, którego cron jest zaplanowany na Workerach.
-- Kierunki do oceny, **nierozstrzygnięte**:
+- Open Roadmap Question 10 rozstrzygnięte 2026-09-28: F-02 i S-03 działają lokalnie, z sieci użytkownika.
+- Kierunki na wdrożenie produkcyjne, **odłożone** (`## Parked` w roadmapie):
   - mały poller poza Cloudflare, który zapisuje stan samolotów do Supabase, a Worker czyta go z bazy. Railway
     jest drugim wyborem w `context/foundation/infrastructure.md`, ale jego cron ma minimum 5 minut, więc poller
     co minutę byłby stale działającą usługą;
