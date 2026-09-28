@@ -442,14 +442,14 @@ Jeden wiersz na użytkownika i jedno zapytanie na widok albo zapis. `types_bound
 
 #### Automated
 
-- [x] 4.1 Dry-run pokazuje dokładnie jedną migrację
-- [x] 4.2 Migracja zastosowana: `npx supabase db push`
-- [x] 4.3 Deploy udany: `npm run build && npx wrangler deploy`
-- [x] 4.4 Produkcja: `/` zwraca `200`, a anonimowe `/settings` zwraca `302` → `/auth/signin`
+- [x] 4.1 Dry-run pokazuje dokładnie jedną migrację — 786e83a
+- [x] 4.2 Migracja zastosowana: `npx supabase db push` — 786e83a
+- [x] 4.3 Deploy udany: `npm run build && npx wrangler deploy` — 786e83a
+- [x] 4.4 Produkcja: `/` zwraca `200`, a anonimowe `/settings` zwraca `302` → `/auth/signin` — 786e83a
 
 #### Manual
 
-- [x] 4.5 Człowiek połączył projekt przez `npx supabase link`
-- [x] 4.6 SQL Editor: dwie polityki dla `{authenticated}`, liczba użytkowników równa liczbie wierszy ustawień
-- [x] 4.7 Na produkcji zapis ustawień i odczyt zaokrąglonych wartości po przeładowaniu
-- [x] 4.8 `context/deployment/deploy-plan.md` odnotowuje nową wersję i migrację
+- [x] 4.5 Człowiek połączył projekt przez `npx supabase link` — 786e83a
+- [x] 4.6 SQL Editor: dwie polityki dla `{authenticated}`, liczba użytkowników równa liczbie wierszy ustawień — 786e83a
+- [x] 4.7 Na produkcji zapis ustawień i odczyt zaokrąglonych wartości po przeładowaniu — 786e83a
+- [x] 4.8 `context/deployment/deploy-plan.md` odnotowuje nową wersję i migrację — 786e83a
