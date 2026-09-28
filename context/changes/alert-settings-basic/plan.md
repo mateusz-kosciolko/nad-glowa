@@ -415,28 +415,28 @@ Jeden wiersz na użytkownika i jedno zapytanie na widok albo zapis. `types_bound
 
 #### Automated
 
-- [x] 2.1 Lint i typecheck czyste: `npm run lint && npx astro sync && npx astro check`
-- [x] 2.2 Build przechodzi: `npm run build`
-- [x] 2.3 Anonimowy `POST /api/settings` na dev serwerze zwraca `302` na `/auth/signin`
+- [x] 2.1 Lint i typecheck czyste: `npm run lint && npx astro sync && npx astro check` — 2671c49
+- [x] 2.2 Build przechodzi: `npm run build` — 2671c49
+- [x] 2.3 Anonimowy `POST /api/settings` na dev serwerze zwraca `302` na `/auth/signin` — 2671c49
 
 #### Manual
 
-- [x] 2.4 Przegląd `src/lib/alert-settings.ts`: stałe zgadzają się z ograniczeniami w migracji
+- [x] 2.4 Przegląd `src/lib/alert-settings.ts`: stałe zgadzają się z ograniczeniami w migracji — 2671c49
 
 ### Phase 3: Ekran `/settings`
 
 #### Automated
 
-- [ ] 3.1 Lint, typecheck i build czyste
-- [ ] 3.2 Smoke przechodzi w całości, łącznie z nowymi krokami ustawień
+- [x] 3.1 Lint, typecheck i build czyste
+- [x] 3.2 Smoke przechodzi w całości, łącznie z nowymi krokami ustawień
 
 #### Manual
 
-- [ ] 3.3 Świeże konto na `/settings` widzi promień 30 i puste pola lokalizacji
-- [ ] 3.4 „Use my location” wypełnia pola wartościami z 2 miejscami po przecinku
-- [ ] 3.5 Zapis pokazuje potwierdzenie, a po przeładowaniu widać zaokrąglone współrzędne i znormalizowane kody
-- [ ] 3.6 Błędne dane pokazują błąd bez wysyłki formularza
-- [ ] 3.7 Dashboard ma działający link do `/settings`
+- [x] 3.3 Świeże konto na `/settings` widzi promień 30 i puste pola lokalizacji
+- [x] 3.4 „Use my location” wypełnia pola wartościami z 2 miejscami po przecinku
+- [x] 3.5 Zapis pokazuje potwierdzenie, a po przeładowaniu widać zaokrąglone współrzędne i znormalizowane kody
+- [x] 3.6 Błędne dane pokazują błąd bez wysyłki formularza
+- [x] 3.7 Dashboard ma działający link do `/settings`
 
 ### Phase 4: Produkcja
 

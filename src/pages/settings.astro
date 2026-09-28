@@ -1,0 +1,62 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import AlertSettingsForm from "@/components/settings/AlertSettingsForm";
+import type { AlertSettingsInput } from "@/lib/alert-settings";
+import { createClient } from "@/lib/supabase";
+
+// The middleware redirects anonymous users, so `user` is set here.
+const { user } = Astro.locals;
+const serverError = Astro.url.searchParams.get("error");
+const saved = Astro.url.searchParams.get("saved") === "1";
+
+let initial: AlertSettingsInput | null = null;
+let loadError: string | null = null;
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+if (!user) {
+  loadError = "You need to sign in to see your settings.";
+} else if (!supabase) {
+  loadError = "Supabase is not configured, so your settings cannot be loaded.";
+} else {
+  const { data, error } = await supabase
+    .from("alert_settings")
+    .select("home_lat, home_lon, radius_km, aircraft_types")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (error) {
+    loadError = `Could not load your settings: ${error.message}`;
+  } else if (!data) {
+    // The row is created by the signup trigger (or the migration backfill); none means that step failed.
+    loadError = "Your settings record is missing. Please contact support.";
+  } else {
+    initial = {
+      home_lat: data.home_lat,
+      home_lon: data.home_lon,
+      radius_km: data.radius_km,
+      aircraft_types: data.aircraft_types.filter((code): code is string => typeof code === "string"),
+    };
+  }
+}
+---
+
+<Layout title="Alert settings">
+  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
+    <div class="w-full max-w-md rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+      <h1 class="mb-2 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-center text-2xl font-bold text-transparent">
+        Alert settings
+      </h1>
+      <p class="mb-6 text-center text-sm text-blue-100/60">Where to watch and which aircraft to alert you about.</p>
+      {initial ? (
+        <AlertSettingsForm initial={initial} serverError={serverError} saved={saved} client:load />
+      ) : (
+        <p class="rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">{loadError}</p>
+      )}
+      <p class="mt-4 text-center text-sm text-blue-100/60">
+        <a href="/dashboard" class="text-purple-300 hover:underline">
+          Back to dashboard
+        </a>
+      </p>
+    </div>
+  </div>
+</Layout>

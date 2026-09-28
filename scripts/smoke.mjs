@@ -32,12 +32,15 @@ async function request(path, { method = "GET", form } = {}) {
     body: form ? new URLSearchParams(form).toString() : undefined,
   });
   storeCookies(response);
-  return { status: response.status, location: response.headers.get("location") ?? "" };
+  return { status: response.status, location: response.headers.get("location") ?? "", body: await response.text() };
 }
+
+const settingsForm = { home_lat: "52.23456", home_lon: "21.01178", radius_km: "25", aircraft_types: "b744, a400 B744" };
 
 const steps = [
   ["home renders", () => request("/"), { status: 200 }],
   ["dashboard redirects anonymous user", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
+  ["settings redirects anonymous user", () => request("/settings"), { status: 302, location: "/auth/signin" }],
   [
     "signup creates account",
     () => request("/api/auth/signup", { method: "POST", form: { email, password } }),
@@ -54,20 +57,44 @@ const steps = [
     { status: 302, location: "/" },
   ],
   ["dashboard renders for signed-in user", () => request("/dashboard"), { status: 200 }],
+  ["settings renders for signed-in user", () => request("/settings"), { status: 200 }],
+  [
+    "settings save succeeds",
+    () => request("/api/settings", { method: "POST", form: settingsForm }),
+    { status: 302, location: "/settings?saved=1" },
+  ],
+  [
+    "settings page shows saved values",
+    () => request("/settings"),
+    { status: 200, bodyIncludes: ["52.23", "21.01", "B744, A400"] },
+  ],
+  [
+    "settings save rejects radius 0",
+    () => request("/api/settings", { method: "POST", form: { ...settingsForm, radius_km: "0" } }),
+    { status: 302, location: "/settings?error=" },
+  ],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
+  [
+    "settings save redirects after signout",
+    () => request("/api/settings", { method: "POST", form: settingsForm }),
+    { status: 302, location: "/auth/signin" },
+  ],
 ];
 
 let failed = 0;
 for (const [name, run, expected] of steps) {
   const actual = await run();
+  const missing = (expected.bodyIncludes ?? []).filter((text) => !actual.body.includes(text));
   const ok =
     actual.status === expected.status &&
-    (expected.location === undefined || actual.location.startsWith(expected.location));
+    (expected.location === undefined || actual.location.startsWith(expected.location)) &&
+    missing.length === 0;
   console.log(`${ok ? "PASS" : "FAIL"}  ${name}  -> ${actual.status} ${actual.location}`);
   if (!ok) {
     failed++;
     console.log(`      expected ${expected.status} ${expected.location ?? ""}`);
+    if (missing.length) console.log(`      body missing: ${missing.map((text) => JSON.stringify(text)).join(", ")}`);
   }
 }
 
