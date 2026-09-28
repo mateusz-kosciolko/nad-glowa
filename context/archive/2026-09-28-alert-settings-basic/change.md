@@ -1,10 +1,10 @@
 ---
 change_id: alert-settings-basic
 title: Alert settings basic
-status: implemented
+status: archived
 created: 2026-09-28
 updated: 2026-09-28
-archived_at: null
+archived_at: 2026-09-28T10:32:29Z
 ---
 
 ## Notes
