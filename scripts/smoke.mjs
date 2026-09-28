@@ -41,6 +41,8 @@ const steps = [
   ["home renders", () => request("/"), { status: 200 }],
   ["dashboard redirects anonymous user", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
   ["settings redirects anonymous user", () => request("/settings"), { status: 302, location: "/auth/signin" }],
+  // No signed-in probe step: in CI it would depend on adsb.fi being up.
+  ["adsb probe redirects anonymous user", () => request("/api/adsb/probe"), { status: 302, location: "/auth/signin" }],
   [
     "signup creates account",
     () => request("/api/auth/signup", { method: "POST", form: { email, password } }),

@@ -2,12 +2,15 @@
 import "../styles/global.css";
 import Banner from "@/components/Banner.astro";
 import { missingConfigs } from "@/lib/config-status";
+import { ADSB_SOURCES, DEFAULT_ADSB_SOURCE } from "@/lib/adsb";
 
 interface Props {
   title?: string;
 }
 
 const { title = "10x Astro Starter" } = Astro.props;
+// adsb.fi's terms require crediting the source with a link to its site wherever its data is used.
+const adsbSource = ADSB_SOURCES[DEFAULT_ADSB_SOURCE];
 ---
 
 <!doctype html>
@@ -34,6 +37,12 @@ const { title = "10x Astro Starter" } = Astro.props;
       </Banner>
     ))}
     <slot />
+    <footer class="bg-[#0a0e1a] px-4 py-3 text-center text-xs text-blue-100/60">
+      Aircraft data:{" "}
+      <a href={adsbSource.homepage} target="_blank" rel="noopener noreferrer" class="text-purple-300 hover:underline">
+        {adsbSource.label}
+      </a>
+    </footer>
   </body>
 </html>
 

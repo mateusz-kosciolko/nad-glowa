@@ -346,26 +346,26 @@ Brak zmian w bazie. Rollback Workera (`wrangler rollback`) usuwa sondę i stopk�
 
 #### Automated
 
-- [x] 1.1 Lint przechodzi z nowym skryptem: `npm run lint`
-- [x] 1.2 Krótki przebieg pomiaru kończy się kodem 0 i wypisuje tabelę dla obu źródeł: `SAMPLES=1 ROUTE_LOOKUPS=3 npm run adsb:measure`
+- [x] 1.1 Lint przechodzi z nowym skryptem: `npm run lint` — dfd6df3
+- [x] 1.2 Krótki przebieg pomiaru kończy się kodem 0 i wypisuje tabelę dla obu źródeł: `SAMPLES=1 ROUTE_LOOKUPS=3 npm run adsb:measure` — dfd6df3
 
 #### Manual
 
-- [x] 1.3 Pełny pomiar zapisany w `measurement.md`, a adsb.fi spełnia próg łącznie ze wszystkich próbek (`t` ≥ 90% samolotów w powietrzu, ≥ 95% zgodnych ze wzorcem)
+- [x] 1.3 Pełny pomiar zapisany w `measurement.md`, a adsb.fi spełnia próg łącznie ze wszystkich próbek (`t` ≥ 90% samolotów w powietrzu, ≥ 95% zgodnych ze wzorcem) — dfd6df3
 
 ### Phase 2: Klient ADS-B i sonda diagnostyczna
 
 #### Automated
 
-- [ ] 2.1 Lint przechodzi: `npm run lint`
-- [ ] 2.2 Typy przechodzą: `npx astro sync && npx astro check`
-- [ ] 2.3 Build przechodzi: `npm run build`
-- [ ] 2.4 Smoke przechodzi z nowym krokiem przeciwko lokalnemu serwerowi z lokalną Supabase: `npm run smoke`
+- [x] 2.1 Lint przechodzi: `npm run lint`
+- [x] 2.2 Typy przechodzą: `npx astro sync && npx astro check`
+- [x] 2.3 Build przechodzi: `npm run build`
+- [x] 2.4 Smoke przechodzi z nowym krokiem przeciwko lokalnemu serwerowi z lokalną Supabase: `npm run smoke`
 
 #### Manual
 
-- [ ] 2.5 Lokalnie sonda zwraca `ok: true` i `total > 0` dla adsb.fi i adsb.lol, bez współrzędnych
-- [ ] 2.6 Stopka z linkiem do adsb.fi widoczna na `/` i `/settings`
+- [x] 2.5 Lokalnie sonda zwraca `ok: true` i `total > 0` dla adsb.fi i adsb.lol, bez współrzędnych
+- [x] 2.6 Stopka z linkiem do adsb.fi widoczna na `/` i `/settings`
 
 ### Phase 3: Produkcja i dokument decyzji
 
