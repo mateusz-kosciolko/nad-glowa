@@ -356,31 +356,31 @@ zadanie nie działa na produkcji.
 
 #### Automated
 
-- [x] 1.1 Próbka importu supabase-admin odrzucona przez ESLint, po skasowaniu npm run lint przechodzi
-- [x] 1.2 npx astro sync && npx astro check oraz npm run build przechodzą
-- [x] 1.3 curl na /cdn-cgi/handler/scheduled zwraca 200 i konsola dev loguje bieg
-- [x] 1.4 npm run smoke przechodzi na npm run dev
-- [x] 1.7 npm run build, npm run preview i npm run smoke przechodzą jak w CI
+- [x] 1.1 Próbka importu supabase-admin odrzucona przez ESLint, po skasowaniu npm run lint przechodzi — a52d71d
+- [x] 1.2 npx astro sync && npx astro check oraz npm run build przechodzą — a52d71d
+- [x] 1.3 curl na /cdn-cgi/handler/scheduled zwraca 200 i konsola dev loguje bieg — a52d71d
+- [x] 1.4 npm run smoke przechodzi na npm run dev — a52d71d
+- [x] 1.7 npm run build, npm run preview i npm run smoke przechodzą jak w CI — a52d71d
 
 #### Manual
 
-- [x] 1.5 worker-configuration.d.ts zawiera tylko nazwy sekretów, bez wartości
-- [x] 1.6 Strony /, /auth/signin, /dashboard i /settings działają jak przed zmianą
+- [x] 1.5 worker-configuration.d.ts zawiera tylko nazwy sekretów, bez wartości — a52d71d
+- [x] 1.6 Strony /, /auth/signin, /dashboard i /settings działają jak przed zmianą — a52d71d
 
 ### Phase 2: Ślad biegów i lokalny zegar
 
 #### Automated
 
-- [ ] 2.1 npx supabase migration up stosuje migrację bez resetu danych
-- [ ] 2.2 npm run test:db przechodzi z cron_runs_rls.sql
-- [ ] 2.3 npm run db:types, npm run lint, astro check i npm run build przechodzą
+- [x] 2.1 npx supabase migration up stosuje migrację bez resetu danych
+- [x] 2.2 npm run test:db przechodzi z cron_runs_rls.sql
+- [x] 2.3 npm run db:types, npm run lint, astro check i npm run build przechodzą
 
 #### Manual
 
-- [ ] 2.4 Przez 3 minuty z cron:local przybywa jeden wiersz ok na minutę
-- [ ] 2.5 Po zatrzymaniu dev cron:local loguje błąd i działa dalej, po starcie biegi wracają
-- [ ] 2.6 Bez SUPABASE_SERVICE_KEY bieg loguje ostrzeżenie i nie przerywa dev
-- [ ] 2.7 Wiersz sprzed 8 dni znika po następnym biegu
+- [x] 2.4 Przez 3 minuty z cron:local przybywa jeden wiersz ok na minutę
+- [x] 2.5 Po zatrzymaniu dev cron:local loguje błąd i działa dalej, po starcie biegi wracają
+- [x] 2.6 Bez SUPABASE_SERVICE_KEY bieg loguje ostrzeżenie i nie przerywa dev
+- [x] 2.7 Wiersz sprzed 8 dni znika po następnym biegu
 
 ### Phase 3: Widoczność na dashboardzie i dokumentacja
 

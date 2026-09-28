@@ -64,6 +64,30 @@ export type Database = {
         }
         Relationships: []
       }
+      cron_runs: {
+        Row: {
+          duration_ms: number
+          error: string | null
+          id: number
+          started_at: string
+          status: string
+        }
+        Insert: {
+          duration_ms: number
+          error?: string | null
+          id?: never
+          started_at: string
+          status: string
+        }
+        Update: {
+          duration_ms?: number
+          error?: string | null
+          id?: never
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

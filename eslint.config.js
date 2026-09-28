@@ -80,6 +80,7 @@ const scriptsConfig = defineConfig({
       fetch: true,
       URLSearchParams: true,
       setTimeout: true,
+      setInterval: true,
       AbortSignal: true,
       performance: true,
     },

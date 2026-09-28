@@ -12,6 +12,7 @@
     "format": "prettier --write .",
     "smoke": "node scripts/smoke.mjs",
     "adsb:measure": "node scripts/adsb-measure.mjs",
+    "cron:local": "node scripts/cron-local.mjs",
     "test:db": "supabase test db",
     "db:types": "supabase gen types typescript --local > src/db/database.types.ts",
     "cf:types": "wrangler types"
