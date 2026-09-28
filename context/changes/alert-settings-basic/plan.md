@@ -401,27 +401,27 @@ Jeden wiersz na użytkownika i jedno zapytanie na widok albo zapis. `types_bound
 
 #### Automated
 
-- [x] 1.1 Migracja stosuje się bez błędów: `npx supabase db reset`
-- [x] 1.2 Wszystkie 12 asercji pgTAP przechodzi: `npm run test:db`
-- [x] 1.3 Typy wygenerowane i zawierają tabelę: `npm run db:types && grep -q alert_settings src/db/database.types.ts`
-- [x] 1.4 Krok testów bazy jest w CI: `grep -q "supabase test db" .github/workflows/ci.yml`
-- [x] 1.5 Lint i typecheck czyste: `npm run lint && npx astro sync && npx astro check`
+- [x] 1.1 Migracja stosuje się bez błędów: `npx supabase db reset` — 8ca088d
+- [x] 1.2 Wszystkie 12 asercji pgTAP przechodzi: `npm run test:db` — 8ca088d
+- [x] 1.3 Typy wygenerowane i zawierają tabelę: `npm run db:types && grep -q alert_settings src/db/database.types.ts` — 8ca088d
+- [x] 1.4 Krok testów bazy jest w CI: `grep -q "supabase test db" .github/workflows/ci.yml` — 8ca088d
+- [x] 1.5 Lint i typecheck czyste: `npm run lint && npx astro sync && npx astro check` — 8ca088d
 
 #### Manual
 
-- [x] 1.6 Spec zawiera akapit o backfillu i wynik weryfikacji domeny na tablicy
+- [x] 1.6 Spec zawiera akapit o backfillu i wynik weryfikacji domeny na tablicy — 8ca088d
 
 ### Phase 2: Zapis ustawień (backend)
 
 #### Automated
 
-- [ ] 2.1 Lint i typecheck czyste: `npm run lint && npx astro sync && npx astro check`
-- [ ] 2.2 Build przechodzi: `npm run build`
-- [ ] 2.3 Anonimowy `POST /api/settings` na dev serwerze zwraca `302` na `/auth/signin`
+- [x] 2.1 Lint i typecheck czyste: `npm run lint && npx astro sync && npx astro check`
+- [x] 2.2 Build przechodzi: `npm run build`
+- [x] 2.3 Anonimowy `POST /api/settings` na dev serwerze zwraca `302` na `/auth/signin`
 
 #### Manual
 
-- [ ] 2.4 Przegląd `src/lib/alert-settings.ts`: stałe zgadzają się z ograniczeniami w migracji
+- [x] 2.4 Przegląd `src/lib/alert-settings.ts`: stałe zgadzają się z ograniczeniami w migracji
 
 ### Phase 3: Ekran `/settings`
 
