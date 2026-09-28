@@ -59,8 +59,8 @@ export const GET: APIRoute = async (context) => {
 
   const result = await fetchAircraftNear({ lat, lon, radiusKm }, source);
   if (!result.ok) {
-    const { ok, httpStatus, durationMs, error: fetchError } = result;
-    return json(502, { source, ok, httpStatus, durationMs, error: fetchError });
+    const { ok, httpStatus, durationMs, error: fetchError, upstream } = result;
+    return json(502, { source, ok, httpStatus, durationMs, error: fetchError, upstream });
   }
 
   const { ok, httpStatus, durationMs, skipped, aircraft } = result;

@@ -4,8 +4,8 @@ deployed_at: 2026-09-28
 platform: Cloudflare Workers (Static Assets)
 worker_name: nad-glowa
 production_url: https://nad-glowa.mateusz-kosciolko-321.workers.dev
-version_id: 32455abe-e7eb-4c06-8587-09c98ca5612d
-status: deployed-and-verified
+version_id: 67f7e569-9798-4a5b-b236-e448d39db000
+status: deployed-probe-blocked
 ---
 
 # Deploy plan — pierwsze wdrożenie na produkcję
@@ -26,15 +26,23 @@ z endpointem `POST /api/settings` i linkiem z `/dashboard`. `PROTECTED_ROUTES`: 
 (polityki select + update dla `authenticated`; insert/delete brak, odebrane też na poziomie grantów), trigger
 `on_auth_user_created` → `public.handle_new_user()` (security definer) oraz backfill istniejących kont.
 
+2026-09-28 — zmiana `adsb-source-verified`: klient ADS-B `src/lib/adsb.ts` (adsb.fi domyślnie, adsb.lol jako
+zapas) i chroniona sonda diagnostyczna `GET /api/adsb/probe` (JSON bez współrzędnych, parametr `?source=adsb.lol`).
+`PROTECTED_ROUTES` poszerzone o `/api/adsb`. Stopka „Aircraft data: adsb.fi” z linkiem do `https://adsb.fi`
+na każdej stronie (warunek atrybucji adsb.fi). Pierwsze wdrożenie: `f3e7fff6-…`. Drugie, diagnostyczne:
+`67f7e569-…` — błąd sondy dla odpowiedzi innych niż 2xx zawiera `upstream: { server, cfRay, retryAfter, bodyStart }`.
+Bez zmian w bazie.
+
 **Brak logiki alertów** — poller ADS-B i predykcja przelotu jeszcze nie istnieją; ustawienia są zapisywane,
-ale nic ich jeszcze nie czyta.
+ale nic ich jeszcze nie czyta. Oba źródła ADS-B odmawiają żądań z produkcyjnego Workera
+(`context/foundation/adsb-source.md`).
 
 |                     |                                                                    |
 | ------------------- | ------------------------------------------------------------------ |
 | Platforma           | Cloudflare Workers with Static Assets (**nie** Pages)              |
 | Nazwa Workera       | `nad-glowa`                                                        |
 | URL produkcyjny     | https://nad-glowa.mateusz-kosciolko-321.workers.dev                |
-| Aktywny Version ID  | `32455abe-e7eb-4c06-8587-09c98ca5612d`                             |
+| Aktywny Version ID  | `67f7e569-9798-4a5b-b236-e448d39db000`                             |
 | Konto Cloudflare    | `mateusz.kosciolko@gmail.com` (`321276ecf944b4a3f73a126d4bbaa3b0`) |
 | Plan Cloudflare     | Free                                                               |
 | Projekt Supabase    | `nwphfexokrngshgmhucf`, region EU                                  |
@@ -74,9 +82,11 @@ npx wrangler deployments list                  # historia
 ```
 
 Poniżej minuty, bez rebuildu — wersje są niezmiennymi uploadami. Aktywna jest
-`32455abe-e7eb-4c06-8587-09c98ca5612d` (2026-09-28, `/settings`); poprzednia sprawna wersja to
-`146f9abe-61c7-42b3-a3a7-98fd104e45fd` (scaffold z wyłączonymi Preview URLs). Wcześniejsza:
-`99a7916d-2871-4dc9-85fe-f80f13c5d9c9` (pierwsze wdrożenie, jeszcze z włączonymi Preview URLs).
+`67f7e569-9798-4a5b-b236-e448d39db000` (2026-09-28, sonda ADS-B z diagnostyką `upstream` + stopka). Poprzednie:
+`f3e7fff6-07a7-43f6-aadd-5a84afd8a9ac` (2026-09-28, sonda bez diagnostyki + stopka),
+`32455abe-e7eb-4c06-8587-09c98ca5612d` (2026-09-28, `/settings`), `146f9abe-61c7-42b3-a3a7-98fd104e45fd`
+(scaffold z wyłączonymi Preview URLs). Wcześniejsza: `99a7916d-2871-4dc9-85fe-f80f13c5d9c9` (pierwsze wdrożenie,
+jeszcze z włączonymi Preview URLs). Rollback do `32455abe-…` usuwa sondę i stopkę bez skutków ubocznych.
 
 **Czego rollback NIE cofa**: migracji Supabase ani wysłanych powiadomień. Migracje pisz addytywnie —
 destrukcyjne dopiero wtedy, gdy Worker już nie odwołuje się do kolumny. Po rollbacku do `146f9abe-…`
@@ -113,17 +123,23 @@ czyli `@supabase/ssr` przechodzi na workerd pełny round-trip cookies, nie tylko
 Wynik z 2026-09-28 (wersja `32455abe-…`): `/` → 200, `/settings` (anonim) → 302 na `/auth/signin`,
 `POST /api/settings` (anonim) → 302 na `/auth/signin`, baner „Supabase nie jest skonfigurowany" nieobecny.
 
+Wynik z 2026-09-28 (wersje `f3e7fff6-…` i `67f7e569-…`): `/api/adsb/probe` (anonim) → 302 na `/auth/signin`,
+`/` → 200, stopka „Aircraft data: adsb.fi” z linkiem obecna w HTML. Sonda wywołana przez zalogowanego użytkownika
+**nie przeszła**: adsb.fi → 502 z `httpStatus: 403` (strona blokady Cloudflare, 5–10 ms), adsb.lol → 502
+z `httpStatus: 429` (limit nginx źródła, ~120–160 ms), powtarzalnie w obu wersjach. Z sieci lokalnej ten sam kod
+dostaje 200 z obu źródeł. Dowody i interpretacja: `context/foundation/adsb-source.md` („Dostępność z produkcji”).
+
 **Nie uruchamiaj `npm run smoke` przeciwko produkcji.** Skrypt rejestruje prawdziwe konto
 `smoke-<timestamp>@example.com` i zakłada wyłączone potwierdzanie e-maila. Smoke zostaje testem
 lokalnym i CI-owym przeciwko lokalnej Supabase.
 
 ## Czego NIE wdrożono
 
-| Element                                        | Dlaczego nie teraz                                                                                                                                                                                                                      |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cron Trigger `* * * * *` + handler `scheduled` | W repo nie ma jeszcze pollera ADS-B. Cron bez handlera to błąd co minutę. Wejdzie razem z logiką alertów — **wtedy wymagany Workers Paid $5/mo**, bo free capuje crony na 10 ms CPU                                                     |
-| Auto-deploy z GitHub Actions                   | Repo nie ma remote'a. Wymaga repozytorium GitHub i scoped `CLOUDFLARE_API_TOKEN` (Workers Scripts:Edit tylko dla tego projektu, bez DNS i bez rozliczeń)                                                                                |
-| ~~Publiczne Preview URLs~~                     | **Zamknięte 2026-09-23**: `"preview_urls": false` w `wrangler.jsonc`. Worker wystawia wyłącznie trasę workers.dev. Konsekwencja: weryfikacja przed promocją odbywa się lokalnie, nie przez publiczny URL wersji                         |
-| ~~Migracje Supabase / RLS~~                    | **Częściowo zamknięte 2026-09-28**: `alert_settings` z RLS na produkcji; pozostają tabele powiadomień (FR-009/FR-010) i logu obserwacji (FR-011). RLS jest warunkiem koniecznym dla każdej nowej tabeli, bo klucz `anon` jest publiczny |
-| `site` w `astro.config.mjs`                    | Build ostrzega, że integracja sitemap jest pomijana. Uzupełnić produkcyjnym URL-em                                                                                                                                                      |
-| Własna domena                                  | Na starcie `*.workers.dev`                                                                                                                                                                                                              |
+| Element                                        | Dlaczego nie teraz                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cron Trigger `* * * * *` + handler `scheduled` | W repo nie ma jeszcze pollera ADS-B. Cron bez handlera to błąd co minutę. Wejdzie razem z logiką alertów — **wtedy wymagany Workers Paid $5/mo**, bo free capuje crony na 10 ms CPU. **Od 2026-09-28 otwarte, gdzie działa poller ADS-B**: oba źródła (adsb.fi 403, adsb.lol 429) odmawiają żądań z Workerów (`context/foundation/adsb-source.md`, Open Roadmap Question 10) |
+| Auto-deploy z GitHub Actions                   | Repo nie ma remote'a. Wymaga repozytorium GitHub i scoped `CLOUDFLARE_API_TOKEN` (Workers Scripts:Edit tylko dla tego projektu, bez DNS i bez rozliczeń)                                                                                                                                                                                                                     |
+| ~~Publiczne Preview URLs~~                     | **Zamknięte 2026-09-23**: `"preview_urls": false` w `wrangler.jsonc`. Worker wystawia wyłącznie trasę workers.dev. Konsekwencja: weryfikacja przed promocją odbywa się lokalnie, nie przez publiczny URL wersji                                                                                                                                                              |
+| ~~Migracje Supabase / RLS~~                    | **Częściowo zamknięte 2026-09-28**: `alert_settings` z RLS na produkcji; pozostają tabele powiadomień (FR-009/FR-010) i logu obserwacji (FR-011). RLS jest warunkiem koniecznym dla każdej nowej tabeli, bo klucz `anon` jest publiczny                                                                                                                                      |
+| `site` w `astro.config.mjs`                    | Build ostrzega, że integracja sitemap jest pomijana. Uzupełnić produkcyjnym URL-em                                                                                                                                                                                                                                                                                           |
+| Własna domena                                  | Na starcie `*.workers.dev`                                                                                                                                                                                                                                                                                                                                                   |

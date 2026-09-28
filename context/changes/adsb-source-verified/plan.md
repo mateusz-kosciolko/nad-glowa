@@ -357,24 +357,24 @@ Brak zmian w bazie. Rollback Workera (`wrangler rollback`) usuwa sondę i stopk�
 
 #### Automated
 
-- [x] 2.1 Lint przechodzi: `npm run lint`
-- [x] 2.2 Typy przechodzą: `npx astro sync && npx astro check`
-- [x] 2.3 Build przechodzi: `npm run build`
-- [x] 2.4 Smoke przechodzi z nowym krokiem przeciwko lokalnemu serwerowi z lokalną Supabase: `npm run smoke`
+- [x] 2.1 Lint przechodzi: `npm run lint` — 9668063
+- [x] 2.2 Typy przechodzą: `npx astro sync && npx astro check` — 9668063
+- [x] 2.3 Build przechodzi: `npm run build` — 9668063
+- [x] 2.4 Smoke przechodzi z nowym krokiem przeciwko lokalnemu serwerowi z lokalną Supabase: `npm run smoke` — 9668063
 
 #### Manual
 
-- [x] 2.5 Lokalnie sonda zwraca `ok: true` i `total > 0` dla adsb.fi i adsb.lol, bez współrzędnych
-- [x] 2.6 Stopka z linkiem do adsb.fi widoczna na `/` i `/settings`
+- [x] 2.5 Lokalnie sonda zwraca `ok: true` i `total > 0` dla adsb.fi i adsb.lol, bez współrzędnych — 9668063
+- [x] 2.6 Stopka z linkiem do adsb.fi widoczna na `/` i `/settings` — 9668063
 
 ### Phase 3: Produkcja i dokument decyzji
 
 #### Automated
 
-- [ ] 3.1 Wdrożenie przechodzi: `npm run build && npx wrangler deploy`
-- [ ] 3.2 Produkcja: anonim dostaje 302 na `/auth/signin` z `/api/adsb/probe`, a `/` zwraca 200
+- [x] 3.1 Wdrożenie przechodzi: `npm run build && npx wrangler deploy`
+- [x] 3.2 Produkcja: anonim dostaje 302 na `/auth/signin` z `/api/adsb/probe`, a `/` zwraca 200
 
 #### Manual
 
 - [ ] 3.3 Na produkcji sonda zwraca `ok: true` i `total > 0` dla adsb.fi i adsb.lol
-- [ ] 3.4 `adsb-source.md`, `deploy-plan.md` i roadmapa zaktualizowane, decyzja zaakceptowana
+- [x] 3.4 `adsb-source.md`, `deploy-plan.md` i roadmapa zaktualizowane, decyzja zaakceptowana

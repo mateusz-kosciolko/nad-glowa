@@ -52,7 +52,24 @@ export type AdsbFetchResult =
       aircraft: AircraftState[];
       skipped: number;
     }
-  | { ok: false; source: AdsbSourceId; httpStatus: number | null; durationMs: number; error: string };
+  | {
+      ok: false;
+      source: AdsbSourceId;
+      httpStatus: number | null;
+      durationMs: number;
+      error: string;
+      // Only for non-2xx answers: enough to tell a deliberate block (e.g. an edge rule) from a rate limit.
+      upstream?: UpstreamDiagnostics;
+    };
+
+export interface UpstreamDiagnostics {
+  server: string | null;
+  cfRay: string | null;
+  retryAfter: string | null;
+  bodyStart: string;
+}
+
+const DIAGNOSTIC_BODY_CHARS = 200;
 
 export interface AircraftSummary {
   total: number;
@@ -153,12 +170,13 @@ export async function fetchAircraftNear(
 ): Promise<AdsbFetchResult> {
   const url = ADSB_SOURCES[source].pointUrl(query.lat, query.lon, kmToNm(query.radiusKm));
   const startedAt = Date.now();
-  const failure = (httpStatus: number | null, error: string): AdsbFetchResult => ({
+  const failure = (httpStatus: number | null, error: string, upstream?: UpstreamDiagnostics): AdsbFetchResult => ({
     ok: false,
     source,
     httpStatus,
     durationMs: Date.now() - startedAt,
     error,
+    ...(upstream && { upstream }),
   });
 
   let response: Response;
@@ -172,7 +190,18 @@ export async function fetchAircraftNear(
   }
 
   if (!response.ok) {
-    return failure(response.status, `${source} responded with HTTP ${response.status}`);
+    let bodyStart = "";
+    try {
+      bodyStart = (await response.text()).slice(0, DIAGNOSTIC_BODY_CHARS);
+    } catch {
+      // The status alone is still worth reporting.
+    }
+    return failure(response.status, `${source} responded with HTTP ${response.status}`, {
+      server: response.headers.get("server"),
+      cfRay: response.headers.get("cf-ray"),
+      retryAfter: response.headers.get("retry-after"),
+      bodyStart,
+    });
   }
 
   let body: unknown;

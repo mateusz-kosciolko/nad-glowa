@@ -85,7 +85,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Parallel with:** F-02, S-01, S-02
 - **Blockers:** —
 - **Unknowns:**
-  - Czy źródło podaje też trasę (skąd/dokąd)? — Owner: user. Block: no. Odpowiedź przesądza, czy S-07 potrzebuje drugiego źródła.
+  - Czy źródło podaje też trasę (skąd/dokąd)? — Owner: user. Block: no. Odpowiedź przesądza, czy S-07 potrzebuje drugiego źródła. **Odpowiedź (2026-09-28):** nie. adsb.lol `routeset` zwraca 201 z pustym ciałem, więc się nie nadaje. adsbdb (wyszukiwanie po znaku wywoławczym) dało trasę dla 37/60 (61,7%), średnio 42 ms. S-07 potrzebuje adsbdb jako drugiego źródła → `context/foundation/adsb-source.md`.
 - **Risk:** Stoi na początku, bo bez typu samolotu w danych reguła biznesowa w ogóle nie działa. Jeśli żadne darmowe źródło tego nie daje, cały kamień milowy wymaga rewizji PRD, a lepiej to wiedzieć, zanim powstanie reszta.
 - **Status:** in-progress
 
@@ -138,7 +138,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **PRD refs:** US-01, FR-009, NFR (< 60 s)
 - **Prerequisites:** F-01, F-02, S-02
 - **Parallel with:** S-01, S-06
-- **Blockers:** —
+- **Blockers:** Miejsce pobierania danych ADS-B (Open Roadmap Question 10) — oba darmowe źródła odmawiają żądań z Cloudflare Workers (`context/foundation/adsb-source.md`).
 - **Unknowns:**
   - Kanał powiadomień: Telegram czy e-mail (Open Roadmap Question 3)? — Owner: user. Block: yes. `infrastructure.md` wskazuje Telegram (jedno wywołanie HTTPS; środowisko nie ma SMTP).
 - **Risk:** Bez S-04 ta sama maszyna może wywoływać alert przy każdym biegu zadania, więc S-03 służy do walidacji, a nie do codziennego używania. S-04 musi wejść zaraz po nim.
@@ -191,7 +191,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Parallel with:** S-01, S-04, S-05, S-06
 - **Blockers:** —
 - **Unknowns:**
-  - Czy trasę daje źródło z F-01, czy potrzebne jest osobne źródło wyszukujące po znaku wywoławczym? — Owner: user. Block: no. Rozstrzyga się przy F-01.
+  - Czy trasę daje źródło z F-01, czy potrzebne jest osobne źródło wyszukujące po znaku wywoławczym? — Owner: user. Block: no. Rozstrzyga się przy F-01. **Odpowiedź (2026-09-28):** potrzebne jest osobne źródło. adsb.lol `routeset` zwraca 201 z pustym ciałem. adsbdb dało trasę dla 37/60 znaków wywoławczych (61,7%), średnio 42 ms. Dostępność adsbdb z Cloudflare Workers nie była testowana → `context/foundation/adsb-source.md`.
 - **Risk:** Wydzielone z S-03, bo PRD dopuszcza „trasa nieznana”, a osobne źródło trasy to druga zależność zewnętrzna; wpięcie go w pierwszy alert niepotrzebnie wydłużyłoby drogę do walidacji.
 - **Status:** proposed
 
@@ -212,7 +212,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 ## Open Roadmap Questions
 
 1. **Czy istniejące płatne alerty (Flightradar24 lub podobne) już rozwiązują ten problem?** — Owner: user. Block: roadmap-wide. PRD każe sprawdzić to przed budową; przy celu `speed` najtaniej zrobić to przed S-03.
-2. **Które darmowe publiczne źródło ADS-B podaje typ samolotu i flagę wojskową?** — Owner: user. Block: F-01 (rozstrzyga je), S-03, S-06.
+2. **Które darmowe publiczne źródło ADS-B podaje typ samolotu i flagę wojskową?** — Owner: user. Block: F-01 (rozstrzyga je), S-03, S-06. Jakość danych rozstrzygnięta przez F-01 → `context/foundation/adsb-source.md`: adsb.fi podstawowe, adsb.lol zapasowe, flaga wojskowa `dbFlags & 1`. Dostępność z Cloudflare Workers nie przeszła (adsb.fi 403, adsb.lol 429), zob. pytanie 10.
 3. **Kanał powiadomień: Telegram czy e-mail?** — Owner: user. Block: S-03.
 4. **Długość okna deduplikacji?** — Owner: user. Block: S-04.
 5. **Metoda logowania (e-mail + hasło, OAuth, magic link)?** — Owner: user. Block: — (S-01 zakłada utrzymanie działającego e-maila z hasłem).
@@ -220,6 +220,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 7. **Skala docelowa: wolumen zapytań i danych?** — Owner: user. Block: — (wpływa na budżet zapytań na jeden bieg zadania, ryzyko z `infrastructure.md`).
 8. **Czy dziennik obserwacji jest zapisywany w MVP, choć jego przeglądanie (FR-011) jest odłożone?** — Owner: user. Block: — w tym kamieniu milowym; od odpowiedzi zależy drugorzędne kryterium sukcesu.
 9. **Czy MVP ma zawierać kolekcję rekordów zarządzaną przez użytkownika?** — Owner: user. Block: — w tym kamieniu milowym (kandydaci FR-008, FR-011 są odłożeni).
+10. **Gdzie działa pobieranie danych ADS-B (poller), skoro oba darmowe źródła odmawiają żądań z Cloudflare Workers?** — Owner: user. Block: S-03; dotyczy też F-02, którego cron jest zaplanowany na Workerach. Z produkcji adsb.fi zwraca 403, a adsb.lol 429; z sieci lokalnej ten sam kod działa. Kierunki do oceny i dowody: `context/foundation/adsb-source.md`.
 
 ## Parked
 
