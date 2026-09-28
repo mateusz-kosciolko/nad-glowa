@@ -3,3 +3,4 @@
 CLAUDE.md
 AGENTS.md
 src/db/database.types.ts
+worker-configuration.d.ts

@@ -13,7 +13,8 @@
     "smoke": "node scripts/smoke.mjs",
     "adsb:measure": "node scripts/adsb-measure.mjs",
     "test:db": "supabase test db",
-    "db:types": "supabase gen types typescript --local > src/db/database.types.ts"
+    "db:types": "supabase gen types typescript --local > src/db/database.types.ts",
+    "cf:types": "wrangler types"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

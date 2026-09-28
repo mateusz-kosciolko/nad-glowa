@@ -5,8 +5,9 @@ Astro 7 SSR app (React 19 islands, Tailwind 4, shadcn/ui) with Supabase Auth, de
 ## Hard rules
 
 - Never write to `context/archive/`; archived changes are immutable.
-- Read `SUPABASE_URL` / `SUPABASE_KEY` only via `astro:env/server` (server-only secrets in @astro.config.mjs). Never import them into React components or client scripts.
+- Read `SUPABASE_URL` / `SUPABASE_KEY` / `SUPABASE_SERVICE_KEY` only via `astro:env/server` (server-only secrets in @astro.config.mjs). Never import them into React components or client scripts.
 - Create Supabase clients only with `createClient()` from @src/lib/supabase.ts and handle its `null` return (Supabase not configured), as in @src/pages/api/auth/signin.ts.
+- Klient z kluczem `service_role` (`createAdminClient()` z `src/lib/supabase-admin.ts`) omija RLS i wolno go użyć wyłącznie w handlerze `scheduled`, który nie ma sesji użytkownika. Reguła ESLint `no-restricted-imports` blokuje ten import wszędzie indziej — nie wyłączaj jej lokalnym komentarzem. Kod obsługujący żądania użytkownika zawsze używa klucza `anon` i polega na politykach RLS.
 - To require login for a page, add its path prefix to `PROTECTED_ROUTES` in @src/middleware.ts; the middleware sets `context.locals.user`.
 - `AGENTS.md` is a symlink to `CLAUDE.md`. Edit `CLAUDE.md`, and put project rules outside the `@przeprogramowani/10x-cli` BEGIN/END block, which the CLI manages.
 
