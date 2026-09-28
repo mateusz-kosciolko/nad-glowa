@@ -427,29 +427,29 @@ Jeden wiersz na użytkownika i jedno zapytanie na widok albo zapis. `types_bound
 
 #### Automated
 
-- [x] 3.1 Lint, typecheck i build czyste
-- [x] 3.2 Smoke przechodzi w całości, łącznie z nowymi krokami ustawień
+- [x] 3.1 Lint, typecheck i build czyste — 0c3fd04
+- [x] 3.2 Smoke przechodzi w całości, łącznie z nowymi krokami ustawień — 0c3fd04
 
 #### Manual
 
-- [x] 3.3 Świeże konto na `/settings` widzi promień 30 i puste pola lokalizacji
-- [x] 3.4 „Use my location” wypełnia pola wartościami z 2 miejscami po przecinku
-- [x] 3.5 Zapis pokazuje potwierdzenie, a po przeładowaniu widać zaokrąglone współrzędne i znormalizowane kody
-- [x] 3.6 Błędne dane pokazują błąd bez wysyłki formularza
-- [x] 3.7 Dashboard ma działający link do `/settings`
+- [x] 3.3 Świeże konto na `/settings` widzi promień 30 i puste pola lokalizacji — 0c3fd04
+- [x] 3.4 „Use my location” wypełnia pola wartościami z 2 miejscami po przecinku — 0c3fd04
+- [x] 3.5 Zapis pokazuje potwierdzenie, a po przeładowaniu widać zaokrąglone współrzędne i znormalizowane kody — 0c3fd04
+- [x] 3.6 Błędne dane pokazują błąd bez wysyłki formularza — 0c3fd04
+- [x] 3.7 Dashboard ma działający link do `/settings` — 0c3fd04
 
 ### Phase 4: Produkcja
 
 #### Automated
 
-- [ ] 4.1 Dry-run pokazuje dokładnie jedną migrację
-- [ ] 4.2 Migracja zastosowana: `npx supabase db push`
-- [ ] 4.3 Deploy udany: `npm run build && npx wrangler deploy`
-- [ ] 4.4 Produkcja: `/` zwraca `200`, a anonimowe `/settings` zwraca `302` → `/auth/signin`
+- [x] 4.1 Dry-run pokazuje dokładnie jedną migrację
+- [x] 4.2 Migracja zastosowana: `npx supabase db push`
+- [x] 4.3 Deploy udany: `npm run build && npx wrangler deploy`
+- [x] 4.4 Produkcja: `/` zwraca `200`, a anonimowe `/settings` zwraca `302` → `/auth/signin`
 
 #### Manual
 
-- [ ] 4.5 Człowiek połączył projekt przez `npx supabase link`
-- [ ] 4.6 SQL Editor: dwie polityki dla `{authenticated}`, liczba użytkowników równa liczbie wierszy ustawień
-- [ ] 4.7 Na produkcji zapis ustawień i odczyt zaokrąglonych wartości po przeładowaniu
-- [ ] 4.8 `context/deployment/deploy-plan.md` odnotowuje nową wersję i migrację
+- [x] 4.5 Człowiek połączył projekt przez `npx supabase link`
+- [x] 4.6 SQL Editor: dwie polityki dla `{authenticated}`, liczba użytkowników równa liczbie wierszy ustawień
+- [x] 4.7 Na produkcji zapis ustawień i odczyt zaokrąglonych wartości po przeładowaniu
+- [x] 4.8 `context/deployment/deploy-plan.md` odnotowuje nową wersję i migrację

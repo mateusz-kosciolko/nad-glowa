@@ -1,10 +1,10 @@
 ---
 project: nad-glowa
-deployed_at: 2026-09-23
+deployed_at: 2026-09-28
 platform: Cloudflare Workers (Static Assets)
 worker_name: nad-glowa
 production_url: https://nad-glowa.mateusz-kosciolko-321.workers.dev
-version_id: 146f9abe-61c7-42b3-a3a7-98fd104e45fd
+version_id: 32455abe-e7eb-4c06-8587-09c98ca5612d
 status: deployed-and-verified
 ---
 
@@ -15,16 +15,26 @@ Ograniczenia stacka: `context/foundation/tech-stack.md`.
 
 ## Co zostało wdrożone
 
-Aplikacja w stanie ze scaffoldu: strona główna, rejestracja/logowanie Supabase (`/auth/signin`,
+2026-09-23 — aplikacja w stanie ze scaffoldu: strona główna, rejestracja/logowanie Supabase (`/auth/signin`,
 `/auth/signup`, `/api/auth/*`), chroniony `/dashboard` z middleware ustawiającym `context.locals.user`.
-**Brak logiki alertów** — poller ADS-B i predykcja przelotu jeszcze nie istnieją.
+
+2026-09-28 — zmiana `alert-settings-basic`: chroniony ekran `/settings` (lokalizacja domowa lat/lon
+zaokrąglana przez `numeric(5,2)` do ~1 km, promień domyślnie 30 km, typy samolotów jako kody ICAO)
+z endpointem `POST /api/settings` i linkiem z `/dashboard`. `PROTECTED_ROUTES`: `/dashboard`, `/settings`,
+`/api/settings`. Na produkcyjnej Supabase migracja `supabase/migrations/20260928084032_alert_settings.sql`
+(`npx supabase db push`, `--dry-run` wcześniej pokazał tylko ten plik): tabela `public.alert_settings` z RLS
+(polityki select + update dla `authenticated`; insert/delete brak, odebrane też na poziomie grantów), trigger
+`on_auth_user_created` → `public.handle_new_user()` (security definer) oraz backfill istniejących kont.
+
+**Brak logiki alertów** — poller ADS-B i predykcja przelotu jeszcze nie istnieją; ustawienia są zapisywane,
+ale nic ich jeszcze nie czyta.
 
 |                     |                                                                    |
 | ------------------- | ------------------------------------------------------------------ |
 | Platforma           | Cloudflare Workers with Static Assets (**nie** Pages)              |
 | Nazwa Workera       | `nad-glowa`                                                        |
 | URL produkcyjny     | https://nad-glowa.mateusz-kosciolko-321.workers.dev                |
-| Aktywny Version ID  | `146f9abe-61c7-42b3-a3a7-98fd104e45fd`                             |
+| Aktywny Version ID  | `32455abe-e7eb-4c06-8587-09c98ca5612d`                             |
 | Konto Cloudflare    | `mateusz.kosciolko@gmail.com` (`321276ecf944b4a3f73a126d4bbaa3b0`) |
 | Plan Cloudflare     | Free                                                               |
 | Projekt Supabase    | `nwphfexokrngshgmhucf`, region EU                                  |
@@ -64,11 +74,13 @@ npx wrangler deployments list                  # historia
 ```
 
 Poniżej minuty, bez rebuildu — wersje są niezmiennymi uploadami. Aktywna jest
-`146f9abe-61c7-42b3-a3a7-98fd104e45fd`; poprzednia sprawna wersja to `99a7916d-2871-4dc9-85fe-f80f13c5d9c9`
-(pierwsze wdrożenie, jeszcze z włączonymi Preview URLs).
+`32455abe-e7eb-4c06-8587-09c98ca5612d` (2026-09-28, `/settings`); poprzednia sprawna wersja to
+`146f9abe-61c7-42b3-a3a7-98fd104e45fd` (scaffold z wyłączonymi Preview URLs). Wcześniejsza:
+`99a7916d-2871-4dc9-85fe-f80f13c5d9c9` (pierwsze wdrożenie, jeszcze z włączonymi Preview URLs).
 
 **Czego rollback NIE cofa**: migracji Supabase ani wysłanych powiadomień. Migracje pisz addytywnie —
-destrukcyjne dopiero wtedy, gdy Worker już nie odwołuje się do kolumny.
+destrukcyjne dopiero wtedy, gdy Worker już nie odwołuje się do kolumny. Po rollbacku do `146f9abe-…`
+tabela `alert_settings` (i trigger `on_auth_user_created`) zostaje w bazie, ale stary kod jej nie używa.
 
 ## Granica dostępu do produkcji
 
@@ -98,17 +110,20 @@ static assets → 200, baner „Supabase nie jest skonfigurowany" nieobecny, edg
 Ręcznie w przeglądarce potwierdzone logowanie kontem z panelu Supabase i wyrenderowany `/dashboard` —
 czyli `@supabase/ssr` przechodzi na workerd pełny round-trip cookies, nie tylko start.
 
+Wynik z 2026-09-28 (wersja `32455abe-…`): `/` → 200, `/settings` (anonim) → 302 na `/auth/signin`,
+`POST /api/settings` (anonim) → 302 na `/auth/signin`, baner „Supabase nie jest skonfigurowany" nieobecny.
+
 **Nie uruchamiaj `npm run smoke` przeciwko produkcji.** Skrypt rejestruje prawdziwe konto
 `smoke-<timestamp>@example.com` i zakłada wyłączone potwierdzanie e-maila. Smoke zostaje testem
 lokalnym i CI-owym przeciwko lokalnej Supabase.
 
 ## Czego NIE wdrożono
 
-| Element                                        | Dlaczego nie teraz                                                                                                                                                                                              |
-| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Cron Trigger `* * * * *` + handler `scheduled` | W repo nie ma jeszcze pollera ADS-B. Cron bez handlera to błąd co minutę. Wejdzie razem z logiką alertów — **wtedy wymagany Workers Paid $5/mo**, bo free capuje crony na 10 ms CPU                             |
-| Auto-deploy z GitHub Actions                   | Repo nie ma remote'a. Wymaga repozytorium GitHub i scoped `CLOUDFLARE_API_TOKEN` (Workers Scripts:Edit tylko dla tego projektu, bez DNS i bez rozliczeń)                                                        |
-| ~~Publiczne Preview URLs~~                     | **Zamknięte 2026-09-23**: `"preview_urls": false` w `wrangler.jsonc`. Worker wystawia wyłącznie trasę workers.dev. Konsekwencja: weryfikacja przed promocją odbywa się lokalnie, nie przez publiczny URL wersji |
-| Migracje Supabase / RLS                        | Brak `supabase/migrations`. Schemat powstaje razem z logiką alertów; RLS jest warunkiem koniecznym, bo klucz `anon` jest publiczny                                                                              |
-| `site` w `astro.config.mjs`                    | Build ostrzega, że integracja sitemap jest pomijana. Uzupełnić produkcyjnym URL-em                                                                                                                              |
-| Własna domena                                  | Na starcie `*.workers.dev`                                                                                                                                                                                      |
+| Element                                        | Dlaczego nie teraz                                                                                                                                                                                                                      |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Cron Trigger `* * * * *` + handler `scheduled` | W repo nie ma jeszcze pollera ADS-B. Cron bez handlera to błąd co minutę. Wejdzie razem z logiką alertów — **wtedy wymagany Workers Paid $5/mo**, bo free capuje crony na 10 ms CPU                                                     |
+| Auto-deploy z GitHub Actions                   | Repo nie ma remote'a. Wymaga repozytorium GitHub i scoped `CLOUDFLARE_API_TOKEN` (Workers Scripts:Edit tylko dla tego projektu, bez DNS i bez rozliczeń)                                                                                |
+| ~~Publiczne Preview URLs~~                     | **Zamknięte 2026-09-23**: `"preview_urls": false` w `wrangler.jsonc`. Worker wystawia wyłącznie trasę workers.dev. Konsekwencja: weryfikacja przed promocją odbywa się lokalnie, nie przez publiczny URL wersji                         |
+| ~~Migracje Supabase / RLS~~                    | **Częściowo zamknięte 2026-09-28**: `alert_settings` z RLS na produkcji; pozostają tabele powiadomień (FR-009/FR-010) i logu obserwacji (FR-011). RLS jest warunkiem koniecznym dla każdej nowej tabeli, bo klucz `anon` jest publiczny |
+| `site` w `astro.config.mjs`                    | Build ostrzega, że integracja sitemap jest pomijana. Uzupełnić produkcyjnym URL-em                                                                                                                                                      |
+| Własna domena                                  | Na starcie `*.workers.dev`                                                                                                                                                                                                              |
