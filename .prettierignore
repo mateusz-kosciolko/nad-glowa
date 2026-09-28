@@ -2,3 +2,4 @@
 .claude/prompts/
 CLAUDE.md
 AGENTS.md
+src/db/database.types.ts

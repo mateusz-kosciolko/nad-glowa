@@ -3,7 +3,7 @@ project: "Nad Głową"
 version: 1
 status: draft
 created: 2026-09-25
-updated: 2026-09-25
+updated: 2026-09-28
 prd_version: 1
 main_goal: speed
 top_blocker: decisions
@@ -39,17 +39,17 @@ Obserwator z balkonu dowiaduje się o nietypowym samolocie (wojskowym, ciężkim
 
 ## At a glance
 
-| ID   | Change ID             | Outcome (user can …)                                                                       | Prerequisites    | PRD refs                               | Status   |
-| ---- | --------------------- | ------------------------------------------------------------------------------------------ | ---------------- | -------------------------------------- | -------- |
-| F-01 | adsb-source-verified  | (foundation) wybrane darmowe źródło ADS-B potwierdzone jako dające typ, pozycję i kurs     | —                | Open Question 2, Business Logic        | ready    |
-| F-02 | minute-cron-heartbeat | (foundation) zadanie cykliczne działa co minutę na produkcji i zostawia ślad każdego biegu | —                | NFR (< 60 s)                           | ready    |
-| S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie                   | —                | FR-001, Access Control                 | ready    |
-| S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                      | —                | FR-003, FR-004, FR-005, Access Control | ready    |
-| S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                           | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | blocked  |
-| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji                | S-03             | FR-010, US-01                          | blocked  |
-| S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                                 | S-03             | FR-006                                 | proposed |
-| S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście               | F-01, S-02       | FR-002, FR-005                         | proposed |
-| S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                                  | S-03             | FR-009, US-01                          | proposed |
+| ID   | Change ID             | Outcome (user can …)                                                                       | Prerequisites    | PRD refs                               | Status      |
+| ---- | --------------------- | ------------------------------------------------------------------------------------------ | ---------------- | -------------------------------------- | ----------- |
+| F-01 | adsb-source-verified  | (foundation) wybrane darmowe źródło ADS-B potwierdzone jako dające typ, pozycję i kurs     | —                | Open Question 2, Business Logic        | ready       |
+| F-02 | minute-cron-heartbeat | (foundation) zadanie cykliczne działa co minutę na produkcji i zostawia ślad każdego biegu | —                | NFR (< 60 s)                           | ready       |
+| S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie                   | —                | FR-001, Access Control                 | ready       |
+| S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                      | —                | FR-003, FR-004, FR-005, Access Control | in-progress |
+| S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                           | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | blocked     |
+| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji                | S-03             | FR-010, US-01                          | blocked     |
+| S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                                 | S-03             | FR-006                                 | proposed    |
+| S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście               | F-01, S-02       | FR-002, FR-005                         | proposed    |
+| S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                                  | S-03             | FR-009, US-01                          | proposed    |
 
 ## Streams
 
@@ -129,7 +129,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Unknowns:**
   - Domyślny promień (Open Roadmap Question 6) — Owner: user. Block: no. Zatwierdzony spec `aba254e` przyjmuje 30 km; wystarczy to potwierdzić.
 - **Risk:** Lista typów jest tu w najprostszej postaci (kody typów), żeby nie czekać na F-01. Czytelny wybór to S-06. Jeśli F-01 pokaże, że źródło raportuje typy inaczej niż standardowe kody, S-03 będzie potrzebował mapowania.
-- **Status:** ready
+- **Status:** in-progress
 
 ### S-03: Pierwszy alert przed przelotem
 

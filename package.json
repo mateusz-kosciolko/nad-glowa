@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "test:db": "supabase test db",
+    "db:types": "supabase gen types typescript --local > src/db/database.types.ts"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

@@ -75,6 +75,9 @@ ograniczenie domeny na elementach tablicy tej domeny. To jedyne założenie w ty
 niesprawdzone empirycznie — potwierdzić przez `supabase db reset` przed `db push`.
 Jeśli nie działa, walidacja pojedynczych kodów spada do warstwy aplikacji, a reszta
 schematu zostaje bez zmian.
+**Wynik (2026-09-28): potwierdzone.** Po `supabase db reset` zapis `'{b744}'` odrzuca
+`icao_type_check` (kod `23514`), a `'{B744,A320}'` przechodzi. Ścieżka awaryjna
+(`text[]` + ograniczenie tabeli) nie była potrzebna.
 
 ## Polityki
 
@@ -104,6 +107,12 @@ przycisku. Usunięcie konta nadal sprząta wiersz przez `on delete cascade`, kt�
 poza RLS.
 
 `to authenticated` odcina rolę `anon`, która ma domyślne grants Supabase na `public`.
+Grants są drugą warstwą: migracja robi `revoke all … from anon` oraz
+`revoke all on public.alert_settings from authenticated` i dopiero potem
+`grant select, update … to authenticated`. Drugi `revoke` to odstępstwo od pierwotnie
+zatwierdzonego SQL — domyślne uprawnienia Supabase dają `authenticated` wszystkie prawa
+do nowych tabel w `public`, a sam `grant` ich nie odbiera. Skutek: `insert` i `delete`
+padają już na uprawnieniach (`42501`), zanim dojdzie do polityk.
 `(select auth.uid())` zamiast gołego wywołania — Postgres liczy je raz na zapytanie
 (InitPlan), a nie raz na wiersz.
 
@@ -131,6 +140,11 @@ create trigger on_auth_user_created
 użytkownika. `set search_path = ''` zamyka podmianę `search_path` w funkcji definer,
 dlatego wszystkie nazwy są w pełni kwalifikowane. Trigger obejmuje także konta zakładane
 ręcznie w panelu Supabase, co według PRD jest jedyną drogą rejestracji.
+
+**Backfill dla kont sprzed migracji.** Trigger obejmuje tylko konta zakładane po
+migracji. Konto założone ręcznie przy weryfikacji wdrożenia nie miałoby wiersza, a brak
+polityki `insert` znaczy, że aplikacja nie może go dorobić. Dlatego migracja kończy się
+`insert … select id from auth.users on conflict (user_id) do nothing`.
 
 **Znany tryb awarii**: wyjątek w tej funkcji objawia się przy zakładaniu konta jako
 nieczytelne „Database error saving new user". Przy diagnozie problemów z rejestracją
@@ -171,6 +185,6 @@ z kosztem wrappera na stole.
 1. `npx supabase start && npx supabase db reset` — migracja przechodzi, domena egzekwuje wzorzec.
 2. Utworzyć użytkownika lokalnie → wiersz w `alert_settings` istnieje z domyślnymi wartościami.
 3. Jako użytkownik A: `select` zwraca własny wiersz; `select` po `user_id` użytkownika B zwraca zero wierszy.
-4. `delete` na własnym wierszu zwraca zero usuniętych (brak polityki).
-5. `insert` z poziomu aplikacji odrzucony (brak polityki).
+4. `delete` na własnym wierszu odrzucony (`42501`, brak uprawnienia i polityki).
+5. `insert` z poziomu aplikacji odrzucony (`42501`, brak uprawnienia i polityki).
 6. Dopiero wtedy `npx supabase db push`.
