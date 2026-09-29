@@ -386,12 +386,12 @@ zadanie nie działa na produkcji.
 
 #### Automated
 
-- [x] 3.1 npm run lint, astro check i npm run build przechodzą
-- [x] 3.2 npm run smoke przechodzi na npm run dev
+- [x] 3.1 npm run lint, astro check i npm run build przechodzą — 2224d61
+- [x] 3.2 npm run smoke przechodzi na npm run dev — 2224d61
 
 #### Manual
 
-- [x] 3.3 Dashboard pokazuje Last cron run z N poniżej 60 przy działającym cron:local
-- [x] 3.4 Po ponad 5 minutach bez cron:local dashboard pokazuje ostrzeżenie
-- [x] 3.5 Na pustej cron_runs dashboard pokazuje No cron runs yet
-- [ ] 3.6 Instrukcja z README pozwala od zera uzupełnić .dev.vars i zobaczyć pierwszy bieg
+- [x] 3.3 Dashboard pokazuje Last cron run z N poniżej 60 przy działającym cron:local — 2224d61
+- [x] 3.4 Po ponad 5 minutach bez cron:local dashboard pokazuje ostrzeżenie — 2224d61
+- [x] 3.5 Na pustej cron_runs dashboard pokazuje No cron runs yet — 2224d61
+- [x] 3.6 Instrukcja z README pozwala od zera uzupełnić .dev.vars i zobaczyć pierwszy bieg — 2224d61
