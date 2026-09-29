@@ -12,7 +12,8 @@ async function tick() {
   try {
     const response = await fetch(BASE_URL + URL_PATH, { signal: AbortSignal.timeout(TIMEOUT_MS) });
     await response.text();
-    console.log(`${at}  ${response.ok ? "OK  " : "FAIL"}  HTTP ${response.status}`);
+    // The handler never throws, so 200 only means it ran; whether the run was recorded is in the dev log.
+    console.log(`${at}  ${response.ok ? "invoked" : "FAIL   "}  HTTP ${response.status}`);
   } catch (error) {
     // Keep looping: the dev server may simply not be up yet.
     const reason = error instanceof Error ? (error.cause?.code ?? error.message) : String(error);
@@ -21,5 +22,6 @@ async function tick() {
 }
 
 console.log(`cron:local -> ${BASE_URL}${URL_PATH} every ${INTERVAL_MS / 1000} s (Ctrl+C to stop)`);
+console.log("Each run's result ([cron] ... recorded: yes/no) is logged by the dev server, not here.");
 await tick();
 setInterval(() => void tick(), INTERVAL_MS);

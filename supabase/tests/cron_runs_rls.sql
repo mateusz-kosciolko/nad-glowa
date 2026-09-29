@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap;
-select plan(7);
+select plan(11);
 
 -- ── struktura ────────────────────────────────────────────────────────
 select has_table('public'::name, 'cron_runs'::name);
@@ -16,6 +16,23 @@ select is(
     where schemaname = 'public' and tablename = 'cron_runs'),
   1,
   'dokładnie jedna polityka — select, bez insert i delete'
+);
+
+-- ── ograniczenia (jako właściciel, jak service_role) ─────────────────
+select throws_ok(
+  $$insert into public.cron_runs (started_at, duration_ms, status, error)
+     values (now(), 0, 'ok', 'x')$$,
+  '23514',
+  null,
+  'udany bieg nie niesie komunikatu błędu'
+);
+
+select throws_ok(
+  $$insert into public.cron_runs (started_at, duration_ms, status)
+     values (now(), 0, 'skipped')$$,
+  '23514',
+  null,
+  'status spoza ok/error odrzucony'
 );
 
 -- Wiersz testowy wstawia właściciel tabeli, tak jak service_role omija RLS.
@@ -35,12 +52,27 @@ select is(
   'zalogowany użytkownik czyta biegi'
 );
 
+-- error może zawierać dane innego użytkownika, więc zalogowany jej nie czyta.
+select throws_ok(
+  $$select error from public.cron_runs$$,
+  '42501',
+  null,
+  'zalogowany użytkownik nie czyta kolumny error'
+);
+
 select throws_ok(
   $$insert into public.cron_runs (started_at, duration_ms, status)
      values (now(), 1, 'ok')$$,
   '42501',
   null,
   'insert odrzucony — zapisuje wyłącznie handler scheduled'
+);
+
+select throws_ok(
+  $$update public.cron_runs set status = 'error'$$,
+  '42501',
+  null,
+  'update odrzucony — ślad biegów jest tylko do odczytu'
 );
 
 select throws_ok(

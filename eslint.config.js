@@ -90,27 +90,47 @@ const scriptsConfig = defineConfig({
 
 // Klucz service_role omija RLS. Wartość polityk z alert_settings zależy od tego,
 // że kod obsługujący żądania użytkownika nie ma jak po ten klient sięgnąć.
+// Sam klucz i goły klient supabase-js są zablokowane osobno: inaczej dało się
+// zbudować klienta service_role w dowolnej trasie z pominięciem supabase-admin.
+const SERVICE_KEY_MESSAGE =
+  "Klucz service_role omija RLS. Klienta z nim tworzy wyłącznie src/lib/supabase-admin.ts, a importuje go tylko handler scheduled (src/workers/scheduled.ts).";
+const rawServiceKeyPaths = [
+  { name: "astro:env/server", importNames: ["SUPABASE_SERVICE_KEY"], message: SERVICE_KEY_MESSAGE },
+  { name: "@supabase/supabase-js", importNames: ["createClient"], message: SERVICE_KEY_MESSAGE },
+];
+
 const serviceKeyBoundary = defineConfig({
   files: ["src/**/*.{ts,tsx,astro}"],
   rules: {
     "no-restricted-imports": [
       "error",
       {
+        paths: rawServiceKeyPaths,
         patterns: [
           {
-            group: ["**/supabase-admin", "@/lib/supabase-admin"],
-            message:
-              "supabase-admin używa klucza service_role, który omija RLS. Import wolno wykonać wyłącznie w handlerze scheduled (src/workers/scheduled.ts).",
+            // `.*` catches `supabase-admin.ts` / `.js` specifiers, which also resolve.
+            group: ["**/supabase-admin", "**/supabase-admin.*", "@/lib/supabase-admin", "@/lib/supabase-admin.*"],
+            message: SERVICE_KEY_MESSAGE,
           },
         ],
       },
     ],
+    "no-restricted-syntax": [
+      "error",
+      { selector: "ImportExpression[source.value=/supabase-admin/]", message: SERVICE_KEY_MESSAGE },
+    ],
   },
 });
 
+// The scheduled handler may import supabase-admin, but not build its own service_role client.
 const schedulerConfig = defineConfig({
-  files: ["src/workers/scheduled.ts", "src/lib/supabase-admin.ts"],
-  rules: { "no-restricted-imports": "off" },
+  files: ["src/workers/scheduled.ts"],
+  rules: { "no-restricted-imports": ["error", { paths: rawServiceKeyPaths }], "no-restricted-syntax": "off" },
+});
+
+const adminClientConfig = defineConfig({
+  files: ["src/lib/supabase-admin.ts"],
+  rules: { "no-restricted-imports": "off", "no-restricted-syntax": "off" },
 });
 
 export default defineConfig(
@@ -127,5 +147,6 @@ export default defineConfig(
   scriptsConfig,
   serviceKeyBoundary,
   schedulerConfig,
+  adminClientConfig,
   eslintPluginPrettier,
 );

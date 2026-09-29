@@ -21,7 +21,14 @@ export async function handleScheduled(
   _env: Env,
   _ctx: ExecutionContext,
 ): Promise<void> {
-  const supabase = createAdminClient();
+  let supabase: ReturnType<typeof createAdminClient>;
+  try {
+    supabase = createAdminClient();
+  } catch (error) {
+    // supabase-js throws on a malformed SUPABASE_URL; keep the "never throws" contract.
+    console.error(`[cron] skipped run (cron: ${controller.cron}): Supabase client failed: ${describeError(error)}`);
+    return;
+  }
   if (!supabase) {
     console.warn(`[cron] skipped run (cron: ${controller.cron}): SUPABASE_SERVICE_KEY is not configured`);
     return;

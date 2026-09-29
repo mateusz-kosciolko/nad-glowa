@@ -7,7 +7,7 @@ Astro 7 SSR app (React 19 islands, Tailwind 4, shadcn/ui) with Supabase Auth, de
 - Never write to `context/archive/`; archived changes are immutable.
 - Read `SUPABASE_URL` / `SUPABASE_KEY` / `SUPABASE_SERVICE_KEY` only via `astro:env/server` (server-only secrets in @astro.config.mjs). Never import them into React components or client scripts.
 - Create Supabase clients only with `createClient()` from @src/lib/supabase.ts and handle its `null` return (Supabase not configured), as in @src/pages/api/auth/signin.ts.
-- Klient z kluczem `service_role` (`createAdminClient()` z `src/lib/supabase-admin.ts`) omija RLS i wolno go użyć wyłącznie w handlerze `scheduled`, który nie ma sesji użytkownika. Reguła ESLint `no-restricted-imports` blokuje ten import wszędzie indziej — nie wyłączaj jej lokalnym komentarzem. Kod obsługujący żądania użytkownika zawsze używa klucza `anon` i polega na politykach RLS.
+- Klient z kluczem `service_role` (`createAdminClient()` z `src/lib/supabase-admin.ts`) omija RLS i wolno go użyć wyłącznie w handlerze `scheduled`, który nie ma sesji użytkownika. Reguły ESLint `no-restricted-imports` / `no-restricted-syntax` blokują wszędzie indziej ten import (także z rozszerzeniem i dynamiczny), `SUPABASE_SERVICE_KEY` z `astro:env/server` oraz `createClient` z `@supabase/supabase-js` — nie wyłączaj ich lokalnym komentarzem. Kod obsługujący żądania użytkownika zawsze używa klucza `anon` i polega na politykach RLS.
 - To require login for a page, add its path prefix to `PROTECTED_ROUTES` in @src/middleware.ts; the middleware sets `context.locals.user`.
 - `AGENTS.md` is a symlink to `CLAUDE.md`. Edit `CLAUDE.md`, and put project rules outside the `@przeprogramowani/10x-cli` BEGIN/END block, which the CLI manages.
 
@@ -19,6 +19,7 @@ Astro 7 SSR app (React 19 islands, Tailwind 4, shadcn/ui) with Supabase Auth, de
 - `npm run build` — SSR build for Cloudflare.
 - `npx wrangler deploy` — the only supported deploy command (Workers with Static Assets). Never `wrangler pages deploy` or any other `wrangler pages *` command: they ignore `wrangler.jsonc`, so the deploy silently loses `nodejs_compat` and any cron triggers.
 - There is no separate `wrangler dev` step. With `@astrojs/cloudflare` v14, `npm run dev` already runs workerd inside Vite; tutorials recommending `wrangler pages dev ./dist` are obsolete for these pins.
+- If the dev server answers 500 with "The file does not exist at …/node_modules/.vite/deps_ssr/… in the optimize deps directory" (seen after running `astro sync` / `build` alongside it), restart `npm run dev`; it is a stale Vite dep cache, not a code error.
 - `npm run smoke` — HTTP auth-flow test against a running server (`BASE_URL`, default `http://localhost:4321`); needs Supabase with email confirmation disabled.
 - `npm run cron:local` — fires the Worker's `scheduled` handler every 60 s via `GET /cdn-cgi/handler/scheduled` (`astro dev` never fires Cron Triggers on its own); needs a running `npm run dev` and `SUPABASE_SERVICE_KEY` in `.dev.vars`. The `/__scheduled` path from `context/foundation/infrastructure.md` belongs to `wrangler dev --test-scheduled` and does not exist here.
 - `npm run cf:types` — regenerates `worker-configuration.d.ts` (Workers runtime types and `Env`) after changing `wrangler.jsonc` or the variable names in `.dev.vars`; commit the result, CI does not generate it.
