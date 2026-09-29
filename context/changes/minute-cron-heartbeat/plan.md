@@ -371,27 +371,27 @@ zadanie nie działa na produkcji.
 
 #### Automated
 
-- [x] 2.1 npx supabase migration up stosuje migrację bez resetu danych
-- [x] 2.2 npm run test:db przechodzi z cron_runs_rls.sql
-- [x] 2.3 npm run db:types, npm run lint, astro check i npm run build przechodzą
+- [x] 2.1 npx supabase migration up stosuje migrację bez resetu danych — 5035b98
+- [x] 2.2 npm run test:db przechodzi z cron_runs_rls.sql — 5035b98
+- [x] 2.3 npm run db:types, npm run lint, astro check i npm run build przechodzą — 5035b98
 
 #### Manual
 
-- [x] 2.4 Przez 3 minuty z cron:local przybywa jeden wiersz ok na minutę
-- [x] 2.5 Po zatrzymaniu dev cron:local loguje błąd i działa dalej, po starcie biegi wracają
-- [x] 2.6 Bez SUPABASE_SERVICE_KEY bieg loguje ostrzeżenie i nie przerywa dev
-- [x] 2.7 Wiersz sprzed 8 dni znika po następnym biegu
+- [x] 2.4 Przez 3 minuty z cron:local przybywa jeden wiersz ok na minutę — 5035b98
+- [x] 2.5 Po zatrzymaniu dev cron:local loguje błąd i działa dalej, po starcie biegi wracają — 5035b98
+- [x] 2.6 Bez SUPABASE_SERVICE_KEY bieg loguje ostrzeżenie i nie przerywa dev — 5035b98
+- [x] 2.7 Wiersz sprzed 8 dni znika po następnym biegu — 5035b98
 
 ### Phase 3: Widoczność na dashboardzie i dokumentacja
 
 #### Automated
 
-- [ ] 3.1 npm run lint, astro check i npm run build przechodzą
-- [ ] 3.2 npm run smoke przechodzi na npm run dev
+- [x] 3.1 npm run lint, astro check i npm run build przechodzą
+- [x] 3.2 npm run smoke przechodzi na npm run dev
 
 #### Manual
 
-- [ ] 3.3 Dashboard pokazuje Last cron run z N poniżej 60 przy działającym cron:local
-- [ ] 3.4 Po ponad 5 minutach bez cron:local dashboard pokazuje ostrzeżenie
-- [ ] 3.5 Na pustej cron_runs dashboard pokazuje No cron runs yet
+- [x] 3.3 Dashboard pokazuje Last cron run z N poniżej 60 przy działającym cron:local
+- [x] 3.4 Po ponad 5 minutach bez cron:local dashboard pokazuje ostrzeżenie
+- [x] 3.5 Na pustej cron_runs dashboard pokazuje No cron runs yet
 - [ ] 3.6 Instrukcja z README pozwala od zera uzupełnić .dev.vars i zobaczyć pierwszy bieg

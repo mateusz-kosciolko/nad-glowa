@@ -20,8 +20,10 @@ Astro 7 SSR app (React 19 islands, Tailwind 4, shadcn/ui) with Supabase Auth, de
 - `npx wrangler deploy` — the only supported deploy command (Workers with Static Assets). Never `wrangler pages deploy` or any other `wrangler pages *` command: they ignore `wrangler.jsonc`, so the deploy silently loses `nodejs_compat` and any cron triggers.
 - There is no separate `wrangler dev` step. With `@astrojs/cloudflare` v14, `npm run dev` already runs workerd inside Vite; tutorials recommending `wrangler pages dev ./dist` are obsolete for these pins.
 - `npm run smoke` — HTTP auth-flow test against a running server (`BASE_URL`, default `http://localhost:4321`); needs Supabase with email confirmation disabled.
+- `npm run cron:local` — fires the Worker's `scheduled` handler every 60 s via `GET /cdn-cgi/handler/scheduled` (`astro dev` never fires Cron Triggers on its own); needs a running `npm run dev` and `SUPABASE_SERVICE_KEY` in `.dev.vars`. The `/__scheduled` path from `context/foundation/infrastructure.md` belongs to `wrangler dev --test-scheduled` and does not exist here.
+- `npm run cf:types` — regenerates `worker-configuration.d.ts` (Workers runtime types and `Env`) after changing `wrangler.jsonc` or the variable names in `.dev.vars`; commit the result, CI does not generate it.
 
-No unit test runner is configured; `smoke` is the only automated test.
+No unit test runner is configured; the automated tests are `smoke` (HTTP) and `npm run test:db` (pgTAP permission tests in `supabase/tests/`).
 
 ## Structure & conventions
 

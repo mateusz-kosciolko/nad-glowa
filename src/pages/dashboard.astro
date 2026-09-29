@@ -1,7 +1,45 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import { describeLastRun } from "@/lib/cron-runs";
+import { createClient } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 
 const { user } = Astro.locals;
+
+function formatAge(ageSeconds: number): string {
+  return ageSeconds < 120 ? `${String(ageSeconds)} s` : `${String(Math.floor(ageSeconds / 60))} min`;
+}
+
+// Heartbeat of the minute job: without it, "no alerts" and "the clock stopped" look the same.
+let cronLine: string;
+let cronStale = false;
+let lastRunFailed = false;
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+if (!supabase) {
+  cronLine = "Cron status unavailable: Supabase is not configured.";
+} else {
+  const { data, error } = await supabase
+    .from("cron_runs")
+    .select("started_at, status")
+    .order("started_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    // The status card is informational; a failed read must not break the dashboard.
+    cronLine = "Cron status unavailable.";
+  } else {
+    const lastRun = describeLastRun(data?.started_at ?? null, new Date());
+    if (lastRun.state === "never") {
+      cronLine = "No cron runs yet";
+    } else {
+      cronLine = `Last cron run: ${formatAge(lastRun.ageSeconds)} ago`;
+      cronStale = lastRun.state === "stale";
+      lastRunFailed = data?.status === "error";
+    }
+  }
+}
 ---
 
 <Layout title="Dashboard">
@@ -14,6 +52,24 @@ const { user } = Astro.locals;
         Welcome, <span class="font-semibold text-white">{user?.email}</span>
       </p>
       <p class="mt-2 text-sm text-blue-100/50">This page is only for authenticated users.</p>
+      <div
+        class:list={cn(
+          "mt-4 rounded-lg border px-3 py-2 text-sm",
+          cronStale
+            ? "border-amber-500/30 bg-amber-900/30 text-amber-200"
+            : "border-white/10 bg-white/5 text-blue-100/80",
+        )}
+      >
+        <p>
+          {cronLine}
+          {lastRunFailed && <span class="text-red-300"> (last run failed)</span>}
+        </p>
+        {cronStale && (
+          <p class="mt-1 text-xs">
+            No run for over 5 minutes — is <code>npm run cron:local</code> running?
+          </p>
+        )}
+      </div>
       <div class="mt-6 flex items-center justify-center gap-3">
         <a
           href="/settings"

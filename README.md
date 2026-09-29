@@ -56,6 +56,9 @@ npm run dev
 - `npm run lint:fix` - Auto-fix ESLint issues
 - `npm run format` - Run Prettier
 - `npm run smoke` - Smoke test the auth flow against a running server (`BASE_URL`, defaults to `http://localhost:4321`)
+- `npm run cron:local` - Run the minute job locally: calls the Worker's `scheduled` handler every 60 s on a running `npm run dev` (`BASE_URL`, defaults to `http://localhost:4321`). Each run is recorded in the `cron_runs` table and shown on the dashboard as "Last cron run"
+- `npm run test:db` - Run the pgTAP database tests in `supabase/tests/` against the local Supabase
+- `npm run cf:types` - Regenerate `worker-configuration.d.ts` (Cloudflare Workers types)
 
 ## Project Structure
 
@@ -104,6 +107,12 @@ SUPABASE_URL=http://127.0.0.1:54321
 SUPABASE_KEY=<anon key from CLI output>
 ```
 
+Add the `service_role` key to `.dev.vars` only (never to client code). The minute job (`npm run cron:local`) uses it to record its runs, because it has no user session. Print it again at any time with `npx supabase status`:
+
+```
+SUPABASE_SERVICE_KEY=<service_role key from CLI output>
+```
+
 5. To stop the stack when done:
 
 ```bash
@@ -112,7 +121,7 @@ npx supabase stop
 
 The local Studio UI is available at `http://localhost:54323`.
 
-No database tables or migrations are required — this project uses Supabase Auth's built-in `auth.users` table only.
+`npx supabase start` applies the migrations in `supabase/migrations/` (alert settings and the `cron_runs` job log). To apply migrations added later without wiping local data, run `npx supabase migration up`.
 
 ### Using a cloud Supabase project instead
 
