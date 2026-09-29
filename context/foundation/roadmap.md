@@ -3,7 +3,7 @@ project: "Nad Głową"
 version: 1
 status: draft
 created: 2026-09-25
-updated: 2026-09-28
+updated: 2026-09-29
 prd_version: 1
 main_goal: speed
 top_blocker: decisions
@@ -39,17 +39,17 @@ Obserwator z balkonu dowiaduje się o nietypowym samolocie (wojskowym, ciężkim
 
 ## At a glance
 
-| ID   | Change ID             | Outcome (user can …)                                                                   | Prerequisites    | PRD refs                               | Status      |
-| ---- | --------------------- | -------------------------------------------------------------------------------------- | ---------------- | -------------------------------------- | ----------- |
-| F-01 | adsb-source-verified  | (foundation) wybrane darmowe źródło ADS-B potwierdzone jako dające typ, pozycję i kurs | —                | Open Question 2, Business Logic        | done        |
-| F-02 | minute-cron-heartbeat | (foundation) zadanie cykliczne działa co minutę lokalnie i zostawia ślad każdego biegu | —                | NFR (< 60 s)                           | in-progress |
-| S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie               | —                | FR-001, Access Control                 | ready       |
-| S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                  | —                | FR-003, FR-004, FR-005, Access Control | done        |
-| S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                       | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | blocked     |
-| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji            | S-03             | FR-010, US-01                          | blocked     |
-| S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                             | S-03             | FR-006                                 | proposed    |
-| S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście           | F-01, S-02       | FR-002, FR-005                         | proposed    |
-| S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                              | S-03             | FR-009, US-01                          | proposed    |
+| ID   | Change ID             | Outcome (user can …)                                                                   | Prerequisites    | PRD refs                               | Status   |
+| ---- | --------------------- | -------------------------------------------------------------------------------------- | ---------------- | -------------------------------------- | -------- |
+| F-01 | adsb-source-verified  | (foundation) wybrane darmowe źródło ADS-B potwierdzone jako dające typ, pozycję i kurs | —                | Open Question 2, Business Logic        | done     |
+| F-02 | minute-cron-heartbeat | (foundation) zadanie cykliczne działa co minutę lokalnie i zostawia ślad każdego biegu | —                | NFR (< 60 s)                           | done     |
+| S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie               | —                | FR-001, Access Control                 | ready    |
+| S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                  | —                | FR-003, FR-004, FR-005, Access Control | done     |
+| S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                       | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | blocked  |
+| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji            | S-03             | FR-010, US-01                          | blocked  |
+| S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                             | S-03             | FR-006                                 | proposed |
+| S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście           | F-01, S-02       | FR-002, FR-005                         | proposed |
+| S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                              | S-03             | FR-009, US-01                          | proposed |
 
 ## Streams
 
@@ -100,7 +100,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Blockers:** — (plan Cloudflare Workers Paid był potrzebny tylko dla crona na produkcji; odłożony razem z nim, zob. `## Parked`)
 - **Unknowns:** —
 - **Risk:** Rejestr ryzyk w `infrastructure.md` ocenia cichą awarię crona na M/H; heartbeat jest najtańszym zabezpieczeniem i musi istnieć, zanim pierwszy alert stanie się sygnałem, na którym polegamy. Lokalnie zadanie działa tylko, gdy komputer użytkownika jest włączony, więc heartbeat odróżnia też „komputer był wyłączony” od „brak samolotów”.
-- **Status:** in-progress
+- **Status:** done
 
 ## Slices
 
@@ -240,3 +240,4 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 
 - **S-02: zalogowany użytkownik może zapisać i zmienić przybliżoną lokalizację domu (~1 km), promień obserwacji (wstępnie wypełniony wartością domyślną) i listę typów samolotów, a inni użytkownicy nigdy tych danych nie widzą.** — Archived 2026-09-28 → `context/archive/2026-09-28-alert-settings-basic/`. Lesson: —.
 - **F-01: (foundation) wybrane darmowe publiczne źródło ADS-B jest potwierdzone empirycznie: dla obszaru wokół domu zwraca typ samolotu, identyfikator maszyny, pozycję, kurs i prędkość, jest osiągalne ze środowiska produkcyjnego aplikacji, a decyzja wraz z limitami i warunkami użycia jest zapisana.** — Archived 2026-09-28 → `context/archive/2026-09-28-adsb-source-verified/`. Lesson: —.
+- **F-02: (foundation) zadanie cykliczne uruchamia się co minutę lokalnie, z sieci użytkownika (tam źródła ADS-B odpowiadają), i przy każdym biegu, także pustym, zapisuje ślad (czas biegu), więc cisza „brak ciekawych samolotów” jest odróżnialna od ciszy „zadanie przestało działać”.** — Archived 2026-09-29 → `context/archive/2026-09-28-minute-cron-heartbeat/`. Lesson: —.
