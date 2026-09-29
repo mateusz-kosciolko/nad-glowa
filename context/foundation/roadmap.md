@@ -45,7 +45,7 @@ Obserwator z balkonu dowiaduje się o nietypowym samolocie (wojskowym, ciężkim
 | F-02 | minute-cron-heartbeat | (foundation) zadanie cykliczne działa co minutę lokalnie i zostawia ślad każdego biegu | —                | NFR (< 60 s)                           | done     |
 | S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie               | —                | FR-001, Access Control                 | ready    |
 | S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                  | —                | FR-003, FR-004, FR-005, Access Control | done     |
-| S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                       | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | blocked  |
+| S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                       | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | ready    |
 | S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji            | S-03             | FR-010, US-01                          | blocked  |
 | S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                             | S-03             | FR-006                                 | proposed |
 | S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście           | F-01, S-02       | FR-002, FR-005                         | proposed |
@@ -140,9 +140,9 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Parallel with:** S-01, S-06
 - **Blockers:** — (miejsce pobierania danych ADS-B rozstrzygnięte 2026-09-28: lokalnie, z sieci użytkownika; Open Roadmap Question 10)
 - **Unknowns:**
-  - Kanał powiadomień: Telegram czy e-mail (Open Roadmap Question 3)? — Owner: user. Block: yes. `infrastructure.md` wskazuje Telegram (jedno wywołanie HTTPS; środowisko nie ma SMTP).
+  - Kanał powiadomień: Telegram czy e-mail (Open Roadmap Question 3)? — Owner: user. Block: no. **Odpowiedź (2026-09-29):** Telegram (jedno wywołanie HTTPS; środowisko nie ma SMTP, zgodnie z `infrastructure.md`).
 - **Risk:** Bez S-04 ta sama maszyna może wywoływać alert przy każdym biegu zadania, więc S-03 służy do walidacji, a nie do codziennego używania. S-04 musi wejść zaraz po nim.
-- **Status:** blocked
+- **Status:** ready
 
 ### S-04: Bez powtórzonych alertów
 
@@ -203,7 +203,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 | F-02       | minute-cron-heartbeat | Uruchom zadanie co minutę z heartbeatem          | yes                   | Run `/10x-plan minute-cron-heartbeat`; lokalnie, bez Workers Paid; granica klucza serwisowego z planu `511ba0a` (Task 2) należy tutaj |
 | S-01       | invite-only-access    | Zamknij rejestrację i chroń wszystkie trasy      | yes                   | Run `/10x-plan invite-only-access`; zastąp ścieżkę testu smoke                                                                        |
 | S-02       | alert-settings-basic  | Ustawienia alertów: dom, promień, typy           | yes                   | Część danych pokrywają spec `aba254e` i plan `511ba0a` (Task 1); rozszerzyć o ekran ustawień                                          |
-| S-03       | first-advance-alert   | Pierwszy alert przed przelotem nad domem         | no                    | Blokuje wybór kanału (Q3) oraz F-02; pobieranie ADS-B lokalnie (Q10)                                                                  |
+| S-03       | first-advance-alert   | Pierwszy alert przed przelotem nad domem         | yes                   | Run `/10x-plan first-advance-alert`; kanał Telegram (Q3), pobieranie ADS-B lokalnie (Q10)                                             |
 | S-04       | no-repeat-alerts      | Deduplikacja alertów po maszynie                 | no                    | Blokuje długość okna (Q4) oraz S-03                                                                                                   |
 | S-05       | pause-resume-alerts   | Pauza i wznowienie alertów                       | no                    | Czeka na S-03                                                                                                                         |
 | S-06       | aircraft-type-picker  | Wybór typów z czytelnymi nazwami i wyszukiwaniem | no                    | Czeka na F-01 i S-02                                                                                                                  |
@@ -213,7 +213,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 
 1. **Czy istniejące płatne alerty (Flightradar24 lub podobne) już rozwiązują ten problem?** — Owner: user. Block: roadmap-wide. PRD każe sprawdzić to przed budową; przy celu `speed` najtaniej zrobić to przed S-03.
 2. **Które darmowe publiczne źródło ADS-B podaje typ samolotu i flagę wojskową?** — Owner: user. Block: F-01 (rozstrzyga je), S-03, S-06. Jakość danych rozstrzygnięta przez F-01 → `context/foundation/adsb-source.md`: adsb.fi podstawowe, adsb.lol zapasowe, flaga wojskowa `dbFlags & 1`. Dostępność z Cloudflare Workers nie przeszła (adsb.fi 403, adsb.lol 429), zob. pytanie 10.
-3. **Kanał powiadomień: Telegram czy e-mail?** — Owner: user. Block: S-03.
+3. **Kanał powiadomień: Telegram czy e-mail?** — Owner: user. Block: — (rozstrzygnięte). **Odpowiedź (2026-09-29):** Telegram.
 4. **Długość okna deduplikacji?** — Owner: user. Block: S-04.
 5. **Metoda logowania (e-mail + hasło, OAuth, magic link)?** — Owner: user. Block: — (S-01 zakłada utrzymanie działającego e-maila z hasłem).
 6. **Domyślna wartość promienia?** — Owner: user. Block: — (S-02 przyjmuje 30 km ze zatwierdzonego spec).
