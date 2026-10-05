@@ -1,12 +1,23 @@
 /* eslint-disable no-console -- console is the only output channel of a cron run (wrangler tail / dev terminal) */
 import { CRON_RUN_RETENTION_DAYS, type CronRunStatus } from "@/lib/cron-runs";
 import { createAdminClient } from "@/lib/supabase-admin";
+import { runAlertPoll, type AlertPollSummary } from "@/workers/alert-poller";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+// Bounds cron_runs.error when many users fail in the same run.
+const MAX_ERROR_CHARS = 500;
 
-// The run's actual work. Empty in F-02; the S-03 poller plugs in here.
-function runWork(): Promise<void> {
-  return Promise.resolve();
+// The run's actual work: one alert poll for every active user.
+function runWork(supabase: NonNullable<ReturnType<typeof createAdminClient>>): Promise<AlertPollSummary> {
+  return runAlertPoll(supabase, () => new Date());
+}
+
+function describeSummary(summary: AlertPollSummary | null): string {
+  if (!summary) {
+    return "";
+  }
+  const { users, polled, matches, duplicates, sent } = summary;
+  return `; users: ${users}, polled: ${polled}, matches: ${matches}, duplicates: ${duplicates}, sent: ${sent}`;
 }
 
 function describeError(error: unknown): string {
@@ -37,8 +48,13 @@ export async function handleScheduled(
   const startedAt = new Date();
   let status: CronRunStatus = "ok";
   let runError: string | null = null;
+  let summary: AlertPollSummary | null = null;
   try {
-    await runWork();
+    summary = await runWork(supabase);
+    if (summary.errors.length > 0) {
+      status = "error";
+      runError = summary.errors.join("; ").slice(0, MAX_ERROR_CHARS);
+    }
   } catch (error) {
     status = "error";
     runError = describeError(error);
@@ -65,7 +81,7 @@ export async function handleScheduled(
 
     console.log(
       `[cron] run at ${startedAt.toISOString()} (cron: ${controller.cron}) ${status} in ${durationMs} ms` +
-        `${runError ? `: ${runError}` : ""}; recorded: ${insertError ? "no" : "yes"}; pruned: ${pruned ?? 0}`,
+        `${runError ? `: ${runError}` : ""}${describeSummary(summary)}; recorded: ${insertError ? "no" : "yes"}; pruned: ${pruned ?? 0}`,
     );
   } catch (error) {
     console.error(`[cron] run at ${startedAt.toISOString()} bookkeeping failed: ${describeError(error)}`);

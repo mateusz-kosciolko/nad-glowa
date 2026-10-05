@@ -543,11 +543,11 @@ wymaga wcześniejszego `db push` (Faza 4, `deploy-plan.md`).
 
 #### Automated
 
-- [x] 2.1 Migracja stosuje się bez resetu danych
-- [x] 2.2 Testy bazy przechodzą z nowymi asercjami
-- [x] 2.3 Typy zawierają kolumnę `telegram_chat_id`
-- [x] 2.4 Lint, testy, typecheck i build czyste
-- [x] 2.5 Smoke przechodzi z nowymi krokami
+- [x] 2.1 Migracja stosuje się bez resetu danych — fe8c3aa
+- [x] 2.2 Testy bazy przechodzą z nowymi asercjami — fe8c3aa
+- [x] 2.3 Typy zawierają kolumnę `telegram_chat_id` — fe8c3aa
+- [x] 2.4 Lint, testy, typecheck i build czyste — fe8c3aa
+- [x] 2.5 Smoke przechodzi z nowymi krokami — fe8c3aa
 
 #### Manual
 
@@ -559,15 +559,15 @@ wymaga wcześniejszego `db push` (Faza 4, `deploy-plan.md`).
 
 #### Automated
 
-- [ ] 3.1 Migracja stosuje się bez resetu danych
-- [ ] 3.2 Testy bazy przechodzą z nowym plikiem
-- [ ] 3.3 Typy, lint, testy, typecheck i build czyste
-- [ ] 3.4 Wyzwolenie `scheduled` zwraca 200, a log pokazuje liczniki biegu
-- [ ] 3.5 Smoke przechodzi na `npm run dev`
+- [x] 3.1 Migracja stosuje się bez resetu danych
+- [x] 3.2 Testy bazy przechodzą z nowym plikiem
+- [x] 3.3 Typy, lint, testy, typecheck i build czyste
+- [x] 3.4 Wyzwolenie `scheduled` zwraca 200, a log pokazuje liczniki biegu
+- [x] 3.5 Smoke przechodzi na `npm run dev`
 
 #### Manual
 
-- [ ] 3.6 Bez `TELEGRAM_BOT_TOKEN` bieg kończy się `error`, a dashboard pokazuje „(last run failed)”
+- [x] 3.6 Bez `TELEGRAM_BOT_TOKEN` bieg kończy się `error`, a dashboard pokazuje „(last run failed)”
 - [ ] 3.7 Alert o popularnym typie przychodzi na Telegram z pełną treścią
 - [ ] 3.8 Ta sama maszyna nie daje drugiego alertu w kolejnych biegach
 - [ ] 3.9 `paused = true` wstrzymuje alerty, biegi trwają

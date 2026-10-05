@@ -34,6 +34,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_notifications: {
+        Row: {
+          aircraft_hex: string
+          aircraft_type: string
+          already_close: boolean
+          closest_at: string
+          closest_distance_km: number
+          id: number
+          registration: string | null
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          aircraft_hex: string
+          aircraft_type: string
+          already_close: boolean
+          closest_at: string
+          closest_distance_km: number
+          id?: never
+          registration?: string | null
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          aircraft_hex?: string
+          aircraft_type?: string
+          already_close?: boolean
+          closest_at?: string
+          closest_distance_km?: number
+          id?: never
+          registration?: string | null
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       alert_settings: {
         Row: {
           aircraft_types: unknown[]
