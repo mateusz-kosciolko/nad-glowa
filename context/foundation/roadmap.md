@@ -46,7 +46,7 @@ Obserwator z balkonu dowiaduje się o nietypowym samolocie (wojskowym, ciężkim
 | S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie               | —                | FR-001, Access Control                 | ready       |
 | S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                  | —                | FR-003, FR-004, FR-005, Access Control | done        |
 | S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                       | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | in-progress |
-| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji            | S-03             | FR-010, US-01                          | blocked     |
+| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji            | S-03             | FR-010, US-01                          | planning    |
 | S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                             | S-03             | FR-006                                 | proposed    |
 | S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście           | F-01, S-02       | FR-002, FR-005                         | proposed    |
 | S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                              | S-03             | FR-009, US-01                          | proposed    |
@@ -153,9 +153,9 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Parallel with:** S-01, S-05, S-06, S-07
 - **Blockers:** —
 - **Unknowns:**
-  - Długość okna deduplikacji (Open Roadmap Question 4) — Owner: user. Block: yes.
+  - Długość okna deduplikacji (Open Roadmap Question 4) — Owner: user. Block: no. **Odpowiedź (2026-10-05):** 60 min od wysłania alertu; ta sama maszyna to ten sam adres transpondera (bez adresów z `~`) lub ta sama rejestracja.
 - **Risk:** To zabezpieczenie „bez spamu” z PRD; dopóki go nie ma, produkt nie nadaje się do używania na co dzień, więc ma pierwszeństwo przed pozostałymi elementami po S-03.
-- **Status:** blocked
+- **Status:** planning — realizowane w zmianie `first-advance-alert` (S-03 wchłonął S-04).
 
 ### S-05: Wstrzymanie i wznowienie alertów
 
@@ -166,7 +166,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Parallel with:** S-01, S-04, S-06, S-07
 - **Blockers:** —
 - **Unknowns:** —
-- **Risk:** Darmowy projekt bazy usypia się po 7 dniach bezczynności (`infrastructure.md`), więc pauza nie może zatrzymywać zadania cyklicznego, tylko samo wysyłanie; inaczej alerty po urlopie nie wrócą.
+- **Risk:** Darmowy projekt bazy usypia się po 7 dniach bezczynności (`infrastructure.md`), więc pauza nie może zatrzymywać zadania cyklicznego, tylko samo wysyłanie; inaczej alerty po urlopie nie wrócą. Poller ze zmiany `first-advance-alert` już to respektuje: pomija użytkowników z `paused = true`, a zadanie cykliczne biegnie dalej.
 - **Status:** proposed
 
 ### S-06: Czytelny wybór typów samolotów
@@ -204,7 +204,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 | S-01       | invite-only-access    | Zamknij rejestrację i chroń wszystkie trasy      | yes                   | Run `/10x-plan invite-only-access`; zastąp ścieżkę testu smoke                                                                        |
 | S-02       | alert-settings-basic  | Ustawienia alertów: dom, promień, typy           | yes                   | Część danych pokrywają spec `aba254e` i plan `511ba0a` (Task 1); rozszerzyć o ekran ustawień                                          |
 | S-03       | first-advance-alert   | Pierwszy alert przed przelotem nad domem         | yes                   | Run `/10x-plan first-advance-alert`; kanał Telegram (Q3), pobieranie ADS-B lokalnie (Q10)                                             |
-| S-04       | no-repeat-alerts      | Deduplikacja alertów po maszynie                 | no                    | Blokuje długość okna (Q4) oraz S-03                                                                                                   |
+| S-04       | no-repeat-alerts      | Deduplikacja alertów po maszynie                 | no                    | Realizowane w zmianie `first-advance-alert`; okno 60 min (Q4)                                                                         |
 | S-05       | pause-resume-alerts   | Pauza i wznowienie alertów                       | no                    | Czeka na S-03                                                                                                                         |
 | S-06       | aircraft-type-picker  | Wybór typów z czytelnymi nazwami i wyszukiwaniem | no                    | Czeka na F-01 i S-02                                                                                                                  |
 | S-07       | route-in-alerts       | Trasa (skąd/dokąd) w alercie                     | no                    | Czeka na S-03; źródło trasy wyjaśnia F-01                                                                                             |
@@ -214,11 +214,11 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 1. **Czy istniejące płatne alerty (Flightradar24 lub podobne) już rozwiązują ten problem?** — Owner: user. Block: roadmap-wide. PRD każe sprawdzić to przed budową; przy celu `speed` najtaniej zrobić to przed S-03.
 2. **Które darmowe publiczne źródło ADS-B podaje typ samolotu i flagę wojskową?** — Owner: user. Block: F-01 (rozstrzyga je), S-03, S-06. Jakość danych rozstrzygnięta przez F-01 → `context/foundation/adsb-source.md`: adsb.fi podstawowe, adsb.lol zapasowe, flaga wojskowa `dbFlags & 1`. Dostępność z Cloudflare Workers nie przeszła (adsb.fi 403, adsb.lol 429), zob. pytanie 10.
 3. **Kanał powiadomień: Telegram czy e-mail?** — Owner: user. Block: — (rozstrzygnięte). **Odpowiedź (2026-09-29):** Telegram.
-4. **Długość okna deduplikacji?** — Owner: user. Block: S-04.
+4. **Długość okna deduplikacji?** — Owner: user. Block: — (rozstrzygnięte). **Odpowiedź (2026-10-05):** 60 min od wysłania alertu; ta sama maszyna = adres transpondera (bez adresów z `~`) lub rejestracja. Realizowane w zmianie `first-advance-alert` (S-03 wchłonął S-04).
 5. **Metoda logowania (e-mail + hasło, OAuth, magic link)?** — Owner: user. Block: — (S-01 zakłada utrzymanie działającego e-maila z hasłem).
 6. **Domyślna wartość promienia?** — Owner: user. Block: — (S-02 przyjmuje 30 km ze zatwierdzonego spec).
 7. **Skala docelowa: wolumen zapytań i danych?** — Owner: user. Block: — (wpływa na budżet zapytań na jeden bieg zadania, ryzyko z `infrastructure.md`).
-8. **Czy dziennik obserwacji jest zapisywany w MVP, choć jego przeglądanie (FR-011) jest odłożone?** — Owner: user. Block: — w tym kamieniu milowym; od odpowiedzi zależy drugorzędne kryterium sukcesu.
+8. **Czy dziennik obserwacji jest zapisywany w MVP, choć jego przeglądanie (FR-011) jest odłożone?** — Owner: user. Block: — w tym kamieniu milowym; od odpowiedzi zależy drugorzędne kryterium sukcesu. Stan po zmianie `first-advance-alert`: każdy wysłany alert trafia do tabeli `public.alert_notifications` (tylko `service_role`, bez retencji i bez polityki odczytu dla użytkowników; tę dodałoby FR-011).
 9. **Czy MVP ma zawierać kolekcję rekordów zarządzaną przez użytkownika?** — Owner: user. Block: — w tym kamieniu milowym (kandydaci FR-008, FR-011 są odłożeni).
 10. **Gdzie działa pobieranie danych ADS-B (poller), skoro oba darmowe źródła odmawiają żądań z Cloudflare Workers?** — Owner: user. Block: — (rozstrzygnięte). **Odpowiedź (2026-09-28):** na razie lokalnie, z sieci użytkownika; pobieranie i zadanie cykliczne nie są wdrażane na serwer w M-1. Research innych źródeł nie dał darmowego źródła działającego z Workerów (szczegóły: `context/foundation/adsb-source.md`, „Research alternatyw”). Wdrożenie produkcyjne czeka w `## Parked`.
 

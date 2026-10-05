@@ -48,16 +48,32 @@ ale nic ich jeszcze nie czyta. Oba źródła ADS-B odmawiają żądań z produkc
 | Projekt Supabase    | `nwphfexokrngshgmhucf`, region EU                                  |
 | Komenda wdrożeniowa | `npm run build && npx wrangler deploy`                             |
 
+## Przed następnym wdrożeniem
+
+Zmiana `first-advance-alert` (2026-10-05, jeszcze niewdrożona) dodała dwie migracje, których nie ma na
+produkcyjnej Supabase: `supabase/migrations/20261005113514_alert_settings_telegram.sql` (kolumna
+`telegram_chat_id` w `alert_settings`) i `supabase/migrations/20261005132125_alert_notifications.sql` (tabela
+`public.alert_notifications`, tylko `service_role`). **Przed kolejnym `npx wrangler deploy` trzeba je wypchnąć**
+(`npx supabase db push`, wcześniej `--dry-run`), bo `/settings` w obecnym kodzie czyta `telegram_chat_id`
+i bez migracji przestanie działać. Kolejność: najpierw migracje, potem deploy — migracje są addytywne,
+więc obecna wersja Workera działa z nimi bez zmian. `--dry-run` prawdopodobnie pokaże też dwie migracje
+`cron_runs` z `minute-cron-heartbeat` (`20260928180224`, `20260929065324`), które nie trafiły na produkcję,
+bo cron działa lokalnie; są addytywne i można je wypchnąć razem z powyższymi.
+
+`TELEGRAM_BOT_TOKEN` istnieje tylko lokalnie w `.dev.vars`; w Workers Secrets go nie ma. Na produkcji
+sekret jest opcjonalny, dopóki poller nie jest tam wdrożony (Open Roadmap Question 10).
+
 ## Podpięte sekrety
 
 Wartości nie są tu zapisane i nigdy nie będą — Workers Secrets są write-only, panel i CLI ich nie pokazują.
 Rotacja: ponowne `npx wrangler secret put <NAZWA>` (tworzy nową wersję, bez rebuildu).
 
-| Nazwa                  | Gdzie żyje                                          | Odczyt w kodzie                                  |
-| ---------------------- | --------------------------------------------------- | ------------------------------------------------ |
-| `SUPABASE_URL`         | Workers Secret + lokalnie `.dev.vars`               | `astro:env/server` → `src/lib/supabase.ts`       |
-| `SUPABASE_KEY`         | Workers Secret + lokalnie `.dev.vars`               | `astro:env/server` → `src/lib/supabase.ts`       |
-| `SUPABASE_SERVICE_KEY` | tylko lokalnie `.dev.vars` (w Workers Secrets brak) | `astro:env/server` → `src/lib/supabase-admin.ts` |
+| Nazwa                  | Gdzie żyje                                          | Odczyt w kodzie                                                                               |
+| ---------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `SUPABASE_URL`         | Workers Secret + lokalnie `.dev.vars`               | `astro:env/server` → `src/lib/supabase.ts`                                                    |
+| `SUPABASE_KEY`         | Workers Secret + lokalnie `.dev.vars`               | `astro:env/server` → `src/lib/supabase.ts`                                                    |
+| `SUPABASE_SERVICE_KEY` | tylko lokalnie `.dev.vars` (w Workers Secrets brak) | `astro:env/server` → `src/lib/supabase-admin.ts`                                              |
+| `TELEGRAM_BOT_TOKEN`   | tylko lokalnie `.dev.vars` (w Workers Secrets brak) | `astro:env/server` → `src/workers/alert-poller.ts`, `src/pages/api/settings/telegram-test.ts` |
 
 Użyty jest klucz **`anon` / `public`**, nie `service_role` — ochroną danych jest RLS w Postgresie,
 nie tajność klucza. `service_role` obchodzi RLS. Decyzją z 2026-09-24 trafi do tej aplikacji jako osobny

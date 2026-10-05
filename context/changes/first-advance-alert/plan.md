@@ -559,15 +559,15 @@ wymaga wcześniejszego `db push` (Faza 4, `deploy-plan.md`).
 
 #### Automated
 
-- [x] 3.1 Migracja stosuje się bez resetu danych
-- [x] 3.2 Testy bazy przechodzą z nowym plikiem
-- [x] 3.3 Typy, lint, testy, typecheck i build czyste
-- [x] 3.4 Wyzwolenie `scheduled` zwraca 200, a log pokazuje liczniki biegu
-- [x] 3.5 Smoke przechodzi na `npm run dev`
+- [x] 3.1 Migracja stosuje się bez resetu danych — 6c2fd8e
+- [x] 3.2 Testy bazy przechodzą z nowym plikiem — 6c2fd8e
+- [x] 3.3 Typy, lint, testy, typecheck i build czyste — 6c2fd8e
+- [x] 3.4 Wyzwolenie `scheduled` zwraca 200, a log pokazuje liczniki biegu — 6c2fd8e
+- [x] 3.5 Smoke przechodzi na `npm run dev` — 6c2fd8e
 
 #### Manual
 
-- [x] 3.6 Bez `TELEGRAM_BOT_TOKEN` bieg kończy się `error`, a dashboard pokazuje „(last run failed)”
+- [x] 3.6 Bez `TELEGRAM_BOT_TOKEN` bieg kończy się `error`, a dashboard pokazuje „(last run failed)” — 6c2fd8e
 - [ ] 3.7 Alert o popularnym typie przychodzi na Telegram z pełną treścią
 - [ ] 3.8 Ta sama maszyna nie daje drugiego alertu w kolejnych biegach
 - [ ] 3.9 `paused = true` wstrzymuje alerty, biegi trwają
@@ -576,12 +576,12 @@ wymaga wcześniejszego `db push` (Faza 4, `deploy-plan.md`).
 
 #### Automated
 
-- [ ] 4.1 Lint i testy czyste po zmianach dokumentów
-- [ ] 4.2 Roadmapa zawiera odpowiedź na pytanie 4
+- [x] 4.1 Lint i testy czyste po zmianach dokumentów
+- [x] 4.2 Roadmapa zawiera odpowiedź na pytanie 4
 
 #### Manual
 
 - [ ] 4.3 Zapytanie o alerty później niż 2 min przed najbliższym punktem zwraca 0
 - [ ] 4.4 Alert porównany z rzeczywistym przelotem na `globe.adsb.fi` mieści się w kryterium
 - [ ] 4.5 Godzina w wiadomości zgadza się z zegarem lokalnym
-- [ ] 4.6 Roadmapa i `deploy-plan.md` opisują stan po zmianie
+- [x] 4.6 Roadmapa i `deploy-plan.md` opisują stan po zmianie
