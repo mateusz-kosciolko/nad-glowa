@@ -20,11 +20,12 @@ Astro 7 SSR app (React 19 islands, Tailwind 4, shadcn/ui) with Supabase Auth, de
 - `npx wrangler deploy` — the only supported deploy command (Workers with Static Assets). Never `wrangler pages deploy` or any other `wrangler pages *` command: they ignore `wrangler.jsonc`, so the deploy silently loses `nodejs_compat` and any cron triggers.
 - There is no separate `wrangler dev` step. With `@astrojs/cloudflare` v14, `npm run dev` already runs workerd inside Vite; tutorials recommending `wrangler pages dev ./dist` are obsolete for these pins.
 - If the dev server answers 500 with "The file does not exist at …/node_modules/.vite/deps_ssr/… in the optimize deps directory" (seen after running `astro sync` / `build` alongside it), restart `npm run dev`; it is a stale Vite dep cache, not a code error.
+- `npm test` — Vitest unit tests (@vitest.config.ts) for pure modules only: `src/lib/**/*.test.ts`, run in Node without workerd or the Astro config, so tested modules must not import `astro:*` or Supabase. Import `describe`/`it`/`expect` explicitly from `vitest`.
 - `npm run smoke` — HTTP auth-flow test against a running server (`BASE_URL`, default `http://localhost:4321`); needs Supabase with email confirmation disabled.
 - `npm run cron:local` — fires the Worker's `scheduled` handler every 60 s via `GET /cdn-cgi/handler/scheduled` (`astro dev` never fires Cron Triggers on its own); needs a running `npm run dev` and `SUPABASE_SERVICE_KEY` in `.dev.vars`. The `/__scheduled` path from `context/foundation/infrastructure.md` belongs to `wrangler dev --test-scheduled` and does not exist here.
 - `npm run cf:types` — regenerates `worker-configuration.d.ts` (Workers runtime types and `Env`) after changing `wrangler.jsonc` or the variable names in `.dev.vars`; commit the result, CI does not generate it.
 
-No unit test runner is configured; the automated tests are `smoke` (HTTP) and `npm run test:db` (pgTAP permission tests in `supabase/tests/`).
+Three kinds of automated tests: `npm test` (Vitest unit tests for pure `src/lib` modules), `smoke` (HTTP) and `npm run test:db` (pgTAP permission tests in `supabase/tests/`).
 
 ## Structure & conventions
 
