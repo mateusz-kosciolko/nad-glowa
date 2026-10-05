@@ -35,7 +35,13 @@ async function request(path, { method = "GET", form } = {}) {
   return { status: response.status, location: response.headers.get("location") ?? "", body: await response.text() };
 }
 
-const settingsForm = { home_lat: "52.23456", home_lon: "21.01178", radius_km: "25", aircraft_types: "b744, a400 B744" };
+const settingsForm = {
+  home_lat: "52.23456",
+  home_lon: "21.01178",
+  radius_km: "25",
+  aircraft_types: "b744, a400 B744",
+  telegram_chat_id: "123456789",
+};
 
 const steps = [
   ["home renders", () => request("/"), { status: 200 }],
@@ -68,11 +74,22 @@ const steps = [
   [
     "settings page shows saved values",
     () => request("/settings"),
-    { status: 200, bodyIncludes: ["52.23", "21.01", "B744, A400"] },
+    { status: 200, bodyIncludes: ["52.23", "21.01", "B744, A400", "123456789"] },
   ],
   [
     "settings save rejects radius 0",
     () => request("/api/settings", { method: "POST", form: { ...settingsForm, radius_km: "0" } }),
+    { status: 302, location: "/settings?error=" },
+  ],
+  [
+    "settings save rejects non-numeric telegram chat id",
+    () => request("/api/settings", { method: "POST", form: { ...settingsForm, telegram_chat_id: "abc" } }),
+    { status: 302, location: "/settings?error=" },
+  ],
+  // No token in CI, and locally Telegram rejects the made-up chat ID, so this never depends on Telegram delivering.
+  [
+    "telegram test reports an error for signed-in user",
+    () => request("/api/settings/telegram-test", { method: "POST" }),
     { status: 302, location: "/settings?error=" },
   ],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
@@ -80,6 +97,11 @@ const steps = [
   [
     "settings save redirects after signout",
     () => request("/api/settings", { method: "POST", form: settingsForm }),
+    { status: 302, location: "/auth/signin" },
+  ],
+  [
+    "telegram test redirects after signout",
+    () => request("/api/settings/telegram-test", { method: "POST" }),
     { status: 302, location: "/auth/signin" },
   ],
 ];

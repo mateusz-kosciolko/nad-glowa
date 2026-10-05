@@ -19,6 +19,7 @@ export default defineConfig({
       SUPABASE_URL: envField.string({ context: "server", access: "secret", optional: true }),
       SUPABASE_KEY: envField.string({ context: "server", access: "secret", optional: true }),
       SUPABASE_SERVICE_KEY: envField.string({ context: "server", access: "secret", optional: true }),
+      TELEGRAM_BOT_TOKEN: envField.string({ context: "server", access: "secret", optional: true }),
     },
   },
 });

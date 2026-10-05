@@ -531,23 +531,23 @@ wymaga wcześniejszego `db push` (Faza 4, `deploy-plan.md`).
 
 #### Automated
 
-- [x] 1.1 Testy jednostkowe przechodzą: `npm test`
-- [x] 1.2 Lint, typecheck i build czyste
-- [x] 1.3 Krok testów jest w CI
+- [x] 1.1 Testy jednostkowe przechodzą: `npm test` — 2cb56ef
+- [x] 1.2 Lint, typecheck i build czyste — 2cb56ef
+- [x] 1.3 Krok testów jest w CI — 2cb56ef
 
 #### Manual
 
-- [x] 1.4 Przegląd granic w `src/lib/flyover.ts` względem Business Logic PRD i decyzji planu
+- [x] 1.4 Przegląd granic w `src/lib/flyover.ts` względem Business Logic PRD i decyzji planu — 2cb56ef
 
 ### Phase 2: Kanał Telegram w ustawieniach
 
 #### Automated
 
-- [ ] 2.1 Migracja stosuje się bez resetu danych
-- [ ] 2.2 Testy bazy przechodzą z nowymi asercjami
-- [ ] 2.3 Typy zawierają kolumnę `telegram_chat_id`
-- [ ] 2.4 Lint, testy, typecheck i build czyste
-- [ ] 2.5 Smoke przechodzi z nowymi krokami
+- [x] 2.1 Migracja stosuje się bez resetu danych
+- [x] 2.2 Testy bazy przechodzą z nowymi asercjami
+- [x] 2.3 Typy zawierają kolumnę `telegram_chat_id`
+- [x] 2.4 Lint, testy, typecheck i build czyste
+- [x] 2.5 Smoke przechodzi z nowymi krokami
 
 #### Manual
 

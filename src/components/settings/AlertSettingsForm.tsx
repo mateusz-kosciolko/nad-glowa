@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { CircleCheck, LocateFixed, MapPin, Plane, Radar, Save } from "lucide-react";
+import { CircleCheck, LocateFixed, MapPin, Plane, Radar, Save, Send } from "lucide-react";
 import { FormField } from "@/components/auth/FormField";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { ServerError } from "@/components/auth/ServerError";
@@ -31,6 +31,7 @@ export default function AlertSettingsForm({ initial, serverError, saved = false 
   const [lon, setLon] = useState(coordinateToText(initial.home_lon));
   const [radius, setRadius] = useState(String(initial.radius_km));
   const [types, setTypes] = useState(initial.aircraft_types.join(", "));
+  const [chatId, setChatId] = useState(initial.telegram_chat_id === null ? "" : String(initial.telegram_chat_id));
   const [clientError, setClientError] = useState<string | null>(null);
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
   const [locating, setLocating] = useState(false);
@@ -134,6 +135,21 @@ export default function AlertSettingsForm({ initial, serverError, saved = false 
         icon={<Plane className="size-4" />}
         hint={
           <p className={hintClass}>ICAO type codes separated by commas (max. {MAX_AIRCRAFT_TYPES}), e.g. B744, A400.</p>
+        }
+      />
+
+      <FormField
+        id="telegram_chat_id"
+        label="Telegram chat ID"
+        inputMode="numeric"
+        value={chatId}
+        onChange={setChatId}
+        placeholder="Your numeric chat ID"
+        icon={<Send className="size-4" />}
+        hint={
+          <p className={hintClass}>
+            Open your bot in Telegram and press Start, then get your chat ID from @userinfobot.
+          </p>
         }
       />
 

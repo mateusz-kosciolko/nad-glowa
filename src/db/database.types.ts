@@ -41,6 +41,7 @@ export type Database = {
           home_lon: number | null
           paused: boolean
           radius_km: number
+          telegram_chat_id: number | null
           updated_at: string
           user_id: string
         }
@@ -50,6 +51,7 @@ export type Database = {
           home_lon?: number | null
           paused?: boolean
           radius_km?: number
+          telegram_chat_id?: number | null
           updated_at?: string
           user_id: string
         }
@@ -59,6 +61,7 @@ export type Database = {
           home_lon?: number | null
           paused?: boolean
           radius_km?: number
+          telegram_chat_id?: number | null
           updated_at?: string
           user_id?: string
         }

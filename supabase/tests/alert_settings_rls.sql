@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap;
-select plan(12);
+select plan(15);
 
 -- ── struktura ────────────────────────────────────────────────────────
 select has_table('public'::name, 'alert_settings'::name);
@@ -87,6 +87,18 @@ select is(
   'wiersz użytkownika B jest niewidoczny nawet po jawnym user_id'
 );
 
+-- ── kanał Telegram: własny chat ID zapisywalny, cudzy niewidoczny ────
+update public.alert_settings
+   set telegram_chat_id = -1001234567890
+ where user_id = '11111111-1111-1111-1111-111111111111';
+
+select is(
+  (select telegram_chat_id from public.alert_settings
+    where user_id = '11111111-1111-1111-1111-111111111111'),
+  -1001234567890::bigint,
+  'użytkownik A zapisał własny telegram_chat_id (ujemne ID grupy mieści się w bigint)'
+);
+
 -- Brak uprawnienia delete (revoke w migracji) odrzuca operację, zanim
 -- dojdzie do polityk, więc wiersz zostaje nietknięty.
 select throws_ok(
@@ -103,6 +115,33 @@ select throws_ok(
   '42501',
   null,
   'insert odrzucony — wiersz tworzy wyłącznie trigger'
+);
+
+-- ── RLS oczami użytkownika B ─────────────────────────────────────────
+set local request.jwt.claims =
+  '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}';
+
+select is(
+  (select count(*)::int from public.alert_settings
+    where user_id = '11111111-1111-1111-1111-111111111111'),
+  0,
+  'użytkownik B nie widzi ustawień (ani chat ID) użytkownika A'
+);
+
+-- Update cudzego wiersza nie rzuca, ale polityka using odfiltrowuje go,
+-- więc chat ID użytkownika A zostaje nietknięty.
+update public.alert_settings
+   set telegram_chat_id = 999
+ where user_id = '11111111-1111-1111-1111-111111111111';
+
+set local request.jwt.claims =
+  '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+
+select is(
+  (select telegram_chat_id from public.alert_settings
+    where user_id = '11111111-1111-1111-1111-111111111111'),
+  -1001234567890::bigint,
+  'użytkownik B nie nadpisał chat ID użytkownika A'
 );
 
 select * from finish();

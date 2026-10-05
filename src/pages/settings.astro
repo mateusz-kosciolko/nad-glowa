@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase";
 const { user } = Astro.locals;
 const serverError = Astro.url.searchParams.get("error");
 const saved = Astro.url.searchParams.get("saved") === "1";
+const telegramSent = Astro.url.searchParams.get("telegram") === "sent";
 
 let initial: AlertSettingsInput | null = null;
 let loadError: string | null = null;
@@ -20,7 +21,7 @@ if (!user) {
 } else {
   const { data, error } = await supabase
     .from("alert_settings")
-    .select("home_lat, home_lon, radius_km, aircraft_types")
+    .select("home_lat, home_lon, radius_km, aircraft_types, telegram_chat_id")
     .eq("user_id", user.id)
     .maybeSingle();
 
@@ -35,6 +36,7 @@ if (!user) {
       home_lon: data.home_lon,
       radius_km: data.radius_km,
       aircraft_types: data.aircraft_types.filter((code): code is string => typeof code === "string"),
+      telegram_chat_id: data.telegram_chat_id,
     };
   }
 }
@@ -48,7 +50,24 @@ if (!user) {
       </h1>
       <p class="mb-6 text-center text-sm text-blue-100/60">Where to watch and which aircraft to alert you about.</p>
       {initial ? (
-        <AlertSettingsForm initial={initial} serverError={serverError} saved={saved} client:load />
+        <>
+          <AlertSettingsForm initial={initial} serverError={serverError} saved={saved} client:load />
+          {/* A separate form: nested forms are invalid HTML, and the test must not save unsaved edits. */}
+          <form method="POST" action="/api/settings/telegram-test" class="mt-6 border-t border-white/10 pt-4">
+            <p class="mb-2 text-xs text-blue-100/50">The test message goes to your saved Telegram chat ID.</p>
+            {telegramSent && !serverError && (
+              <p class="mb-2 flex items-center gap-2 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
+                Test message sent. Check your Telegram chat.
+              </p>
+            )}
+            <button
+              type="submit"
+              class="flex w-full items-center justify-center gap-2 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm transition-colors hover:bg-white/20"
+            >
+              Send test message
+            </button>
+          </form>
+        </>
       ) : (
         <p class="rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">{loadError}</p>
       )}

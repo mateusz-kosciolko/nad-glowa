@@ -123,6 +123,22 @@ The local Studio UI is available at `http://localhost:54323`.
 
 `npx supabase start` applies the migrations in `supabase/migrations/` (alert settings and the `cron_runs` job log). To apply migrations added later without wiping local data, run `npx supabase migration up`.
 
+### Telegram alerts
+
+Aircraft alerts are delivered by a Telegram bot. To set up the channel from scratch:
+
+1. In Telegram, talk to [@BotFather](https://t.me/BotFather), send `/newbot` and follow the prompts. It replies with the bot token.
+2. Add the token to `.dev.vars` (and as a Worker secret in production: `npx wrangler secret put TELEGRAM_BOT_TOKEN`). It is a server-only secret read through `astro:env/server`:
+
+```
+TELEGRAM_BOT_TOKEN=<token from BotFather>
+```
+
+3. Open a chat with your bot and press **Start** — a bot cannot message you before you do.
+4. Get your chat ID from [@userinfobot](https://t.me/userinfobot) (send it any message; it replies with your numeric ID).
+5. Paste the chat ID into **Telegram chat ID** on `/settings` and save.
+6. Press **Send test message** below the settings form. The message arrives in your chat, or the page shows Telegram's error (e.g. "chat not found").
+
 ### Using a cloud Supabase project instead
 
 If you prefer to use a hosted Supabase project, add these variables to your `.env` and `.dev.vars` files:
