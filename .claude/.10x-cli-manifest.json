@@ -2,8 +2,8 @@
   "package": "@przeprogramowani/10x-cli",
   "version": "1.22.0",
   "manifestVersion": 3,
-  "lastApplied": "2026-09-28T17:27:45.603Z",
-  "lessonId": "m2l3",
+  "lastApplied": "2026-10-05T08:02:45.209Z",
+  "lessonId": "m2l5",
   "course": "10xdevs4",
   "tool": "claude-code",
   "files": {
@@ -54,13 +54,13 @@
           "references/starter-registry.yaml"
         ],
         "contentHashes": {
-          "SKILL.md": "e97c14eb65b82fc5ee7ff064091fe510432306ff211b4beb5ffb352edcb52231",
+          "SKILL.md": "b1eb7634b3b91cae4dd1b61ed38e6d06f575b7be8f4e707ca19ff2416a1f1860",
           "references/agent-friendly-criteria.md": "04e0cd99f1e64dd6dffe37a68844ddd8efb593057584afbe0fed308724eb0cad",
-          "references/decision-flow.md": "8f88998ae05601eb52d8d7038af4310a7b558d8c14ac091668e148b06de4fffd",
-          "references/eval-cases.md": "1bd474bd52bfb7a7efd5fa9a4f50f31f1a123f6acd6d0b5f2e9fd310b32fb920",
-          "references/handoff-schema.md": "157c5b8546b32c115b4e4ad05e29546bc6adda2a3739e30148bf391c9de167b2",
-          "references/residual-interview.md": "6b2b3f2b5975745e7c68e26748e7c2aaf4300de00e415f7c712fb8fac0272d95",
-          "references/starter-registry.yaml": "620a9b26b308f697b56cc0ef9a589c545c0d3054dd8fff49fd02b4f5dbd49b17"
+          "references/decision-flow.md": "6d4cbb39cef8008194bb4b17fdab2b613efb1ce8ebb5d0e7d523ac942d142c45",
+          "references/eval-cases.md": "c0d78806f4870d08a845c6ecacea11652ebb32ead9ae0c7d9704a155d3621930",
+          "references/handoff-schema.md": "6151895f9a345e1878a103f5c2a8a5e2644dbc34c4742df015c267b6cda27177",
+          "references/residual-interview.md": "26486c8dcc22a2abd93a113fbb2cf62a2d802cd38facb1bef7ed379823a2ebbb",
+          "references/starter-registry.yaml": "e5659c5e0fafe3383cea18103cc13292504dd333579c2dd52001f37502554bf1"
         }
       },
       "10x-stack-assess": {
@@ -74,13 +74,13 @@
           "references/starter-registry.yaml"
         ],
         "contentHashes": {
-          "SKILL.md": "ca7f0d58ae40d17d91ceb6a2cf35747076166f0de29834cb902a8e92caa9d0aa",
+          "SKILL.md": "ce18e5fbaf9fc2d0971c6ca32ee5de8a82ac16108ee86d0b10d6cb4e03366350",
           "references/agent-friendly-criteria.md": "04e0cd99f1e64dd6dffe37a68844ddd8efb593057584afbe0fed308724eb0cad",
-          "references/decision-flow.md": "8f88998ae05601eb52d8d7038af4310a7b558d8c14ac091668e148b06de4fffd",
-          "references/eval-cases.md": "1bd474bd52bfb7a7efd5fa9a4f50f31f1a123f6acd6d0b5f2e9fd310b32fb920",
-          "references/handoff-schema.md": "157c5b8546b32c115b4e4ad05e29546bc6adda2a3739e30148bf391c9de167b2",
-          "references/residual-interview.md": "6b2b3f2b5975745e7c68e26748e7c2aaf4300de00e415f7c712fb8fac0272d95",
-          "references/starter-registry.yaml": "620a9b26b308f697b56cc0ef9a589c545c0d3054dd8fff49fd02b4f5dbd49b17"
+          "references/decision-flow.md": "6d4cbb39cef8008194bb4b17fdab2b613efb1ce8ebb5d0e7d523ac942d142c45",
+          "references/eval-cases.md": "c0d78806f4870d08a845c6ecacea11652ebb32ead9ae0c7d9704a155d3621930",
+          "references/handoff-schema.md": "6151895f9a345e1878a103f5c2a8a5e2644dbc34c4742df015c267b6cda27177",
+          "references/residual-interview.md": "26486c8dcc22a2abd93a113fbb2cf62a2d802cd38facb1bef7ed379823a2ebbb",
+          "references/starter-registry.yaml": "e5659c5e0fafe3383cea18103cc13292504dd333579c2dd52001f37502554bf1"
         }
       },
       "10x-bootstrapper": {
@@ -95,14 +95,14 @@
           "references/verification-log-schema.md"
         ],
         "contentHashes": {
-          "SKILL.md": "14bfcb5e4ef69919bfc06cb8a9b5f6fbcb6be21061c054ad4098c50e54ed19e4",
-          "references/bootstrapper-config.yaml": "49c89560aed35e2eb694592f0cb90ab41f425d1effc4b94682bd601b024842c1",
-          "references/handoff-consumer.md": "3029b1ffdff09f85b840cfcc97a5ed50cabb6a6b8b0e6465032792227184917b",
+          "SKILL.md": "e0c52a60d9ab883c76478f35e93ea0bc0d13a0bde9a49fc5e1a67ad11d9d9a5b",
+          "references/bootstrapper-config.yaml": "e328ec20a69b53547feb3c3919704fc889eb33c739278b5e165eb743bab205e1",
+          "references/handoff-consumer.md": "43fde1a2166bf3e6337dc3345e49163deb853821949859bf8bd148a60369232d",
           "references/post-scaffold-verification.md": "9b2915667ff937c8630d9d58e45e6643169078e428cc7c2b7cb721d7ab9ec666",
           "references/pre-scaffold-verification.md": "8154ab886d22d21cdd23c1cc26069644932b6155cc1bee614ec6991306695708",
-          "references/refusal-protocol.md": "a4a5cb111659ab24dc88d9587d158f37896bbac618ec645c622ce680a685a8f1",
-          "references/scaffold-merge.md": "33454bd846edf024d62bae30c8604ca26caafb391b08eaf4163d61e566d9f252",
-          "references/verification-log-schema.md": "eaa89efa5fc4eaf3aa242f0b172757778dea44a42e3ac53e44057a828b40a458"
+          "references/refusal-protocol.md": "a210af689313070a6231741014c40165990a21a933c161c040e0fa58dc181fd1",
+          "references/scaffold-merge.md": "81695a4acd4ffb71370e65cfb8758b371ac3ba8140aa7da85e8811acce1192eb",
+          "references/verification-log-schema.md": "6935d472d4737871344e1b81713df30eaaaa7d389b24878a1394288938e749b0"
         }
       },
       "10x-health-check": {
@@ -207,6 +207,37 @@
         "contentHashes": {
           "SKILL.md": "ad2d6af5d987c566caa165145bf0f55c77d79ad4668cb204b78508f4a824621b",
           "references/progress-format.md": "01259753af620e2bfcaa04fb34d732d2efcb6fc172f8cf062f24870fe2248642"
+        }
+      },
+      "10x-frame": {
+        "files": ["SKILL.md"],
+        "contentHashes": {
+          "SKILL.md": "3bebaf8db6a5a09cd07a1e4c9b76b4c144a96f5d51a18ff3bff84cdbc7bcf84d"
+        }
+      },
+      "10x-research": {
+        "files": [
+          "SKILL.md",
+          "references/research-document.md",
+          "references/task-orchestration.md",
+          "scripts/metadata-guard.mjs",
+          "scripts/prose-json-check.mjs",
+          "scripts/prose-json-check.test.mjs"
+        ],
+        "contentHashes": {
+          "SKILL.md": "2916816249180400a1596ddf11d4c51dbddb470ba424cb7b4b7de6e6f8baa999",
+          "references/research-document.md": "5603e342c74a3af421ab800a9ff134c4a60b6697a2e39a49384a2781059b9c91",
+          "references/task-orchestration.md": "9279b3d73779c763ca740b09a521155a71369ed4787ca2c85b13be175d5c3dc6",
+          "scripts/metadata-guard.mjs": "a6c567ca15c93fe614d6a484602bb318272da3b38f1098b755335ee4da7fab68",
+          "scripts/prose-json-check.mjs": "44696db6a11664a0369f723dd6c3b379f36dc9774385bddedbb178420aea95cf",
+          "scripts/prose-json-check.test.mjs": "873ce640fd679720da65ee145dde13cf354ed664fcfff25a3f11bc5cc6324d51"
+        }
+      },
+      "10x-ui": {
+        "files": ["SKILL.md", "references/ui-quality-checklist.md"],
+        "contentHashes": {
+          "SKILL.md": "501ddc0e62c94eccbf419ae21f94ebe87eeecd157ab1e380afa126564e180b76",
+          "references/ui-quality-checklist.md": "de2f830b52f5de2bd480f6b283cb23598190958c9b8f868b0322494188b7e0e4"
         }
       }
     },
@@ -882,12 +913,149 @@
       },
       "installedReleaseId": "r-ca3701970cba6fc3667f1f4f40d4c759193ab12ea17f5ddadb13f1d32706e805",
       "installedManifestHash": "af0beb2ee7f7f2e44a0ae20c7ccc90c1cb34885b68219a3a15a6630156f4c6b7"
+    },
+    "m2l5": {
+      "appliedAt": "2026-10-05T08:02:45.209Z",
+      "skills": {
+        "10x-idea-check": {
+          "files": [
+            "SKILL.md",
+            "references/10xdevs-4-certification.md",
+            "references/10xdevs-4-dates.md",
+            "references/assessment-guide.md",
+            "references/examples.md"
+          ]
+        },
+        "10x-init": {
+          "files": ["SKILL.md"]
+        },
+        "10x-shape": {
+          "files": ["SKILL.md", "references/prd-schema.md"]
+        },
+        "10x-prd": {
+          "files": ["SKILL.md"]
+        },
+        "10x-tech-stack-selector": {
+          "files": [
+            "SKILL.md",
+            "references/agent-friendly-criteria.md",
+            "references/decision-flow.md",
+            "references/eval-cases.md",
+            "references/handoff-schema.md",
+            "references/residual-interview.md",
+            "references/starter-registry.yaml"
+          ]
+        },
+        "10x-stack-assess": {
+          "files": [
+            "SKILL.md",
+            "references/agent-friendly-criteria.md",
+            "references/decision-flow.md",
+            "references/eval-cases.md",
+            "references/handoff-schema.md",
+            "references/residual-interview.md",
+            "references/starter-registry.yaml"
+          ]
+        },
+        "10x-bootstrapper": {
+          "files": [
+            "SKILL.md",
+            "references/bootstrapper-config.yaml",
+            "references/handoff-consumer.md",
+            "references/post-scaffold-verification.md",
+            "references/pre-scaffold-verification.md",
+            "references/refusal-protocol.md",
+            "references/scaffold-merge.md",
+            "references/verification-log-schema.md"
+          ]
+        },
+        "10x-health-check": {
+          "files": ["SKILL.md", "references/health-check-schema.md"]
+        },
+        "10x-agents-md": {
+          "files": ["SKILL.md"]
+        },
+        "10x-rule-review": {
+          "files": ["SKILL.md"]
+        },
+        "10x-lesson": {
+          "files": ["SKILL.md"]
+        },
+        "10x-infra-research": {
+          "files": ["SKILL.md", "references/agent-friendly-criteria.md"]
+        },
+        "10x-roadmap": {
+          "files": ["SKILL.md", "references/milestone-state.md"]
+        },
+        "10x-new": {
+          "files": ["SKILL.md", "references/change-md.md"]
+        },
+        "10x-plan": {
+          "files": [
+            "SKILL.md",
+            "references/plan-persistence.md",
+            "references/plan-templates.md",
+            "references/progress-format.md",
+            "references/question-examples.md",
+            "references/task-orchestration.md",
+            "scripts/metadata-guard.mjs",
+            "scripts/metadata-guard.test.mjs"
+          ]
+        },
+        "10x-plan-review": {
+          "files": ["SKILL.md", "references/progress-format.md"]
+        },
+        "10x-implement": {
+          "files": ["SKILL.md", "references/implementation-discipline.md", "references/progress-format.md"]
+        },
+        "10x-archive": {
+          "files": ["SKILL.md", "references/archive-sha.md"]
+        },
+        "10x-status": {
+          "files": ["SKILL.md", "references/progress-format.md"]
+        },
+        "10x-impl-review": {
+          "files": ["SKILL.md", "references/progress-format.md"]
+        },
+        "10x-frame": {
+          "files": ["SKILL.md"]
+        },
+        "10x-research": {
+          "files": [
+            "SKILL.md",
+            "references/research-document.md",
+            "references/task-orchestration.md",
+            "scripts/metadata-guard.mjs",
+            "scripts/prose-json-check.mjs",
+            "scripts/prose-json-check.test.mjs"
+          ]
+        },
+        "10x-ui": {
+          "files": ["SKILL.md", "references/ui-quality-checklist.md"]
+        }
+      },
+      "prompts": [
+        "skill-explainer.md",
+        "m1l5-1-plan-integration.md",
+        "m1l5-2-constrain-approach.md",
+        "m1l5-3-extend-prerequisites.md",
+        "m1l5-4-store-plan.md"
+      ],
+      "configs": [],
+      "representation": {
+        "lang": "pl",
+        "tool": "claude-code",
+        "courseRules": true,
+        "rules": true
+      },
+      "installedReleaseId": "r-0adc5fdd8f2e88eba1001df705a525fe929e4c7e2e047e80f24bb4f647873ae8",
+      "installedManifestHash": "103cc89674813ebf220977e281d7bc3d66b1d24f2691a87ed17820ac91416a2f"
     }
   },
   "managedRules": {
     "path": "CLAUDE.md",
     "begin": "<!-- BEGIN @przeprogramowani/10x-cli -->",
     "end": "<!-- END @przeprogramowani/10x-cli -->",
-    "upstreamHash": "8b687dd52284177a265e60c1ed51285060c90dba30cb2aba37970d38657ed296"
+    "upstreamHash": "69be83a1f0b5a4f1963311f8a44391f023fbdf605c809dd51a0691b89487962b"
   }
 }
