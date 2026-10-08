@@ -91,3 +91,17 @@ export function parseAlertSettingsForm(form: FormData): AlertSettingsParseResult
 
   return { ok: true, value: { home_lat, home_lon, radius_km, aircraft_types, telegram_chat_id } };
 }
+
+export type PauseParseResult = { ok: true; paused: boolean } | { ok: false; error: string };
+
+// An explicit target state, not a toggle: a double click or a resubmitted form cannot flip the state back.
+export function parsePauseForm(form: FormData): PauseParseResult {
+  const value = form.get("paused");
+  if (value === "true") {
+    return { ok: true, paused: true };
+  }
+  if (value === "false") {
+    return { ok: true, paused: false };
+  }
+  return { ok: false, error: "Invalid pause request" };
+}

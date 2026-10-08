@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap;
-select plan(15);
+select plan(17);
 
 -- ── struktura ────────────────────────────────────────────────────────
 select has_table('public'::name, 'alert_settings'::name);
@@ -99,6 +99,18 @@ select is(
   'użytkownik A zapisał własny telegram_chat_id (ujemne ID grupy mieści się w bigint)'
 );
 
+-- ── pauza: własna zapisywalna (FR-006) ───────────────────────────────
+update public.alert_settings
+   set paused = true
+ where user_id = '11111111-1111-1111-1111-111111111111';
+
+select is(
+  (select paused from public.alert_settings
+    where user_id = '11111111-1111-1111-1111-111111111111'),
+  true,
+  'użytkownik A wstrzymał własne alerty'
+);
+
 -- Brak uprawnienia delete (revoke w migracji) odrzuca operację, zanim
 -- dojdzie do polityk, więc wiersz zostaje nietknięty.
 select throws_ok(
@@ -142,6 +154,24 @@ select is(
     where user_id = '11111111-1111-1111-1111-111111111111'),
   -1001234567890::bigint,
   'użytkownik B nie nadpisał chat ID użytkownika A'
+);
+
+-- Pauza cudzego wiersza: polityka using odfiltrowuje go tak samo.
+set local request.jwt.claims =
+  '{"sub":"22222222-2222-2222-2222-222222222222","role":"authenticated"}';
+
+update public.alert_settings
+   set paused = false
+ where user_id = '11111111-1111-1111-1111-111111111111';
+
+set local request.jwt.claims =
+  '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
+
+select is(
+  (select paused from public.alert_settings
+    where user_id = '11111111-1111-1111-1111-111111111111'),
+  true,
+  'użytkownik B nie zmienił pauzy użytkownika A'
 );
 
 select * from finish();

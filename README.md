@@ -139,6 +139,8 @@ TELEGRAM_BOT_TOKEN=<token from BotFather>
 5. Paste the chat ID into **Telegram chat ID** on `/settings` and save.
 6. Press **Send test message** below the settings form. The message arrives in your chat, or the page shows Telegram's error (e.g. "chat not found").
 
+To stop alerts for a while (e.g. on holiday), press **Pause alerts** on the dashboard; no alerts are sent until you press **Resume alerts**. The minute job keeps running and your settings stay as they are.
+
 ### Using a cloud Supabase project instead
 
 If you prefer to use a hosted Supabase project, add these variables to your `.env` and `.dev.vars` files:

@@ -40,6 +40,21 @@ if (!supabase) {
     }
   }
 }
+
+// Pause state of the user's alerts; null when it cannot be read, so the card shows no switch.
+let alertsPaused: boolean | null = null;
+if (supabase && user) {
+  const { data, error } = await supabase.from("alert_settings").select("paused").eq("user_id", user.id).maybeSingle();
+  // Like the cron card: a failed read (or a missing row) must not break the dashboard.
+  if (!error && data) {
+    alertsPaused = data.paused;
+  }
+}
+
+const alertsResult = Astro.url.searchParams.get("alerts");
+const alertsConfirmation =
+  alertsResult === "paused" ? "Alerts paused." : alertsResult === "resumed" ? "Alerts resumed." : null;
+const alertsError = Astro.url.searchParams.get("alerts_error");
 ---
 
 <Layout title="Dashboard">
@@ -69,6 +84,42 @@ if (!supabase) {
             No run for over 5 minutes — is <code>npm run cron:local</code> running?
           </p>
         )}
+      </div>
+      <div
+        class:list={cn(
+          "mt-4 rounded-lg border px-3 py-2 text-sm",
+          alertsPaused === true
+            ? "border-amber-500/30 bg-amber-900/30 text-amber-200"
+            : "border-white/10 bg-white/5 text-blue-100/80",
+        )}
+      >
+        {alertsPaused === null && <p>Alert status unavailable.</p>}
+        {alertsPaused === false && (
+          <form method="POST" action="/api/settings/pause" class="flex items-center justify-between gap-3">
+            <p>Alerts: active</p>
+            <input type="hidden" name="paused" value="true" />
+            <button
+              type="submit"
+              class="rounded-lg border border-white/20 bg-white/10 px-3 py-1 text-xs transition-colors hover:bg-white/20"
+            >
+              Pause alerts
+            </button>
+          </form>
+        )}
+        {alertsPaused === true && (
+          <form method="POST" action="/api/settings/pause" class="flex items-center justify-between gap-3">
+            <p>Alerts paused — you won't get notifications until you resume</p>
+            <input type="hidden" name="paused" value="false" />
+            <button
+              type="submit"
+              class="rounded-lg border border-amber-500/40 bg-amber-500/20 px-3 py-1 text-xs whitespace-nowrap transition-colors hover:bg-amber-500/30"
+            >
+              Resume alerts
+            </button>
+          </form>
+        )}
+        {alertsConfirmation && <p class="mt-1 text-xs text-green-300">{alertsConfirmation}</p>}
+        {alertsError && <p class="mt-1 text-xs text-red-300">{alertsError}</p>}
       </div>
       <div class="mt-6 flex items-center justify-center gap-3">
         <a

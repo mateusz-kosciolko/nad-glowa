@@ -191,6 +191,39 @@ const steps = [
     () => request("/api/settings/telegram-test", { method: "POST" }),
     { status: 302, location: "/settings?telegram_error=" },
   ],
+  // Pause round-trip; saving settings in between must not lift the pause.
+  ["dashboard shows alerts active", () => request("/dashboard"), { status: 200, bodyIncludes: ["Alerts: active"] }],
+  [
+    "pause alerts succeeds",
+    () => request("/api/settings/pause", { method: "POST", form: { paused: "true" } }),
+    { status: 302, location: "/dashboard?alerts=paused" },
+  ],
+  ["dashboard shows alerts paused", () => request("/dashboard"), { status: 200, bodyIncludes: ["Alerts paused"] }],
+  [
+    "settings save during pause succeeds",
+    () => request("/api/settings", { method: "POST", form: settingsForm }),
+    { status: 302, location: "/settings?saved=1" },
+  ],
+  [
+    "dashboard still shows alerts paused after settings save",
+    () => request("/dashboard"),
+    { status: 200, bodyIncludes: ["Alerts paused"] },
+  ],
+  [
+    "pause rejects an invalid value",
+    () => request("/api/settings/pause", { method: "POST", form: { paused: "maybe" } }),
+    { status: 302, location: "/dashboard?alerts_error=" },
+  ],
+  [
+    "resume alerts succeeds",
+    () => request("/api/settings/pause", { method: "POST", form: { paused: "false" } }),
+    { status: 302, location: "/dashboard?alerts=resumed" },
+  ],
+  [
+    "dashboard shows alerts active after resume",
+    () => request("/dashboard"),
+    { status: 200, bodyIncludes: ["Alerts: active"] },
+  ],
   [
     "signout clears session",
     () => request("/api/auth/signout", { method: "POST" }),
@@ -205,6 +238,11 @@ const steps = [
   [
     "telegram test redirects after signout",
     () => request("/api/settings/telegram-test", { method: "POST" }),
+    { status: 302, location: "/auth/signin" },
+  ],
+  [
+    "pause redirects after signout",
+    () => request("/api/settings/pause", { method: "POST", form: { paused: "true" } }),
     { status: 302, location: "/auth/signin" },
   ],
 ];
