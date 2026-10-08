@@ -386,9 +386,9 @@ Workera (jak dotąd). Aktualizacja słownika w przyszłości: uruchomić generat
 
 #### Manual
 
-- [x] 3.5 Na `/settings` widać 14 wyróżnionych z nazwami; kliknięcie dodaje chip, ponowne usuwa
+- [x] 3.5 Na `/settings` widać 14 wyróżnionych z nazwami; kliknięcie dodaje chip, ponowne usuwa — ea31396
 - [x] 3.6 Wyszukanie „globemaster” dodaje C17 z nazwą; „Add code ZZZZ” dodaje chip „ZZZZ · unknown name” — ea31396
 - [x] 3.7 Zapis i ponowne wejście pokazują te same chipy w tej samej kolejności; wcześniej zapisane kody spoza słownika nie giną — ea31396
 - [x] 3.8 Przy 20 wybranych dodawanie jest zablokowane z podpowiedzią — ea31396
-- [x] 3.9 Klawiatura: Tab dochodzi do przełączników, wyników i przycisków usunięcia; Enter w polu wyszukiwania nie wysyła formularza
-- [x] 3.10 Na szerokości telefonu (375 px) wybierak mieści się bez przewijania w poziomie
+- [x] 3.9 Klawiatura: Tab dochodzi do przełączników, wyników i przycisków usunięcia; Enter w polu wyszukiwania nie wysyła formularza — ea31396
+- [x] 3.10 Na szerokości telefonu (375 px) wybierak mieści się bez przewijania w poziomie — ea31396
