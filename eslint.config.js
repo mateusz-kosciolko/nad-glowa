@@ -78,6 +78,7 @@ const scriptsConfig = defineConfig({
       console: true,
       process: true,
       fetch: true,
+      URL: true,
       URLSearchParams: true,
       setTimeout: true,
       setInterval: true,

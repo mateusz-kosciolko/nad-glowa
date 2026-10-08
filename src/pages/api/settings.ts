@@ -27,7 +27,8 @@ export const POST: APIRoute = async (context) => {
   if (error) {
     return context.redirect(`/settings?error=${encodeURIComponent(error.message)}`);
   }
-  // The row is created by the signup trigger (or the migration backfill); none means that step failed.
+  // The row is created by a trigger when the account is created in the Supabase dashboard (or by the migration
+  // backfill); none means that step failed.
   if (data.length === 0) {
     return context.redirect(
       `/settings?error=${encodeURIComponent("Your settings record is missing. Please contact support.")}`,

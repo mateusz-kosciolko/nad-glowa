@@ -48,7 +48,7 @@ export const GET: APIRoute = async (context) => {
   if (error) {
     return json(500, { error: error.message });
   }
-  // No row (the signup trigger failed) or no home location yet: nothing to probe around.
+  // No row (the new-user trigger failed) or no home location yet: nothing to probe around.
   if (!data) {
     return json(409, { error: NO_HOME_ERROR });
   }

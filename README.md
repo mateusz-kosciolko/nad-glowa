@@ -55,7 +55,7 @@ npm run dev
 - `npm run lint` - Run ESLint with type-checked rules
 - `npm run lint:fix` - Auto-fix ESLint issues
 - `npm run format` - Run Prettier
-- `npm run smoke` - Smoke test the auth flow against a running server (`BASE_URL`, defaults to `http://localhost:4321`)
+- `npm run smoke` - Smoke test the auth flow against a running server (`BASE_URL`, defaults to `http://localhost:4321`); reads `.dev.vars` and needs the local Supabase `service_role` key
 - `npm run cron:local` - Run the minute job locally: calls the Worker's `scheduled` handler every 60 s on a running `npm run dev` (`BASE_URL`, defaults to `http://localhost:4321`). Each run is recorded in the `cron_runs` table and shown on the dashboard as "Last cron run"
 - `npm run test:db` - Run the pgTAP database tests in `supabase/tests/` against the local Supabase
 - `npm run cf:types` - Regenerate `worker-configuration.d.ts` (Cloudflare Workers types)
@@ -107,7 +107,7 @@ SUPABASE_URL=http://127.0.0.1:54321
 SUPABASE_KEY=<anon key from CLI output>
 ```
 
-Add the `service_role` key to `.dev.vars` only (never to client code). The minute job (`npm run cron:local`) uses it to record its runs, because it has no user session. Print it again at any time with `npx supabase status`:
+Add the `service_role` key to `.dev.vars` only (never to client code). The minute job (`npm run cron:local`) uses it to record its runs, because it has no user session, and `npm run smoke` uses it to create and delete its test account. Print it again at any time with `npx supabase status`:
 
 ```
 SUPABASE_SERVICE_KEY=<service_role key from CLI output>
@@ -153,26 +153,25 @@ SUPABASE_URL=https://<project-ref>.supabase.co
 SUPABASE_KEY=<anon-key>
 ```
 
-### Email confirmation in local development
+### Creating accounts
 
-By default Supabase requires email confirmation before a user can sign in. To skip this during local development:
+Access is by invitation only: the app has no sign-up page and Supabase rejects sign-ups (`enable_signup = false` in `supabase/config.toml`; on production, **Authentication → Sign In / Providers → Allow new users to sign up** is off). An administrator creates each account by hand:
 
-1. Open the Supabase dashboard for your project
-2. Go to **Authentication → Email → Confirm email**
-3. Toggle it **off**
+1. Open the Supabase dashboard for the project (locally: Studio at `http://127.0.0.1:54323`)
+2. Go to **Authentication → Users → Add user → Create new user**
+3. Enter the email and password and tick **Auto Confirm User**
 
-Users can then sign in immediately after sign-up without clicking a confirmation link.
+The user can sign in right away. A trigger creates the account's `alert_settings` row.
 
 ### Auth routes
 
-| Route                 | Description                                                             |
-| --------------------- | ----------------------------------------------------------------------- |
-| `/auth/signin`        | Email/password sign-in form                                             |
-| `/auth/signup`        | Email/password sign-up form                                             |
-| `/auth/confirm-email` | Post-signup "check your inbox" page                                     |
-| `/dashboard`          | Example protected page (redirects to `/auth/signin` if unauthenticated) |
+| Route          | Description                                                         |
+| -------------- | ------------------------------------------------------------------- |
+| `/auth/signin` | Email/password sign-in form (the only page open to anonymous users) |
+| `/`            | Redirects to `/dashboard`                                           |
+| `/dashboard`   | Dashboard for signed-in users                                       |
 
-Route protection is handled in `src/middleware.ts`. Add paths to the `PROTECTED_ROUTES` array there to require authentication.
+Route protection is handled in `src/middleware.ts` and is closed by default: every route requires a signed-in user unless its exact path is listed in `PUBLIC_ROUTES` there (sign-in page plus the sign-in and sign-out endpoints). Anonymous requests to any other path are redirected to `/auth/signin`.
 
 ## Deployment
 
@@ -194,14 +193,14 @@ Set `SUPABASE_URL` and `SUPABASE_KEY` as secrets in your Cloudflare dashboard or
 
 ## Smoke test
 
-`scripts/smoke.mjs` is a dependency-free Node script that walks the whole auth flow (sign-up, sign-in, protected page, sign-out) over HTTP. Run it against the dev server or the production preview after dependency upgrades:
+`scripts/smoke.mjs` is a dependency-free Node script that walks the whole auth flow over HTTP: anonymous redirects, closed sign-up (in the app and in Supabase), sign-in, protected pages, settings and sign-out. Run it against the dev server or the production preview after dependency upgrades:
 
 ```bash
 npm run dev            # or: npm run build && npm run preview
-BASE_URL=http://localhost:4321 npm run smoke
+npm run smoke          # BASE_URL defaults to http://localhost:4321
 ```
 
-It needs a reachable Supabase instance (local or cloud) with email confirmation disabled.
+Because sign-up is closed, the script creates its test account through the Supabase Admin API and deletes it after the run, even when a step fails. It reads `SUPABASE_URL`, `SUPABASE_KEY` and `SUPABASE_SERVICE_KEY` from `.dev.vars` and needs the `service_role` key of the **local** Supabase. It refuses to run (without sending any request) when `SUPABASE_URL` is not `127.0.0.1`, `localhost` or `::1` — never point it at production.
 
 > **Note:** this script exists primarily to guard the development of the starter itself — it is a fast sanity check that dependency upgrades did not break the build, the Cloudflare adapter or the Supabase auth flow. It is **not** a substitute for a real test suite. Once you build your own product on top of this starter, add proper tests (unit, integration, end-to-end) suited to your application.
 

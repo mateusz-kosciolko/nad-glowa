@@ -1,7 +1,14 @@
 import { defineMiddleware } from "astro:middleware";
 import { createClient } from "@/lib/supabase";
 
-const PROTECTED_ROUTES = ["/dashboard", "/settings", "/api/settings", "/api/adsb"];
+// Every route is private until it is added to this list. Matched exactly against the pathname
+// (a trailing "/" is ignored); anonymous requests to any other path are redirected to sign-in.
+const PUBLIC_ROUTES = ["/auth/signin", "/api/auth/signin", "/api/auth/signout"];
+
+function isPublicRoute(pathname: string) {
+  const normalized = pathname.length > 1 && pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+  return PUBLIC_ROUTES.includes(normalized);
+}
 
 export const onRequest = defineMiddleware(async (context, next) => {
   const supabase = createClient(context.request.headers, context.cookies);
@@ -15,10 +22,8 @@ export const onRequest = defineMiddleware(async (context, next) => {
     context.locals.user = null;
   }
 
-  if (PROTECTED_ROUTES.some((route) => context.url.pathname.startsWith(route))) {
-    if (!context.locals.user) {
-      return context.redirect("/auth/signin");
-    }
+  if (!context.locals.user && !isPublicRoute(context.url.pathname)) {
+    return context.redirect("/auth/signin");
   }
 
   return next();

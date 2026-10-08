@@ -29,7 +29,8 @@ if (!user) {
   if (error) {
     loadError = `Could not load your settings: ${error.message}`;
   } else if (!data) {
-    // The row is created by the signup trigger (or the migration backfill); none means that step failed.
+    // The row is created by a trigger when the account is created in the Supabase dashboard (or by the migration
+    // backfill); none means that step failed.
     loadError = "Your settings record is missing. Please contact support.";
   } else {
     initial = {

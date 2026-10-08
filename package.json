@@ -11,7 +11,7 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "format": "prettier --write .",
-    "smoke": "node scripts/smoke.mjs",
+    "smoke": "node --env-file-if-exists=.dev.vars scripts/smoke.mjs",
     "adsb:measure": "node scripts/adsb-measure.mjs",
     "cron:local": "node scripts/cron-local.mjs",
     "test:db": "supabase test db",

@@ -13,10 +13,7 @@ const error = Astro.url.searchParams.get("error");
       </h1>
       <SignInForm serverError={error} client:load />
       <p class="mt-4 text-center text-sm text-blue-100/60">
-        Don't have an account?{" "}
-        <a href="/auth/signup" class="text-purple-300 hover:underline">
-          Sign up
-        </a>
+        Access is by invitation only. Accounts are created by the administrator.
       </p>
     </div>
   </div>
