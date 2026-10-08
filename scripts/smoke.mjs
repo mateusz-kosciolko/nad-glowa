@@ -178,12 +178,12 @@ const steps = [
   [
     "settings save rejects radius 0",
     () => request("/api/settings", { method: "POST", form: { ...settingsForm, radius_km: "0" } }),
-    { status: 302, location: "/settings?error=" },
+    { status: 302, location: "/settings?error=radius_range" },
   ],
   [
     "settings save rejects non-numeric telegram chat id",
     () => request("/api/settings", { method: "POST", form: { ...settingsForm, telegram_chat_id: "abc" } }),
-    { status: 302, location: "/settings?error=" },
+    { status: 302, location: "/settings?error=invalid_chat_id" },
   ],
   // No token in CI, and locally Telegram rejects the made-up chat ID, so this never depends on Telegram delivering.
   [
@@ -212,7 +212,7 @@ const steps = [
   [
     "pause rejects an invalid value",
     () => request("/api/settings/pause", { method: "POST", form: { paused: "maybe" } }),
-    { status: 302, location: "/dashboard?alerts_error=" },
+    { status: 302, location: "/dashboard?alerts_error=invalid_pause" },
   ],
   [
     "resume alerts succeeds",
@@ -223,6 +223,12 @@ const steps = [
     "dashboard shows alerts active after resume",
     () => request("/dashboard"),
     { status: 200, bodyIncludes: ["Alerts: active"] },
+  ],
+  // Error parameters carry codes; a crafted value must not reach the page.
+  [
+    "dashboard ignores free text in alerts_error",
+    () => request(`/dashboard?alerts_error=${encodeURIComponent("<script>evil</script>")}`),
+    { status: 200, bodyIncludes: ["Something went wrong. Please try again."], bodyExcludes: ["evil"] },
   ],
   [
     "signout clears session",

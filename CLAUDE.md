@@ -36,6 +36,7 @@ Three kinds of automated tests: `npm test` (Vitest unit tests for pure `src/lib`
 - Import from `src` via the `@/` alias (`@/lib/supabase`), not deep relative paths.
 - Merge Tailwind classes with `cn()` from @src/lib/utils.ts; do not concatenate class strings.
 - Auth endpoints report failures by redirecting back to the form with `?error=<encodeURIComponent(message)>`, not by returning JSON.
+- Settings and dashboard endpoints redirect with an error code only (`?error=`, `?telegram_error=`, `?alerts_error=`); pages render it via `messageForCode()` from @src/lib/form-errors.ts, never the raw parameter.
 
 ## Commits & CI
 

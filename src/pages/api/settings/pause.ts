@@ -3,8 +3,9 @@ import { parsePauseForm } from "@/lib/alert-settings";
 import { createClient } from "@/lib/supabase";
 
 // The pause switch lives on the dashboard, so errors go back there, not to /settings.
-function dashboardError(message: string): string {
-  return `/dashboard?alerts_error=${encodeURIComponent(message)}`;
+// Only a code from src/lib/form-errors.ts goes into the URL; the dashboard maps it to a fixed message.
+function dashboardError(code: string): string {
+  return `/dashboard?alerts_error=${encodeURIComponent(code)}`;
 }
 
 export const POST: APIRoute = async (context) => {
@@ -15,12 +16,12 @@ export const POST: APIRoute = async (context) => {
 
   const supabase = createClient(context.request.headers, context.cookies);
   if (!supabase) {
-    return context.redirect(dashboardError("Supabase is not configured"));
+    return context.redirect(dashboardError("supabase_not_configured"));
   }
 
   const parsed = parsePauseForm(await context.request.formData());
   if (!parsed.ok) {
-    return context.redirect(dashboardError(parsed.error));
+    return context.redirect(dashboardError(parsed.code));
   }
 
   // Under RLS with the user's session: only the caller's own row can change. Other settings stay untouched.
@@ -31,11 +32,13 @@ export const POST: APIRoute = async (context) => {
     .select("user_id");
 
   if (error) {
-    return context.redirect(dashboardError(error.message));
+    // eslint-disable-next-line no-console -- server-side detail; the redirect carries only an error code
+    console.error(`Saving the alert pause state failed: ${error.message}`);
+    return context.redirect(dashboardError("save_failed"));
   }
   // The row is created by a trigger when the account is created; none means that step failed.
   if (data.length === 0) {
-    return context.redirect(dashboardError("Your settings record is missing. Please contact support."));
+    return context.redirect(dashboardError("settings_missing"));
   }
 
   return context.redirect(`/dashboard?alerts=${encodeURIComponent(parsed.paused ? "paused" : "resumed")}`);

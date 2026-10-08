@@ -1,6 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import { describeLastRun } from "@/lib/cron-runs";
+import { messageForCode } from "@/lib/form-errors";
 import { createClient } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
 
@@ -14,47 +15,54 @@ function formatAge(ageSeconds: number): string {
 let cronLine: string;
 let cronStale = false;
 let lastRunFailed = false;
+// Pause state of the user's alerts; null when it cannot be read, so the card shows no switch.
+let alertsPaused: boolean | null = null;
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 if (!supabase) {
   cronLine = "Cron status unavailable: Supabase is not configured.";
 } else {
-  const { data, error } = await supabase
-    .from("cron_runs")
-    .select("started_at, status")
-    .order("started_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+  // Independent reads, run in parallel; each card handles its own failure.
+  const [cronResult, settingsResult] = await Promise.all([
+    supabase
+      .from("cron_runs")
+      .select("started_at, status")
+      .order("started_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    user ? supabase.from("alert_settings").select("paused").eq("user_id", user.id).maybeSingle() : null,
+  ]);
 
-  if (error) {
+  if (cronResult.error) {
     // The status card is informational; a failed read must not break the dashboard.
     cronLine = "Cron status unavailable.";
   } else {
-    const lastRun = describeLastRun(data?.started_at ?? null, new Date());
+    const lastRun = describeLastRun(cronResult.data?.started_at ?? null, new Date());
     if (lastRun.state === "never") {
       cronLine = "No cron runs yet";
     } else {
       cronLine = `Last cron run: ${formatAge(lastRun.ageSeconds)} ago`;
       cronStale = lastRun.state === "stale";
-      lastRunFailed = data?.status === "error";
+      lastRunFailed = cronResult.data?.status === "error";
     }
   }
-}
 
-// Pause state of the user's alerts; null when it cannot be read, so the card shows no switch.
-let alertsPaused: boolean | null = null;
-if (supabase && user) {
-  const { data, error } = await supabase.from("alert_settings").select("paused").eq("user_id", user.id).maybeSingle();
   // Like the cron card: a failed read (or a missing row) must not break the dashboard.
-  if (!error && data) {
-    alertsPaused = data.paused;
+  if (settingsResult && !settingsResult.error && settingsResult.data) {
+    alertsPaused = settingsResult.data.paused;
   }
 }
 
+// Confirm only what the state just read agrees with: a reloaded or bookmarked URL must not contradict the card.
 const alertsResult = Astro.url.searchParams.get("alerts");
 const alertsConfirmation =
-  alertsResult === "paused" ? "Alerts paused." : alertsResult === "resumed" ? "Alerts resumed." : null;
-const alertsError = Astro.url.searchParams.get("alerts_error");
+  alertsResult === "paused" && alertsPaused === true
+    ? "Alerts paused."
+    : alertsResult === "resumed" && alertsPaused === false
+      ? "Alerts resumed."
+      : null;
+// The URL carries only error codes; never render the raw parameter.
+const alertsError = messageForCode(Astro.url.searchParams.get("alerts_error"));
 ---
 
 <Layout title="Dashboard">
@@ -100,7 +108,7 @@ const alertsError = Astro.url.searchParams.get("alerts_error");
             <input type="hidden" name="paused" value="true" />
             <button
               type="submit"
-              class="rounded-lg border border-white/20 bg-white/10 px-3 py-1 text-xs transition-colors hover:bg-white/20"
+              class="rounded-lg border border-white/20 bg-white/10 px-3 py-1 text-xs whitespace-nowrap transition-colors hover:bg-white/20"
             >
               Pause alerts
             </button>

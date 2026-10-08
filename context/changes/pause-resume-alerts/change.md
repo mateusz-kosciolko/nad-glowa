@@ -1,7 +1,7 @@
 ---
 change_id: pause-resume-alerts
 title: Pause resume alerts
-status: implemented
+status: impl_reviewed
 created: 2026-10-08
 updated: 2026-10-08
 archived_at: null

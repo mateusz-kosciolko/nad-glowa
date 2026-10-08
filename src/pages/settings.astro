@@ -2,14 +2,16 @@
 import Layout from "@/layouts/Layout.astro";
 import AlertSettingsForm from "@/components/settings/AlertSettingsForm";
 import type { AlertSettingsInput } from "@/lib/alert-settings";
+import { messageForCode } from "@/lib/form-errors";
 import { createClient } from "@/lib/supabase";
 
 // The middleware redirects anonymous users, so `user` is set here.
 const { user } = Astro.locals;
-const serverError = Astro.url.searchParams.get("error");
+// The URL carries only error codes; never render the raw parameter.
+const serverError = messageForCode(Astro.url.searchParams.get("error"));
 const saved = Astro.url.searchParams.get("saved") === "1";
 const telegramSent = Astro.url.searchParams.get("telegram") === "sent";
-const telegramError = Astro.url.searchParams.get("telegram_error");
+const telegramError = messageForCode(Astro.url.searchParams.get("telegram_error"));
 
 let initial: AlertSettingsInput | null = null;
 let loadError: string | null = null;

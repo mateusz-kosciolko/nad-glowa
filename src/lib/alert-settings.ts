@@ -17,7 +17,28 @@ export interface AlertSettingsInput {
   telegram_chat_id: number | null;
 }
 
-export type AlertSettingsParseResult = { ok: true; value: AlertSettingsInput } | { ok: false; error: string };
+// Validation failures: the code goes into the redirect URL, the message is shown to the user. The settings page maps
+// codes back to messages through src/lib/form-errors.ts, so a URL never carries free text.
+export const VALIDATION_MESSAGES = {
+  coords_pair: "Enter both latitude and longitude, or leave both empty",
+  lat_range: "Latitude must be a number between -90 and 90",
+  lon_range: "Longitude must be a number between -180 and 180",
+  radius_required: "Radius is required",
+  radius_range: `Radius must be a whole number between ${RADIUS_MIN} and ${RADIUS_MAX} km`,
+  invalid_aircraft_type: "Invalid aircraft type code (use 2-4 letters or digits, e.g. B744)",
+  too_many_types: `Enter at most ${MAX_AIRCRAFT_TYPES} aircraft types`,
+  invalid_chat_id: "Telegram chat ID must be a whole number, e.g. 123456789",
+  invalid_pause: "Invalid pause request",
+} as const;
+
+export type ValidationErrorCode = keyof typeof VALIDATION_MESSAGES;
+
+function failure(code: ValidationErrorCode): { ok: false; code: ValidationErrorCode; error: string } {
+  return { ok: false, code, error: VALIDATION_MESSAGES[code] };
+}
+
+export type AlertSettingsParseResult =
+  { ok: true; value: AlertSettingsInput } | { ok: false; code: ValidationErrorCode; error: string };
 
 export function parseAircraftTypes(raw: string): string[] {
   const codes = raw
@@ -47,36 +68,38 @@ export function parseAlertSettingsForm(form: FormData): AlertSettingsParseResult
   let home_lon: number | null = null;
   if (rawLat !== "" || rawLon !== "") {
     if (rawLat === "" || rawLon === "") {
-      return { ok: false, error: "Enter both latitude and longitude, or leave both empty" };
+      return failure("coords_pair");
     }
     home_lat = toNumber(rawLat);
     home_lon = toNumber(rawLon);
     if (!Number.isFinite(home_lat) || home_lat < -90 || home_lat > 90) {
-      return { ok: false, error: "Latitude must be a number between -90 and 90" };
+      return failure("lat_range");
     }
     if (!Number.isFinite(home_lon) || home_lon < -180 || home_lon > 180) {
-      return { ok: false, error: "Longitude must be a number between -180 and 180" };
+      return failure("lon_range");
     }
   }
 
   if (rawRadius === "") {
-    return { ok: false, error: "Radius is required" };
+    return failure("radius_required");
   }
   const radius_km = toNumber(rawRadius);
   if (!Number.isInteger(radius_km) || radius_km < RADIUS_MIN || radius_km > RADIUS_MAX) {
-    return { ok: false, error: `Radius must be a whole number between ${RADIUS_MIN} and ${RADIUS_MAX} km` };
+    return failure("radius_range");
   }
 
   const aircraft_types = parseAircraftTypes(readField(form, "aircraft_types"));
   const invalidCode = aircraft_types.find((code) => !ICAO_TYPE_PATTERN.test(code));
   if (invalidCode !== undefined) {
+    // The client-side message names the offending code; the URL carries only the code name.
     return {
       ok: false,
+      code: "invalid_aircraft_type",
       error: `Invalid aircraft type code: ${invalidCode} (use 2-4 letters or digits, e.g. B744)`,
     };
   }
   if (aircraft_types.length > MAX_AIRCRAFT_TYPES) {
-    return { ok: false, error: `Enter at most ${MAX_AIRCRAFT_TYPES} aircraft types` };
+    return failure("too_many_types");
   }
 
   const rawChatId = readField(form, "telegram_chat_id");
@@ -84,7 +107,7 @@ export function parseAlertSettingsForm(form: FormData): AlertSettingsParseResult
   if (rawChatId !== "") {
     const chatId = Number(rawChatId);
     if (!TELEGRAM_CHAT_ID_PATTERN.test(rawChatId) || !Number.isSafeInteger(chatId)) {
-      return { ok: false, error: "Telegram chat ID must be a whole number, e.g. 123456789" };
+      return failure("invalid_chat_id");
     }
     telegram_chat_id = chatId;
   }
@@ -92,7 +115,7 @@ export function parseAlertSettingsForm(form: FormData): AlertSettingsParseResult
   return { ok: true, value: { home_lat, home_lon, radius_km, aircraft_types, telegram_chat_id } };
 }
 
-export type PauseParseResult = { ok: true; paused: boolean } | { ok: false; error: string };
+export type PauseParseResult = { ok: true; paused: boolean } | { ok: false; code: ValidationErrorCode; error: string };
 
 // An explicit target state, not a toggle: a double click or a resubmitted form cannot flip the state back.
 export function parsePauseForm(form: FormData): PauseParseResult {
@@ -103,5 +126,5 @@ export function parsePauseForm(form: FormData): PauseParseResult {
   if (value === "false") {
     return { ok: true, paused: false };
   }
-  return { ok: false, error: "Invalid pause request" };
+  return failure("invalid_pause");
 }
