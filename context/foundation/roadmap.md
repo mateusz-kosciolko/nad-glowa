@@ -39,17 +39,17 @@ Obserwator z balkonu dowiaduje się o nietypowym samolocie (wojskowym, ciężkim
 
 ## At a glance
 
-| ID   | Change ID             | Outcome (user can …)                                                                   | Prerequisites    | PRD refs                               | Status      |
-| ---- | --------------------- | -------------------------------------------------------------------------------------- | ---------------- | -------------------------------------- | ----------- |
-| F-01 | adsb-source-verified  | (foundation) wybrane darmowe źródło ADS-B potwierdzone jako dające typ, pozycję i kurs | —                | Open Question 2, Business Logic        | done        |
-| F-02 | minute-cron-heartbeat | (foundation) zadanie cykliczne działa co minutę lokalnie i zostawia ślad każdego biegu | —                | NFR (< 60 s)                           | done        |
-| S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie               | —                | FR-001, Access Control                 | in-progress |
-| S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                  | —                | FR-003, FR-004, FR-005, Access Control | done        |
-| S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                       | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | done        |
-| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji            | S-03             | FR-010, US-01                          | done        |
-| S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                             | S-03             | FR-006                                 | proposed    |
-| S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście           | F-01, S-02       | FR-002, FR-005                         | proposed    |
-| S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                              | S-03             | FR-009, US-01                          | proposed    |
+| ID   | Change ID             | Outcome (user can …)                                                                   | Prerequisites    | PRD refs                               | Status   |
+| ---- | --------------------- | -------------------------------------------------------------------------------------- | ---------------- | -------------------------------------- | -------- |
+| F-01 | adsb-source-verified  | (foundation) wybrane darmowe źródło ADS-B potwierdzone jako dające typ, pozycję i kurs | —                | Open Question 2, Business Logic        | done     |
+| F-02 | minute-cron-heartbeat | (foundation) zadanie cykliczne działa co minutę lokalnie i zostawia ślad każdego biegu | —                | NFR (< 60 s)                           | done     |
+| S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie               | —                | FR-001, Access Control                 | done     |
+| S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                  | —                | FR-003, FR-004, FR-005, Access Control | done     |
+| S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                       | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | done     |
+| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji            | S-03             | FR-010, US-01                          | done     |
+| S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                             | S-03             | FR-006                                 | proposed |
+| S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście           | F-01, S-02       | FR-002, FR-005                         | proposed |
+| S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                              | S-03             | FR-009, US-01                          | proposed |
 
 ## Streams
 
@@ -116,7 +116,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
   - Metoda logowania (Open Roadmap Question 5) — Owner: user. Block: no. Logowanie e-mailem i hasłem już działa na produkcji; brak decyzji oznacza jego utrzymanie.
   - Czym zastąpić obecny test smoke, który w każdym biegu zakłada konto przez otwartą rejestrację? — Owner: team. Block: no. **Odpowiedź (2026-10-08):** konto przez Admin API lokalnej Supabase, usuwane po biegu; smoke odmawia działania poza lokalnym hostem.
 - **Risk:** Zamknięcie rejestracji odcina ścieżkę, na której opiera się jedyny test automatyczny, więc zmiana musi dostarczyć nową ścieżkę weryfikacji, a nie tylko usunąć formularz.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-02: Podstawowe ustawienia alertów
 
@@ -244,3 +244,4 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **F-02: (foundation) zadanie cykliczne uruchamia się co minutę lokalnie, z sieci użytkownika (tam źródła ADS-B odpowiadają), i przy każdym biegu, także pustym, zapisuje ślad (czas biegu), więc cisza „brak ciekawych samolotów” jest odróżnialna od ciszy „zadanie przestało działać”.** — Archived 2026-09-29 → `context/archive/2026-09-28-minute-cron-heartbeat/`. Lesson: —.
 - **S-03: użytkownik dostaje powiadomienie o samolocie wybranego typu, który według predykcji przeleci w jego promieniu za 2–15 minut, najpóźniej 60 s po pojawieniu się warunku w danych. Powiadomienie zawiera typ, rejestrację, przewidywany czas, kierunek nadlotu i „trasa nieznana”. Przy wykryciu później niż 2 minuty przed przelotem przychodzi z oznaczeniem „już blisko”.** — Archived 2026-10-08 → `context/archive/2026-10-05-first-advance-alert/`. Lesson: —.
 - **S-04: użytkownik nie dostaje drugiego powiadomienia o tej samej maszynie (ten sam adres transpondera lub rejestracja, niezależnie od znaku wywoławczego) w oknie deduplikacji.** — Archived 2026-10-08 → `context/archive/2026-10-05-first-advance-alert/` (wchłonięty przez S-03). Lesson: —.
+- **S-01: użytkownik niezalogowany widzi wyłącznie ekran logowania, a każda inna trasa przekierowuje do logowania; nie da się samodzielnie założyć konta, konta dodaje się ręcznie.** — Archived 2026-10-08 → `context/archive/2026-10-08-invite-only-access/`. Lesson: —.
