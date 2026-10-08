@@ -179,12 +179,12 @@ Brak migracji — kolumna `paused` istnieje. Na produkcji kolumna jest od 2026-0
 
 #### Automated
 
-- [x] 1.1 Lint, testy, typecheck i build czyste
-- [x] 1.2 Testy bazy przechodzą z nowymi asercjami
-- [x] 1.3 Smoke przechodzi z krokami pauzy
+- [x] 1.1 Lint, testy, typecheck i build czyste — dfe4a3e
+- [x] 1.2 Testy bazy przechodzą z nowymi asercjami — dfe4a3e
+- [x] 1.3 Smoke przechodzi z krokami pauzy — dfe4a3e
 
 #### Manual
 
-- [x] 1.4 „Pause alerts” i „Resume alerts” zmieniają kartę z potwierdzeniem
-- [x] 1.5 W pauzie bieg crona pomija użytkownika, po wznowieniu wraca
-- [x] 1.6 Zapis ustawień w pauzie nie zdejmuje pauzy
+- [x] 1.4 „Pause alerts” i „Resume alerts” zmieniają kartę z potwierdzeniem — dfe4a3e
+- [x] 1.5 W pauzie bieg crona pomija użytkownika, po wznowieniu wraca — dfe4a3e
+- [x] 1.6 Zapis ustawień w pauzie nie zdejmuje pauzy — dfe4a3e
