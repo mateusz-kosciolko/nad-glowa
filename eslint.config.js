@@ -83,6 +83,7 @@ const scriptsConfig = defineConfig({
       setTimeout: true,
       setInterval: true,
       AbortSignal: true,
+      Buffer: true,
       performance: true,
     },
   },
@@ -134,6 +135,38 @@ const adminClientConfig = defineConfig({
   rules: { "no-restricted-imports": "off", "no-restricted-syntax": "off" },
 });
 
+// Poza src/ klucz service_role wolno czytać wyłącznie w scripts/smoke.mjs (lokalna Supabase, Admin API).
+const SCRIPT_SERVICE_KEY_MESSAGE =
+  "Klucz service_role omija RLS. W scripts/ czyta go wyłącznie scripts/smoke.mjs (lokalna Supabase przez Admin API).";
+const scriptsServiceKeyBoundary = defineConfig({
+  files: ["scripts/**/*.mjs"],
+  rules: {
+    "no-restricted-syntax": [
+      "error",
+      {
+        selector:
+          "MemberExpression[object.object.name='process'][object.property.name='env'][property.name='SUPABASE_SERVICE_KEY']",
+        message: SCRIPT_SERVICE_KEY_MESSAGE,
+      },
+      {
+        selector:
+          "MemberExpression[object.object.name='process'][object.property.name='env'][property.value='SUPABASE_SERVICE_KEY']",
+        message: SCRIPT_SERVICE_KEY_MESSAGE,
+      },
+      {
+        selector:
+          "VariableDeclarator[init.object.name='process'][init.property.name='env'] > ObjectPattern > Property[key.name='SUPABASE_SERVICE_KEY']",
+        message: SCRIPT_SERVICE_KEY_MESSAGE,
+      },
+    ],
+  },
+});
+
+const smokeConfig = defineConfig({
+  files: ["scripts/smoke.mjs"],
+  rules: { "no-restricted-syntax": "off" },
+});
+
 export default defineConfig(
   includeIgnoreFile(gitignorePath),
   // .claude/: owned by @przeprogramowani/10x-cli and hash-checked; --fix would break `10x get` updates.
@@ -146,6 +179,8 @@ export default defineConfig(
   eslintPluginAstro.configs["flat/jsx-a11y-recommended"],
   astroConfig,
   scriptsConfig,
+  scriptsServiceKeyBoundary,
+  smokeConfig,
   serviceKeyBoundary,
   schedulerConfig,
   adminClientConfig,

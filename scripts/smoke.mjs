@@ -2,8 +2,9 @@
 // Zero dependencies on purpose. Run against a live server: `npm run smoke` (reads `.dev.vars`; BASE_URL defaults
 // to http://localhost:4321).
 // Runs ONLY against a local Supabase: sign-up is closed, so the test account is created through the GoTrue Admin
-// API with the service_role key and deleted after the run, even when a step fails. The script refuses to send any
-// request when SUPABASE_URL does not point at 127.0.0.1, localhost or ::1.
+// API with the service_role key and deleted after the run, even when a step fails or the run is interrupted. The
+// script refuses to send any request when SUPABASE_URL does not point at 127.0.0.1, localhost or ::1, or when the
+// key is not the local Supabase CLI demo key.
 
 const BASE_URL = process.env.BASE_URL ?? "http://localhost:4321";
 const { SUPABASE_URL, SUPABASE_KEY, SUPABASE_SERVICE_KEY } = process.env;
@@ -28,6 +29,20 @@ if (!LOCAL_HOSTS.has(supabaseHost)) {
   console.error(
     `Refusing to run: SUPABASE_URL host "${supabaseHost}" is not a local Supabase (127.0.0.1, localhost, ::1).`,
   );
+  process.exit(1);
+}
+
+// A local host could still be a tunnel to a remote project, so also require the CLI's demo key (iss "supabase-demo").
+function isLocalDemoKey(key) {
+  try {
+    const payload = JSON.parse(Buffer.from(key.split(".")[1] ?? "", "base64url").toString("utf8"));
+    return payload.iss === "supabase-demo";
+  } catch {
+    return false;
+  }
+}
+if (!isLocalDemoKey(SUPABASE_SERVICE_KEY)) {
+  console.error("Refusing to run: SUPABASE_SERVICE_KEY is not the local Supabase CLI demo key (npx supabase status).");
   process.exit(1);
 }
 
@@ -176,7 +191,11 @@ const steps = [
     () => request("/api/settings/telegram-test", { method: "POST" }),
     { status: 302, location: "/settings?telegram_error=" },
   ],
-  ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
+  [
+    "signout clears session",
+    () => request("/api/auth/signout", { method: "POST" }),
+    { status: 302, location: "/auth/signin" },
+  ],
   ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
   [
     "settings save redirects after signout",
@@ -192,6 +211,25 @@ const steps = [
 
 function statusMatches(expected, actual) {
   return expected === "4xx" ? actual >= 400 && actual < 500 : actual === expected;
+}
+
+async function cleanup() {
+  // A cleanup failure is reported but does not change the result.
+  for (const id of createdUserIds.splice(0)) {
+    try {
+      await deleteUser(id);
+    } catch (error) {
+      console.log(`WARN  cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
+}
+
+// Ctrl+C or a CI cancel skips `finally`; remove the test account before exiting.
+for (const signal of ["SIGINT", "SIGTERM"]) {
+  process.once(signal, () => {
+    console.log(`\nInterrupted (${signal}); removing the test account.`);
+    void cleanup().finally(() => process.exit(130));
+  });
 }
 
 let failed = 0;
@@ -220,14 +258,7 @@ try {
   failed++;
   console.log(`FAIL  ${error instanceof Error ? error.message : String(error)}`);
 } finally {
-  // A cleanup failure is reported but does not change the result.
-  for (const id of createdUserIds) {
-    try {
-      await deleteUser(id);
-    } catch (error) {
-      console.log(`WARN  cleanup failed: ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
+  await cleanup();
 }
 
 console.log(failed ? `\n${failed} step(s) failed` : "\nAll smoke steps passed");

@@ -283,6 +283,16 @@ Brak nowych migracji. Faza 2 wypycha cztery istniejące, addytywne migracje; obe
 kolejność „push → deploy” nie ma okna niespójności. Stare konta `smoke-*` w lokalnej bazie można usunąć ręcznie
 w Studio; nie są częścią tej zmiany.
 
+## Odchylenia od planu
+
+Odnotowane w impl-review (F2), 2026-10-08:
+
+- **`[auth.email] enable_signup` zostaje `true`** (Faza 1, pkt 4). W lokalnym GoTrue `false` w tej sekcji wyłącza
+  całego dostawcę e-mail, łącznie z logowaniem. Rejestrację zamyka samo `[auth] enable_signup = false`; na produkcji
+  odpowiednikiem jest wyłącznie przełącznik „Allow new users to sign up” (dostawca Email zostaje włączony).
+- **`/` to endpoint `src/pages/index.ts`** (Faza 1, pkt 2) zamiast `index.astro` z `Astro.redirect`: `return`
+  we frontmatterze wywracał ESLint (`no-misused-promises`). Dla GET zachowanie jest to samo.
+
 ## References
 
 - PRD: `context/foundation/prd.md` (FR-001, Access Control `:119`)

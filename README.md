@@ -155,7 +155,7 @@ SUPABASE_KEY=<anon-key>
 
 ### Creating accounts
 
-Access is by invitation only: the app has no sign-up page and Supabase rejects sign-ups (`enable_signup = false` in `supabase/config.toml`; on production, **Authentication → Sign In / Providers → Allow new users to sign up** is off). An administrator creates each account by hand:
+Access is by invitation only: the app has no sign-up page and Supabase rejects sign-ups (`enable_signup = false` in the `[auth]` section of `supabase/config.toml` — not in `[auth.email]`, which would also disable email sign-in; on production, **Authentication → Sign In / Providers → Allow new users to sign up** is off). An administrator creates each account by hand:
 
 1. Open the Supabase dashboard for the project (locally: Studio at `http://127.0.0.1:54323`)
 2. Go to **Authentication → Users → Add user → Create new user**
