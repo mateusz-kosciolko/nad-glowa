@@ -551,9 +551,9 @@ wymaga wcześniejszego `db push` (Faza 4, `deploy-plan.md`).
 
 #### Manual
 
-- [ ] 2.6 `worker-configuration.d.ts` zawiera nazwę `TELEGRAM_BOT_TOKEN`, bez wartości
-- [ ] 2.7 Przycisk „Send test message” dostarcza wiadomość i pokazuje potwierdzenie
-- [ ] 2.8 Błędny chat ID daje czytelny błąd bez tokena w treści
+- [x] 2.6 `worker-configuration.d.ts` zawiera nazwę `TELEGRAM_BOT_TOKEN`, bez wartości
+- [x] 2.7 Przycisk „Send test message” dostarcza wiadomość i pokazuje potwierdzenie
+- [x] 2.8 Błędny chat ID daje czytelny błąd bez tokena w treści
 
 ### Phase 3: Poller z dziennikiem i deduplikacją
 
@@ -568,20 +568,20 @@ wymaga wcześniejszego `db push` (Faza 4, `deploy-plan.md`).
 #### Manual
 
 - [x] 3.6 Bez `TELEGRAM_BOT_TOKEN` bieg kończy się `error`, a dashboard pokazuje „(last run failed)” — 6c2fd8e
-- [ ] 3.7 Alert o popularnym typie przychodzi na Telegram z pełną treścią
-- [ ] 3.8 Ta sama maszyna nie daje drugiego alertu w kolejnych biegach
-- [ ] 3.9 `paused = true` wstrzymuje alerty, biegi trwają
+- [x] 3.7 Alert o popularnym typie przychodzi na Telegram z pełną treścią
+- [x] 3.8 Ta sama maszyna nie daje drugiego alertu w kolejnych biegach
+- [x] 3.9 `paused = true` wstrzymuje alerty, biegi trwają
 
 ### Phase 4: Walidacja na żywo i dokumentacja
 
 #### Automated
 
-- [x] 4.1 Lint i testy czyste po zmianach dokumentów
-- [x] 4.2 Roadmapa zawiera odpowiedź na pytanie 4
+- [x] 4.1 Lint i testy czyste po zmianach dokumentów — 57d2c80
+- [x] 4.2 Roadmapa zawiera odpowiedź na pytanie 4 — 57d2c80
 
 #### Manual
 
-- [ ] 4.3 Zapytanie o alerty później niż 2 min przed najbliższym punktem zwraca 0
-- [ ] 4.4 Alert porównany z rzeczywistym przelotem na `globe.adsb.fi` mieści się w kryterium
-- [ ] 4.5 Godzina w wiadomości zgadza się z zegarem lokalnym
-- [x] 4.6 Roadmapa i `deploy-plan.md` opisują stan po zmianie
+- [x] 4.3 Zapytanie o alerty później niż 2 min przed najbliższym punktem zwraca 0
+- [x] 4.4 Alert porównany z rzeczywistym przelotem na `globe.adsb.fi` mieści się w kryterium
+- [x] 4.5 Godzina w wiadomości zgadza się z zegarem lokalnym
+- [x] 4.6 Roadmapa i `deploy-plan.md` opisują stan po zmianie — 57d2c80

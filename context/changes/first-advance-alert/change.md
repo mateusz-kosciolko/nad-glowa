@@ -1,9 +1,9 @@
 ---
 change_id: first-advance-alert
 title: First advance alert
-status: implementing
+status: implemented
 created: 2026-10-05
-updated: 2026-10-05
+updated: 2026-10-08
 ---
 
 ## Notes
