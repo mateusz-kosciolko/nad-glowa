@@ -300,30 +300,30 @@ w Studio; nie są częścią tej zmiany.
 
 #### Automated
 
-- [x] 1.1 Lint, testy, typecheck i build czyste
-- [x] 1.2 Brak śladów rejestracji w `src`
-- [x] 1.3 Lokalna Supabase po restarcie odrzuca rejestrację
-- [x] 1.4 Smoke przechodzi na `npm run dev`
-- [x] 1.5 Testy bazy przechodzą
+- [x] 1.1 Lint, testy, typecheck i build czyste — ebf2a2c
+- [x] 1.2 Brak śladów rejestracji w `src` — ebf2a2c
+- [x] 1.3 Lokalna Supabase po restarcie odrzuca rejestrację — ebf2a2c
+- [x] 1.4 Smoke przechodzi na `npm run dev` — ebf2a2c
+- [x] 1.5 Testy bazy przechodzą — ebf2a2c
 
 #### Manual
 
-- [x] 1.6 Bez sesji każda trasa kończy się na ekranie logowania ze stylami i bez „Sign up”
-- [x] 1.7 Po zalogowaniu `/` prowadzi na dashboard, ustawienia i wylogowanie działają
-- [x] 1.8 Smoke z nielokalnym `SUPABASE_URL` kończy się błędem bez żądań
-- [x] 1.9 Po biegu smoke nie przybywa kont `smoke-*`
+- [x] 1.6 Bez sesji każda trasa kończy się na ekranie logowania ze stylami i bez „Sign up” — ebf2a2c
+- [x] 1.7 Po zalogowaniu `/` prowadzi na dashboard, ustawienia i wylogowanie działają — ebf2a2c
+- [x] 1.8 Smoke z nielokalnym `SUPABASE_URL` kończy się błędem bez żądań — ebf2a2c
+- [x] 1.9 Po biegu smoke nie przybywa kont `smoke-*` — ebf2a2c
 
 ### Phase 2: Produkcja
 
 #### Automated
 
-- [ ] 2.1 Dry-run pokazuje dokładnie cztery migracje
-- [ ] 2.2 Migracje zastosowane
-- [ ] 2.3 Deploy udany
-- [ ] 2.4 Produkcja: anonimowe trasy przekierowują do logowania, `/auth/signin` zwraca 200
+- [x] 2.1 Dry-run pokazuje dokładnie cztery migracje
+- [x] 2.2 Migracje zastosowane
+- [x] 2.3 Deploy udany
+- [x] 2.4 Produkcja: anonimowe trasy przekierowują do logowania, `/auth/signin` zwraca 200
 
 #### Manual
 
-- [ ] 2.5 Człowiek wyłączył rejestrację w panelu Supabase
-- [ ] 2.6 Na produkcji logowanie, dashboard i zapis ustawień działają
-- [ ] 2.7 `deploy-plan.md` i roadmapa opisują stan po zmianie
+- [x] 2.5 Człowiek wyłączył rejestrację w panelu Supabase
+- [x] 2.6 Na produkcji logowanie, dashboard i zapis ustawień działają
+- [x] 2.7 `deploy-plan.md` i roadmapa opisują stan po zmianie

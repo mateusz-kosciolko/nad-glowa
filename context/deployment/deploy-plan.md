@@ -1,10 +1,10 @@
 ---
 project: nad-glowa
-deployed_at: 2026-09-28
+deployed_at: 2026-10-08
 platform: Cloudflare Workers (Static Assets)
 worker_name: nad-glowa
 production_url: https://nad-glowa.mateusz-kosciolko-321.workers.dev
-version_id: 67f7e569-9798-4a5b-b236-e448d39db000
+version_id: 49b00703-d4b0-47bd-8e38-006acf3f1189
 status: deployed-probe-blocked
 ---
 
@@ -33,16 +33,30 @@ na każdej stronie (warunek atrybucji adsb.fi). Pierwsze wdrożenie: `f3e7fff6-�
 `67f7e569-…` — błąd sondy dla odpowiedzi innych niż 2xx zawiera `upstream: { server, cfRay, retryAfter, bodyStart }`.
 Bez zmian w bazie.
 
-**Brak logiki alertów** — poller ADS-B i predykcja przelotu jeszcze nie istnieją; ustawienia są zapisywane,
-ale nic ich jeszcze nie czyta. Oba źródła ADS-B odmawiają żądań z produkcyjnego Workera
-(`context/foundation/adsb-source.md`).
+2026-10-08 — zmiana `invite-only-access` (commit `ebf2a2c`), wersja `49b00703-…`: middleware domyślnie zamknięty
+(`PUBLIC_ROUTES` = `/auth/signin`, `/api/auth/signin`, `/api/auth/signout`; każda inna trasa → `302 /auth/signin`),
+`/` przekierowuje na `/dashboard`, strony i endpoint rejestracji oraz landing usunięte, `/auth/signin` z informacją
+„invitation only”. Pierwszy deploy od 2026-09-28, więc wchodzi też kod `minute-cron-heartbeat`
+i `first-advance-alert` (bez crona). Na produkcyjnej Supabase `npx supabase db push` (`--dry-run` wcześniej)
+zastosował cztery migracje: `20260928180224_cron_runs`, `20260929065324_cron_runs_hide_error`,
+`20261005113514_alert_settings_telegram`, `20261005132125_alert_notifications`; `supabase migration list --linked`
+pokazuje local = remote dla wszystkich pięciu. Rejestracja zamknięta w panelu Supabase (Authentication →
+Sign In / Providers → „Allow new users to sign up” wyłączone przez człowieka w panelu); provider Email zostaje
+**włączony** — lokalnie `[auth.email] enable_signup = false` wyłączyło logowanie e-mailem w ogóle, więc na
+produkcji wyłączony jest tylko przełącznik globalny.
+
+**Alerty nie działają na produkcji** — kod pollera ADS-B, predykcji i wysyłki na Telegram (`first-advance-alert`)
+jest wdrożony od 2026-10-08, ale nie ma Cron Triggera (`triggers.crons` w `wrangler.jsonc`) ani sekretu
+`TELEGRAM_BOT_TOKEN`, więc handler `scheduled` nie biegnie, a dashboard pokazuje „No cron runs yet”. Oba źródła
+ADS-B odmawiają żądań z produkcyjnego Workera (`context/foundation/adsb-source.md`); poller działa lokalnie
+(`## Parked` w roadmapie).
 
 |                     |                                                                    |
 | ------------------- | ------------------------------------------------------------------ |
 | Platforma           | Cloudflare Workers with Static Assets (**nie** Pages)              |
 | Nazwa Workera       | `nad-glowa`                                                        |
 | URL produkcyjny     | https://nad-glowa.mateusz-kosciolko-321.workers.dev                |
-| Aktywny Version ID  | `67f7e569-9798-4a5b-b236-e448d39db000`                             |
+| Aktywny Version ID  | `49b00703-d4b0-47bd-8e38-006acf3f1189`                             |
 | Konto Cloudflare    | `mateusz.kosciolko@gmail.com` (`321276ecf944b4a3f73a126d4bbaa3b0`) |
 | Plan Cloudflare     | Free                                                               |
 | Projekt Supabase    | `nwphfexokrngshgmhucf`, region EU                                  |
@@ -50,7 +64,7 @@ ale nic ich jeszcze nie czyta. Oba źródła ADS-B odmawiają żądań z produkc
 
 ## Przed następnym wdrożeniem
 
-Zmiana `first-advance-alert` (2026-10-05, jeszcze niewdrożona) dodała dwie migracje, których nie ma na
+~~Zmiana `first-advance-alert` (2026-10-05, jeszcze niewdrożona) dodała dwie migracje, których nie ma na
 produkcyjnej Supabase: `supabase/migrations/20261005113514_alert_settings_telegram.sql` (kolumna
 `telegram_chat_id` w `alert_settings`) i `supabase/migrations/20261005132125_alert_notifications.sql` (tabela
 `public.alert_notifications`, tylko `service_role`). **Przed kolejnym `npx wrangler deploy` trzeba je wypchnąć**
@@ -58,7 +72,8 @@ produkcyjnej Supabase: `supabase/migrations/20261005113514_alert_settings_telegr
 i bez migracji przestanie działać. Kolejność: najpierw migracje, potem deploy — migracje są addytywne,
 więc obecna wersja Workera działa z nimi bez zmian. `--dry-run` prawdopodobnie pokaże też dwie migracje
 `cron_runs` z `minute-cron-heartbeat` (`20260928180224`, `20260929065324`), które nie trafiły na produkcję,
-bo cron działa lokalnie; są addytywne i można je wypchnąć razem z powyższymi.
+bo cron działa lokalnie; są addytywne i można je wypchnąć razem z powyższymi.~~ **Nieaktualne od 2026-10-08**:
+wszystkie cztery migracje wypchnięte przed deployem `49b00703-…` (zob. „Co zostało wdrożone”).
 
 `TELEGRAM_BOT_TOKEN` istnieje tylko lokalnie w `.dev.vars`; w Workers Secrets go nie ma. Na produkcji
 sekret jest opcjonalny, dopóki poller nie jest tam wdrożony (Open Roadmap Question 10).
@@ -105,7 +120,8 @@ npx wrangler deployments list                  # historia
 ```
 
 Poniżej minuty, bez rebuildu — wersje są niezmiennymi uploadami. Aktywna jest
-`67f7e569-9798-4a5b-b236-e448d39db000` (2026-09-28, sonda ADS-B z diagnostyką `upstream` + stopka). Poprzednie:
+`49b00703-d4b0-47bd-8e38-006acf3f1189` (2026-10-08, `invite-only-access`). Poprzednie:
+`67f7e569-9798-4a5b-b236-e448d39db000` (2026-09-28, sonda ADS-B z diagnostyką `upstream` + stopka),
 `f3e7fff6-07a7-43f6-aadd-5a84afd8a9ac` (2026-09-28, sonda bez diagnostyki + stopka),
 `32455abe-e7eb-4c06-8587-09c98ca5612d` (2026-09-28, `/settings`), `146f9abe-61c7-42b3-a3a7-98fd104e45fd`
 (scaffold z wyłączonymi Preview URLs). Wcześniejsza: `99a7916d-2871-4dc9-85fe-f80f13c5d9c9` (pierwsze wdrożenie,
@@ -114,6 +130,8 @@ jeszcze z włączonymi Preview URLs). Rollback do `32455abe-…` usuwa sondę i 
 **Czego rollback NIE cofa**: migracji Supabase ani wysłanych powiadomień. Migracje pisz addytywnie —
 destrukcyjne dopiero wtedy, gdy Worker już nie odwołuje się do kolumny. Po rollbacku do `146f9abe-…`
 tabela `alert_settings` (i trigger `on_auth_user_created`) zostaje w bazie, ale stary kod jej nie używa.
+Rollback do `67f7e569-…` przywraca w kodzie `/auth/signup`, ale Supabase i tak odrzuci rejestrację
+(przełącznik w panelu).
 
 ## Granica dostępu do produkcji
 
@@ -128,11 +146,11 @@ zmianę planu rozliczeniowego, tworzenie i poszerzanie tokenów API, zakładanie
 Read-only checki na produkcji (nie tworzą danych):
 
 ```bash
-curl -s -o /dev/null -w '%{http_code}\n' https://nad-glowa.mateusz-kosciolko-321.workers.dev/
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://nad-glowa.mateusz-kosciolko-321.workers.dev/
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://nad-glowa.mateusz-kosciolko-321.workers.dev/dashboard
 ```
 
-Oczekiwane: `200` dla `/`, `302` → `/auth/signin` dla `/dashboard`. Drugi wynik jest realnym testem —
+Oczekiwane (od 2026-10-08): `302` → `/auth/signin` dla obu (wcześniej `/` → `200`). Drugi wynik jest realnym testem —
 dowodzi, że `src/middleware.ts` i `@supabase/ssr` wystartowały na workerd. To właśnie tam objawia się
 klasa błędu _„dynamic require of stream is not supported"_, i to na deployu, nie na buildzie.
 
@@ -152,9 +170,15 @@ Wynik z 2026-09-28 (wersje `f3e7fff6-…` i `67f7e569-…`): `/api/adsb/probe` (
 z `httpStatus: 429` (limit nginx źródła, ~120–160 ms), powtarzalnie w obu wersjach. Z sieci lokalnej ten sam kod
 dostaje 200 z obu źródeł. Dowody i interpretacja: `context/foundation/adsb-source.md` („Dostępność z produkcji”).
 
-**Nie uruchamiaj `npm run smoke` przeciwko produkcji.** Skrypt rejestruje prawdziwe konto
-`smoke-<timestamp>@example.com` i zakłada wyłączone potwierdzanie e-maila. Smoke zostaje testem
-lokalnym i CI-owym przeciwko lokalnej Supabase.
+Wynik z 2026-10-08 (wersja `49b00703-…`): anonimowe `/`, `/dashboard`, `/settings`, `/auth/signup`, `/cokolwiek`
+i `POST /api/auth/signup` → 302 na `/auth/signin`; `/auth/signin` → 200 z tekstem „invitation only”, bez „Sign up”.
+Przez kilka sekund po deployu jeden edge serwował jeszcze poprzednią wersję (raz `/auth/signup` → 200) —
+propagacja, kolejne żądania już poprawne.
+
+**Nie uruchamiaj `npm run smoke` przeciwko produkcji.** Od 2026-10-08 skrypt zakłada konto
+`smoke-<timestamp>@example.com` przez Admin API kluczem `service_role` i usuwa je po biegu; odmawia działania,
+jeśli host `SUPABASE_URL` to nie `127.0.0.1` / `localhost` / `::1`. Smoke zostaje testem lokalnym i CI-owym
+przeciwko lokalnej Supabase.
 
 ## Czego NIE wdrożono
 
@@ -163,6 +187,6 @@ lokalnym i CI-owym przeciwko lokalnej Supabase.
 | Cron Trigger `* * * * *`     | Handler `scheduled` jest w repo (`src/worker.ts` → `src/workers/scheduled.ts`), ale `wrangler.jsonc` nie ma `triggers`, więc na Workerze nigdy nie odpala. **Decyzja z 2026-09-28 (Open Roadmap Question 10)**: pobieranie ADS-B i zadanie cykliczne działają lokalnie, z sieci użytkownika (`npm run dev` + wyzwalacz `/cdn-cgi/handler/scheduled`), bo oba źródła (adsb.fi 403, adsb.lol 429) odmawiają żądań z Workerów (`context/foundation/adsb-source.md`). Wdrożenie na serwer jest w `## Parked` roadmapy — **wtedy wymagany Workers Paid $5/mo** (free capuje crony na 10 ms CPU) i `SUPABASE_SERVICE_KEY` w Workers Secrets |
 | Auto-deploy z GitHub Actions | Repo nie ma remote'a. Wymaga repozytorium GitHub i scoped `CLOUDFLARE_API_TOKEN` (Workers Scripts:Edit tylko dla tego projektu, bez DNS i bez rozliczeń)                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | ~~Publiczne Preview URLs~~   | **Zamknięte 2026-09-23**: `"preview_urls": false` w `wrangler.jsonc`. Worker wystawia wyłącznie trasę workers.dev. Konsekwencja: weryfikacja przed promocją odbywa się lokalnie, nie przez publiczny URL wersji                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| ~~Migracje Supabase / RLS~~  | **Częściowo zamknięte 2026-09-28**: `alert_settings` z RLS na produkcji; pozostają tabele powiadomień (FR-009/FR-010) i logu obserwacji (FR-011). RLS jest warunkiem koniecznym dla każdej nowej tabeli, bo klucz `anon` jest publiczny                                                                                                                                                                                                                                                                                                                                                                                               |
+| ~~Migracje Supabase / RLS~~  | **Częściowo zamknięte 2026-09-28**: `alert_settings` z RLS na produkcji; 2026-10-08 doszły `cron_runs` i `alert_notifications` (FR-009/FR-010); pozostaje log obserwacji (FR-011). RLS jest warunkiem koniecznym dla każdej nowej tabeli, bo klucz `anon` jest publiczny                                                                                                                                                                                                                                                                                                                                                              |
 | `site` w `astro.config.mjs`  | Build ostrzega, że integracja sitemap jest pomijana. Uzupełnić produkcyjnym URL-em                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | Własna domena                | Na starcie `*.workers.dev`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |

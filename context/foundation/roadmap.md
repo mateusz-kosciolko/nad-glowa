@@ -69,7 +69,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Frontend:** present — Astro 7 SSR z wyspami React, Tailwind i shadcn; strony `src/pages/index.astro`, `src/pages/dashboard.astro` (pusta), formularze w `src/components/auth/`.
 - **Backend / API:** partial — wyłącznie endpointy auth w `src/pages/api/auth/`; brak handlera zadania cyklicznego i brak crona w `wrangler.jsonc`.
 - **Data:** absent — jest `supabase/config.toml`, brak migracji. Schemat ustawień alertów z izolacją per użytkownik jest zaprojektowany (`aba254e`) i zaplanowany (`511ba0a`), ale niewdrożony.
-- **Auth:** partial — logowanie e-mailem i hasłem działa na produkcji (`src/pages/api/auth/signin.ts`, `src/middleware.ts`). Rejestracja `/auth/signup` jest jednak otwarta, a `PROTECTED_ROUTES` obejmuje tylko `/dashboard`; oba punkty są niezgodne z Access Control w PRD.
+- **Auth:** partial — logowanie e-mailem i hasłem działa na produkcji (`src/pages/api/auth/signin.ts`, `src/middleware.ts`). Rejestracja `/auth/signup` jest jednak otwarta, a `PROTECTED_ROUTES` obejmuje tylko `/dashboard`; oba punkty są niezgodne z Access Control w PRD. **Stan 2026-10-08 (`invite-only-access`, `ebf2a2c`):** rejestracja usunięta z kodu i wyłączona w Supabase (lokalnie `enable_signup = false`, na produkcji w panelu); middleware domyślnie zamknięty — publiczne są tylko trasy z `PUBLIC_ROUTES` (logowanie i wylogowanie).
 - **Deploy / infra:** present — Cloudflare Workers (`wrangler.jsonc`, `preview_urls: false`), CI: lint → `astro check` → build + smoke na lokalnej bazie. Nie wdrożono: planu Workers Paid (wymaganego dla crona), remote'a i auto-deployu, pola `site`.
 - **Observability:** partial — Workers Logs włączone (`observability.enabled: true`); brak śledzenia błędów i brak heartbeatu crona.
 
@@ -114,7 +114,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Blockers:** —
 - **Unknowns:**
   - Metoda logowania (Open Roadmap Question 5) — Owner: user. Block: no. Logowanie e-mailem i hasłem już działa na produkcji; brak decyzji oznacza jego utrzymanie.
-  - Czym zastąpić obecny test smoke, który w każdym biegu zakłada konto przez otwartą rejestrację? — Owner: team. Block: no.
+  - Czym zastąpić obecny test smoke, który w każdym biegu zakłada konto przez otwartą rejestrację? — Owner: team. Block: no. **Odpowiedź (2026-10-08):** konto przez Admin API lokalnej Supabase, usuwane po biegu; smoke odmawia działania poza lokalnym hostem.
 - **Risk:** Zamknięcie rejestracji odcina ścieżkę, na której opiera się jedyny test automatyczny, więc zmiana musi dostarczyć nową ścieżkę weryfikacji, a nie tylko usunąć formularz.
 - **Status:** in-progress
 
