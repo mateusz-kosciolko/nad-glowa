@@ -317,13 +317,13 @@ w Studio; nie są częścią tej zmiany.
 
 #### Automated
 
-- [x] 2.1 Dry-run pokazuje dokładnie cztery migracje
-- [x] 2.2 Migracje zastosowane
-- [x] 2.3 Deploy udany
-- [x] 2.4 Produkcja: anonimowe trasy przekierowują do logowania, `/auth/signin` zwraca 200
+- [x] 2.1 Dry-run pokazuje dokładnie cztery migracje — bc60816
+- [x] 2.2 Migracje zastosowane — bc60816
+- [x] 2.3 Deploy udany — bc60816
+- [x] 2.4 Produkcja: anonimowe trasy przekierowują do logowania, `/auth/signin` zwraca 200 — bc60816
 
 #### Manual
 
-- [x] 2.5 Człowiek wyłączył rejestrację w panelu Supabase
-- [x] 2.6 Na produkcji logowanie, dashboard i zapis ustawień działają
-- [x] 2.7 `deploy-plan.md` i roadmapa opisują stan po zmianie
+- [x] 2.5 Człowiek wyłączył rejestrację w panelu Supabase — bc60816
+- [x] 2.6 Na produkcji logowanie, dashboard i zapis ustawień działają — bc60816
+- [x] 2.7 `deploy-plan.md` i roadmapa opisują stan po zmianie — bc60816
