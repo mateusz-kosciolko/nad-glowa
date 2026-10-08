@@ -1,9 +1,10 @@
 ---
 change_id: first-advance-alert
 title: First advance alert
-status: impl_reviewed
+status: archived
 created: 2026-10-05
 updated: 2026-10-08
+archived_at: 2026-10-08T14:16:46Z
 ---
 
 ## Notes
