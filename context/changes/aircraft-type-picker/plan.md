@@ -206,6 +206,14 @@ w odpowiedzi). Nagłówki: `Content-Type: application/json`, `Cache-Control: no-
 zalogowaniu „aircraft types search finds A400” (`/api/aircraft-types?q=a400`) → 200, `bodyIncludes: ["A400",
 "AIRBUS A-400M"]`.
 
+> **Adaptacje z implementacji (impl-review F1, F2).** Endpoint nie używa jednego `.or(…).limit(50)`: robi dwa
+> równoległe zapytania `.ilike()` (prefiks kodu, fragment nazwy), każde `order("code").limit(50)`, scala je po kodzie
+> i dopiero wtedy rankuje. Bez sortowania szerokie zapytanie („ai” → każdy AIRBUS) mogło wypchnąć dokładne trafienie
+> kodu poza limit, a brak ręcznie składanego filtra `or` usuwa ryzyko związane ze spacjami w zapytaniu. W fazie 3
+> wybierak dodatkowo: dodaje jedyną dostępną opcję po Enter, pokazuje „Add code XXXX” także po błędzie wyszukiwania
+> i ma prop `featuredUnavailable` z komunikatem o niedostępnym słowniku. Smoke „settings page shows saved values”
+> sprawdza teraz `name="aircraft_types" value="B744,A400"` i nazwy na chipach zamiast tekstu dawnego pola.
+
 ### Success Criteria:
 
 #### Automated Verification:

@@ -73,22 +73,27 @@ export function AircraftTypePicker({
   // Names learned from search results, so a chip shows its name without asking the endpoint again.
   const [learnedNames, setLearnedNames] = useState<Record<string, string>>({});
   const latestRequest = useRef(0);
+  // The query of `answer`, readable in the effect without making it a dependency.
+  const answeredQuery = useRef<string | null>(null);
 
   const normalized = normalizeTypeQuery(query);
 
   useEffect(() => {
     const requestId = ++latestRequest.current;
-    if (normalized === null) return;
+    // Going back to the query already answered (c17 → c1 → c17) reuses that answer instead of fetching it again.
+    if (normalized === null || normalized === answeredQuery.current) return;
     const controller = new AbortController();
     const timer = setTimeout(() => {
       searchAircraftTypes(normalized, controller.signal).then(
         (types) => {
           // A response to an older query is ignored.
           if (requestId !== latestRequest.current) return;
+          answeredQuery.current = normalized;
           setAnswer({ query: normalized, status: "done", types });
         },
         () => {
           if (requestId !== latestRequest.current) return;
+          answeredQuery.current = null;
           setAnswer({ query: normalized, status: "error", types: [] });
         },
       );
@@ -185,7 +190,9 @@ export function AircraftTypePicker({
         <div>
           <p className={cn(hintClass, "mb-1")}>Highlighted</p>
           {featuredUnavailable ? (
-            <p className={hintClass}>Highlighted types are unavailable right now. You can still search below.</p>
+            <p className={hintClass}>
+              Type names and highlighted types are unavailable right now. You can still search below.
+            </p>
           ) : (
             <div className="flex flex-wrap gap-1.5">
               {featuredTypes.map((type) => {
