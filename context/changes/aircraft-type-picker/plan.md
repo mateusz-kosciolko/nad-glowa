@@ -379,16 +379,16 @@ Workera (jak dotąd). Aktualizacja słownika w przyszłości: uruchomić generat
 
 #### Automated
 
-- [x] 3.1 Lint i typy przechodzą: `npm run lint && npx astro sync && npx astro check`
-- [x] 3.2 Testy jednostkowe przechodzą: `npm test`
-- [x] 3.3 Build przechodzi: `npm run build`
-- [x] 3.4 Smoke przechodzi (zapis ustawień z `aircraft_types` dalej działa): `npm run smoke`
+- [x] 3.1 Lint i typy przechodzą: `npm run lint && npx astro sync && npx astro check` — ea31396
+- [x] 3.2 Testy jednostkowe przechodzą: `npm test` — ea31396
+- [x] 3.3 Build przechodzi: `npm run build` — ea31396
+- [x] 3.4 Smoke przechodzi (zapis ustawień z `aircraft_types` dalej działa): `npm run smoke` — ea31396
 
 #### Manual
 
 - [x] 3.5 Na `/settings` widać 14 wyróżnionych z nazwami; kliknięcie dodaje chip, ponowne usuwa
-- [x] 3.6 Wyszukanie „globemaster” dodaje C17 z nazwą; „Add code ZZZZ” dodaje chip „ZZZZ · unknown name”
-- [x] 3.7 Zapis i ponowne wejście pokazują te same chipy w tej samej kolejności; wcześniej zapisane kody spoza słownika nie giną
-- [x] 3.8 Przy 20 wybranych dodawanie jest zablokowane z podpowiedzią
+- [x] 3.6 Wyszukanie „globemaster” dodaje C17 z nazwą; „Add code ZZZZ” dodaje chip „ZZZZ · unknown name” — ea31396
+- [x] 3.7 Zapis i ponowne wejście pokazują te same chipy w tej samej kolejności; wcześniej zapisane kody spoza słownika nie giną — ea31396
+- [x] 3.8 Przy 20 wybranych dodawanie jest zablokowane z podpowiedzią — ea31396
 - [x] 3.9 Klawiatura: Tab dochodzi do przełączników, wyników i przycisków usunięcia; Enter w polu wyszukiwania nie wysyła formularza
 - [x] 3.10 Na szerokości telefonu (375 px) wybierak mieści się bez przewijania w poziomie
