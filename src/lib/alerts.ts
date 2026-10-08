@@ -1,6 +1,7 @@
 // Alert rules shared by the poller: duplicate detection and message text. Pure logic, no server-only imports.
 import type { AircraftState } from "@/lib/adsb";
 import type { PassPrediction } from "@/lib/flyover";
+import { formatRoute, type Route } from "@/lib/routes";
 
 // The same aircraft is alerted at most once per window.
 export const DEDUP_WINDOW_MS = 60 * 60_000;
@@ -36,8 +37,13 @@ export function isRecentlyAlerted(
 }
 
 // Plain text (sent without parse_mode, so nothing needs escaping). The adsb.fi link and credit are required
-// attribution.
-export function formatAlertMessage(aircraft: AircraftState, prediction: PassPrediction, now: Date): string {
+// attribution; adsbdb is credited too whenever the route line comes from it.
+export function formatAlertMessage(
+  aircraft: AircraftState,
+  prediction: PassPrediction,
+  route: Route | null,
+  now: Date,
+): string {
   // The poller matches on type, so a null type never reaches here; the fallback only satisfies the type.
   const header = `${aircraft.type ?? "Unknown type"} · ${aircraft.registration ?? "registration unknown"}`;
   let timing: string;
@@ -52,8 +58,8 @@ export function formatAlertMessage(aircraft: AircraftState, prediction: PassPred
     header,
     timing,
     `Approaching from ${prediction.approachFrom}, closest pass ${prediction.closestDistanceKm.toFixed(1)} km`,
-    "Route unknown",
+    route === null ? "Route unknown" : `Route: ${formatRoute(route)}`,
     `https://globe.adsb.fi/?icao=${aircraft.hex}`,
-    "Data: adsb.fi",
+    route === null ? "Data: adsb.fi" : "Data: adsb.fi, adsbdb",
   ].join("\n");
 }

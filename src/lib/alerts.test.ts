@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { AircraftState } from "@/lib/adsb";
 import { formatAlertMessage, isRecentlyAlerted } from "@/lib/alerts";
 import type { PassPrediction } from "@/lib/flyover";
+import type { Route } from "@/lib/routes";
 
 // 12:00 UTC in July is 14:00 in Warsaw (CEST).
 const NOW = new Date("2026-07-15T12:00:00Z");
@@ -60,7 +61,7 @@ describe("isRecentlyAlerted", () => {
 
 describe("formatAlertMessage", () => {
   it("describes a regular alert", () => {
-    const message = formatAlertMessage(aircraft(), prediction(), NOW);
+    const message = formatAlertMessage(aircraft(), prediction(), null, NOW);
     expect(message).toContain("B744");
     expect(message).toContain("SP-LRA");
     expect(message).toContain("~7 min");
@@ -71,16 +72,28 @@ describe("formatAlertMessage", () => {
     expect(message).toContain("Route unknown");
     expect(message).toContain("https://globe.adsb.fi/?icao=48af01");
     expect(message).toContain("Data: adsb.fi");
+    expect(message).not.toContain("adsbdb");
     expect(message).not.toContain("ALREADY CLOSE");
   });
 
+  it("shows a known route and credits adsbdb", () => {
+    const route: Route = {
+      origin: { code: "WAW", city: "Warsaw" },
+      destination: { code: "ORD", city: "Chicago" },
+    };
+    const message = formatAlertMessage(aircraft(), prediction(), route, NOW);
+    expect(message).toContain("Route: Warsaw (WAW) → Chicago (ORD)");
+    expect(message).toContain("Data: adsb.fi, adsbdb");
+    expect(message).not.toContain("Route unknown");
+  });
+
   it("says when the registration is unknown", () => {
-    const message = formatAlertMessage(aircraft({ registration: null }), prediction(), NOW);
+    const message = formatAlertMessage(aircraft({ registration: null }), prediction(), null, NOW);
     expect(message).toContain("registration unknown");
   });
 
   it("replaces the lead time with ALREADY CLOSE", () => {
-    const message = formatAlertMessage(aircraft(), prediction({ secondsToClosest: 60, alreadyClose: true }), NOW);
+    const message = formatAlertMessage(aircraft(), prediction({ secondsToClosest: 60, alreadyClose: true }), null, NOW);
     expect(message).toContain("ALREADY CLOSE");
     expect(message).not.toContain("Overhead in");
     expect(message).not.toContain("min (");

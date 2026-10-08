@@ -16,8 +16,11 @@ function describeSummary(summary: AlertPollSummary | null): string {
   if (!summary) {
     return "";
   }
-  const { users, polled, matches, duplicates, sent } = summary;
-  return `; users: ${users}, polled: ${polled}, matches: ${matches}, duplicates: ${duplicates}, sent: ${sent}`;
+  const { users, polled, matches, duplicates, sent, routes } = summary;
+  return (
+    `; users: ${users}, polled: ${polled}, matches: ${matches}, duplicates: ${duplicates}, sent: ${sent}` +
+    `, routes: ${routes}`
+  );
 }
 
 function describeError(error: unknown): string {

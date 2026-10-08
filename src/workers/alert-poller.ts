@@ -8,6 +8,7 @@ import type { Database } from "@/db/database.types";
 import { fetchAircraftNear, type AircraftState } from "@/lib/adsb";
 import { DEDUP_WINDOW_MS, formatAlertMessage, isRecentlyAlerted } from "@/lib/alerts";
 import { predictPass, queryRadiusKm, type PassPrediction } from "@/lib/flyover";
+import { lookupRoute, type Route } from "@/lib/routes";
 import { sendTelegramMessage } from "@/lib/telegram";
 
 // adsb.fi allows about one request per second per IP; keep a margin.
@@ -19,6 +20,8 @@ export interface AlertPollSummary {
   matches: number;
   duplicates: number;
   sent: number;
+  // Sent alerts that carried a known route.
+  routes: number;
   errors: string[];
 }
 
@@ -38,7 +41,7 @@ function roundKm(km: number): number {
 }
 
 export async function runAlertPoll(supabase: SupabaseClient<Database>, now: () => Date): Promise<AlertPollSummary> {
-  const summary: AlertPollSummary = { users: 0, polled: 0, matches: 0, duplicates: 0, sent: 0, errors: [] };
+  const summary: AlertPollSummary = { users: 0, polled: 0, matches: 0, duplicates: 0, sent: 0, routes: 0, errors: [] };
 
   const token = TELEGRAM_BOT_TOKEN;
   if (!token) {
@@ -76,6 +79,23 @@ export async function runAlertPoll(supabase: SupabaseClient<Database>, now: () =
     ];
   });
   summary.users = users.length;
+
+  // One adsbdb lookup per callsign per run, even when the same aircraft alerts several users. Promises are cached,
+  // so a lookup in flight is shared rather than repeated.
+  const routeCache = new Map<string, Promise<Route | null>>();
+  const routeFor = (aircraft: AircraftState): Promise<Route | null> => {
+    // Military callsigns rarely have a public route and may collide with a civil one; without a callsign there is
+    // nothing to look up.
+    if (aircraft.military || aircraft.callsign === null) {
+      return Promise.resolve(null);
+    }
+    let cached = routeCache.get(aircraft.callsign);
+    if (cached === undefined) {
+      cached = lookupRoute(aircraft.callsign);
+      routeCache.set(aircraft.callsign, cached);
+    }
+    return cached;
+  };
 
   let lastRequestAt: number | null = null;
   let telegramThrottled = false;
@@ -140,11 +160,14 @@ export async function runAlertPoll(supabase: SupabaseClient<Database>, now: () =
         continue;
       }
 
+      // Looked up only for an alert about to be sent; a failed lookup is just a null route, never an error.
+      const route = await routeFor(aircraft);
+
       // Send first, record second: a failed send leaves no row, so the next run retries it.
       const sendResult = await sendTelegramMessage({
         token,
         chatId: user.chatId,
-        text: formatAlertMessage(aircraft, prediction, at),
+        text: formatAlertMessage(aircraft, prediction, route, at),
       });
       if (!sendResult.ok) {
         fail(`Telegram send failed: ${sendResult.error}`);
@@ -160,6 +183,9 @@ export async function runAlertPoll(supabase: SupabaseClient<Database>, now: () =
         continue;
       }
       summary.sent++;
+      if (route !== null) {
+        summary.routes++;
+      }
 
       // Remembered even if the insert fails, so a second entry for the same machine in this response is skipped.
       // sent_at in the table is the database's now(), i.e. the moment after the send.

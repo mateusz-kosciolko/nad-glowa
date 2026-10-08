@@ -251,21 +251,21 @@ Brak. Schemat bez zmian, stare wiersze `alert_notifications` nie są dotykane.
 
 #### Automated
 
-- [x] 1.1 Testy jednostkowe przechodzą: `npm test`
-- [x] 1.2 Lint przechodzi: `npm run lint`
-- [x] 1.3 Sprawdzenie typów przechodzi: `npx astro sync && npx astro check`
+- [x] 1.1 Testy jednostkowe przechodzą: `npm test` — ef9b9c5
+- [x] 1.2 Lint przechodzi: `npm run lint` — ef9b9c5
+- [x] 1.3 Sprawdzenie typów przechodzi: `npx astro sync && npx astro check` — ef9b9c5
 
 ### Phase 2: Trasa w alercie
 
 #### Automated
 
-- [ ] 2.1 Testy jednostkowe przechodzą: `npm test`
-- [ ] 2.2 Lint przechodzi: `npm run lint`
-- [ ] 2.3 Sprawdzenie typów przechodzi: `npx astro sync && npx astro check`
-- [ ] 2.4 Build przechodzi: `npm run build`
+- [x] 2.1 Testy jednostkowe przechodzą: `npm test`
+- [x] 2.2 Lint przechodzi: `npm run lint`
+- [x] 2.3 Sprawdzenie typów przechodzi: `npx astro sync && npx astro check`
+- [x] 2.4 Build przechodzi: `npm run build`
 
 #### Manual
 
-- [ ] 2.5 Alert z linią `Route: … → …` i `Data: adsb.fi, adsbdb` przy `npm run cron:local`
-- [ ] 2.6 Log biegu pokazuje `routes: N`, bieg z alertem bez trasy kończy się statusem `ok`
-- [ ] 2.7 Alert bez znanej trasy ma `Route unknown` i `Data: adsb.fi`
+- [x] 2.5 Alert z linią `Route: … → …` i `Data: adsb.fi, adsbdb` przy `npm run cron:local`
+- [x] 2.6 Log biegu pokazuje `routes: N`, bieg z alertem bez trasy kończy się statusem `ok`
+- [x] 2.7 Alert bez znanej trasy ma `Route unknown` i `Data: adsb.fi`
