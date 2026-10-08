@@ -9,6 +9,7 @@ const { user } = Astro.locals;
 const serverError = Astro.url.searchParams.get("error");
 const saved = Astro.url.searchParams.get("saved") === "1";
 const telegramSent = Astro.url.searchParams.get("telegram") === "sent";
+const telegramError = Astro.url.searchParams.get("telegram_error");
 
 let initial: AlertSettingsInput | null = null;
 let loadError: string | null = null;
@@ -55,6 +56,11 @@ if (!user) {
           {/* A separate form: nested forms are invalid HTML, and the test must not save unsaved edits. */}
           <form method="POST" action="/api/settings/telegram-test" class="mt-6 border-t border-white/10 pt-4">
             <p class="mb-2 text-xs text-blue-100/50">The test message goes to your saved Telegram chat ID.</p>
+            {telegramError && (
+              <p class="mb-2 rounded-lg border border-red-500/30 bg-red-900/30 px-3 py-2 text-sm text-red-300">
+                {telegramError}
+              </p>
+            )}
             {telegramSent && !serverError && (
               <p class="mb-2 flex items-center gap-2 rounded-lg border border-green-500/30 bg-green-900/30 px-3 py-2 text-sm text-green-300">
                 Test message sent. Check your Telegram chat.

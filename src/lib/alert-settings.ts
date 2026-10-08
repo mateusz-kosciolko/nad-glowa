@@ -5,8 +5,9 @@ export const RADIUS_MIN = 1;
 export const RADIUS_MAX = 100;
 export const MAX_AIRCRAFT_TYPES = 20;
 export const ICAO_TYPE_PATTERN = /^[A-Z0-9]{2,4}$/;
-// Up to 15 digits stays within Number.MAX_SAFE_INTEGER; the minus sign covers group chat IDs.
-export const TELEGRAM_CHAT_ID_PATTERN = /^-?\d{1,15}$/;
+// Telegram chat IDs fit in 52 bits (up to 16 digits); the parser also checks Number.isSafeInteger.
+// The minus sign covers group chat IDs.
+export const TELEGRAM_CHAT_ID_PATTERN = /^-?\d{1,16}$/;
 
 export interface AlertSettingsInput {
   home_lat: number | null;
@@ -81,10 +82,11 @@ export function parseAlertSettingsForm(form: FormData): AlertSettingsParseResult
   const rawChatId = readField(form, "telegram_chat_id");
   let telegram_chat_id: number | null = null;
   if (rawChatId !== "") {
-    if (!TELEGRAM_CHAT_ID_PATTERN.test(rawChatId)) {
+    const chatId = Number(rawChatId);
+    if (!TELEGRAM_CHAT_ID_PATTERN.test(rawChatId) || !Number.isSafeInteger(chatId)) {
       return { ok: false, error: "Telegram chat ID must be a whole number, e.g. 123456789" };
     }
-    telegram_chat_id = Number(rawChatId);
+    telegram_chat_id = chatId;
   }
 
   return { ok: true, value: { home_lat, home_lon, radius_km, aircraft_types, telegram_chat_id } };

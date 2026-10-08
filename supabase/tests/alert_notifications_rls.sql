@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap;
-select plan(7);
+select plan(9);
 
 -- ── struktura ────────────────────────────────────────────────────────
 select has_table('public'::name, 'alert_notifications'::name);
@@ -50,6 +50,20 @@ select throws_ok(
   '42501',
   null,
   'insert odrzucony — zapisuje wyłącznie handler scheduled'
+);
+
+select throws_ok(
+  $$update public.alert_notifications set already_close = true$$,
+  '42501',
+  null,
+  'update odrzucony — dziennik jest tylko do zapisu przez handler scheduled'
+);
+
+select throws_ok(
+  $$delete from public.alert_notifications$$,
+  '42501',
+  null,
+  'delete odrzucony — zalogowany nie usuwa wpisów deduplikacji'
 );
 
 -- ── anon ─────────────────────────────────────────────────────────────

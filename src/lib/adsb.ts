@@ -160,7 +160,9 @@ function describeFetchError(error: unknown): string {
   if (error instanceof Error && error.name === "TimeoutError") {
     return `No response within ${TIMEOUT_MS / 1000} s`;
   }
-  return `Network error: ${error instanceof Error ? error.message : String(error)}`;
+  // The request URL carries the home coordinates; runtimes may quote it in network errors.
+  const message = error instanceof Error ? error.message : String(error);
+  return `Network error: ${message.replace(/\/lat\/[^/]+\/lon\/[^/]+/g, "/lat/…/lon/…")}`;
 }
 
 // Never throws: every failure comes back as `ok: false` with a readable error.

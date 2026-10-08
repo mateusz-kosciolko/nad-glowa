@@ -5,8 +5,9 @@ import { sendTelegramMessage } from "@/lib/telegram";
 
 const TEST_MESSAGE = "Nad Głową test message: aircraft alerts will arrive in this chat.";
 
+// A separate parameter, so the settings page shows the error next to the test button, not the save button.
 function settingsError(message: string): string {
-  return `/settings?error=${encodeURIComponent(message)}`;
+  return `/settings?telegram_error=${encodeURIComponent(message)}`;
 }
 
 export const POST: APIRoute = async (context) => {

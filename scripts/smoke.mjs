@@ -90,7 +90,7 @@ const steps = [
   [
     "telegram test reports an error for signed-in user",
     () => request("/api/settings/telegram-test", { method: "POST" }),
-    { status: 302, location: "/settings?error=" },
+    { status: 302, location: "/settings?telegram_error=" },
   ],
   ["signout clears session", () => request("/api/auth/signout", { method: "POST" }), { status: 302, location: "/" }],
   ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],

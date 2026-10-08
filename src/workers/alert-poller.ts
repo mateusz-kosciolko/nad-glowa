@@ -78,7 +78,12 @@ export async function runAlertPoll(supabase: SupabaseClient<Database>, now: () =
   summary.users = users.length;
 
   let lastRequestAt: number | null = null;
+  let telegramThrottled = false;
   for (const [index, user] of users.entries()) {
+    if (telegramThrottled) {
+      summary.errors.push(`Telegram rate limit hit; ${users.length - index} user(s) skipped in this run`);
+      break;
+    }
     const fail = (reason: string) => summary.errors.push(`user ${index + 1}: ${reason}`);
 
     // Space requests, but never delay the first one.
@@ -143,6 +148,15 @@ export async function runAlertPoll(supabase: SupabaseClient<Database>, now: () =
       });
       if (!sendResult.ok) {
         fail(`Telegram send failed: ${sendResult.error}`);
+        // 429: Telegram asks us to slow down, so stop sending for everyone in this run.
+        if (sendResult.httpStatus === 429) {
+          telegramThrottled = true;
+          break;
+        }
+        // 400/403 (chat not found, bot blocked) will not succeed for this chat; skip its remaining candidates.
+        if (sendResult.httpStatus === 400 || sendResult.httpStatus === 403) {
+          break;
+        }
         continue;
       }
       summary.sent++;

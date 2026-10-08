@@ -128,7 +128,7 @@ The local Studio UI is available at `http://localhost:54323`.
 Aircraft alerts are delivered by a Telegram bot. To set up the channel from scratch:
 
 1. In Telegram, talk to [@BotFather](https://t.me/BotFather), send `/newbot` and follow the prompts. It replies with the bot token.
-2. Add the token to `.dev.vars` (and as a Worker secret in production: `npx wrangler secret put TELEGRAM_BOT_TOKEN`). It is a server-only secret read through `astro:env/server`:
+2. Add the token to `.dev.vars` (production prerequisites are listed in `context/deployment/deploy-plan.md`). It is a server-only secret read through `astro:env/server`:
 
 ```
 TELEGRAM_BOT_TOKEN=<token from BotFather>
