@@ -1,10 +1,10 @@
 ---
 change_id: aircraft-type-picker
 title: Aircraft type picker
-status: impl_reviewed
+status: archived
 created: 2026-10-08
 updated: 2026-10-08
-archived_at: null
+archived_at: 2026-10-08T19:24:51Z
 ---
 
 ## Notes
