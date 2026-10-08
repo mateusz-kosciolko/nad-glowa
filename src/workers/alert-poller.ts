@@ -154,13 +154,21 @@ export async function runAlertPoll(supabase: SupabaseClient<Database>, now: () =
     }
     const recent: RecentAlert[] = [...recentRows];
 
+    // Start the route lookups for every alert about to be sent at once, so a burst waits about one timeout
+    // instead of one per callsign. lookupRoute never rejects, so the promises can wait in the cache unawaited.
+    for (const { aircraft } of candidates) {
+      if (!isRecentlyAlerted(aircraft, recent, at)) {
+        void routeFor(aircraft);
+      }
+    }
+
     for (const { aircraft, prediction } of candidates) {
       if (isRecentlyAlerted(aircraft, recent, at)) {
         summary.duplicates++;
         continue;
       }
 
-      // Looked up only for an alert about to be sent; a failed lookup is just a null route, never an error.
+      // Started above; a failed lookup is just a null route, never an error.
       const route = await routeFor(aircraft);
 
       // Send first, record second: a failed send leaves no row, so the next run retries it.

@@ -65,6 +65,20 @@ describe("parseRouteResponse", () => {
     expect(route?.destination.city).toBeNull();
   });
 
+  it("collapses newlines in a city and caps its length", () => {
+    const origin = { ...HIT.response.flightroute.origin, municipality: "War\nsaw\t City" };
+    const destination = { ...HIT.response.flightroute.destination, municipality: "x".repeat(200) };
+    const route = parseRouteResponse({ response: { flightroute: { origin, destination } } });
+    expect(route?.origin.city).toBe("War saw City");
+    expect(route?.destination.city).toHaveLength(60);
+  });
+
+  it("falls back to the ICAO code when the IATA code is longer than 4 characters", () => {
+    const origin = { ...HIT.response.flightroute.origin, iata_code: "WAWWAW" };
+    const route = parseRouteResponse({ response: { flightroute: { ...HIT.response.flightroute, origin } } });
+    expect(route?.origin.code).toBe("EPWA");
+  });
+
   it("returns null when an airport has neither code", () => {
     expect(parseRouteResponse(withAirports({ municipality: "Warsaw" }, { iata_code: "ORD" }))).toBeNull();
   });
@@ -123,13 +137,22 @@ describe("lookupRoute", () => {
     expect(await lookupRoute("LOT3")).toBeNull();
   });
 
-  it("encodes the callsign in the URL and sets a timeout", async () => {
+  it("requests the callsign URL with a timeout and the app's User-Agent", async () => {
     const fetchMock = stubFetch(() => Promise.resolve(Response.json(MISS, { status: 404 })));
-    await lookupRoute("AB C/1");
+    await lookupRoute("LOT3");
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, init] = fetchMock.mock.calls[0];
-    expect(url).toBe("https://api.adsbdb.com/v0/callsign/AB%20C%2F1");
+    expect(url).toBe("https://api.adsbdb.com/v0/callsign/LOT3");
     expect(init?.signal).toBeInstanceOf(AbortSignal);
+    expect(new Headers(init?.headers).get("User-Agent")).toContain("nad-glowa");
     expect(ROUTE_LOOKUP_TIMEOUT_MS).toBe(2000);
+  });
+
+  it("skips the request for a callsign that is not 2-8 letters or digits", async () => {
+    const fetchMock = stubFetch(() => Promise.resolve(Response.json(HIT, { status: 200 })));
+    expect(await lookupRoute("AB C/1")).toBeNull();
+    expect(await lookupRoute("..")).toBeNull();
+    expect(await lookupRoute("A")).toBeNull();
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 });
