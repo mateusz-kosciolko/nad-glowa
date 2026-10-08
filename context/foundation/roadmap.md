@@ -39,17 +39,17 @@ Obserwator z balkonu dowiaduje się o nietypowym samolocie (wojskowym, ciężkim
 
 ## At a glance
 
-| ID   | Change ID             | Outcome (user can …)                                                                   | Prerequisites    | PRD refs                               | Status      |
-| ---- | --------------------- | -------------------------------------------------------------------------------------- | ---------------- | -------------------------------------- | ----------- |
-| F-01 | adsb-source-verified  | (foundation) wybrane darmowe źródło ADS-B potwierdzone jako dające typ, pozycję i kurs | —                | Open Question 2, Business Logic        | done        |
-| F-02 | minute-cron-heartbeat | (foundation) zadanie cykliczne działa co minutę lokalnie i zostawia ślad każdego biegu | —                | NFR (< 60 s)                           | done        |
-| S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie               | —                | FR-001, Access Control                 | done        |
-| S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                  | —                | FR-003, FR-004, FR-005, Access Control | done        |
-| S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                       | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | done        |
-| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji            | S-03             | FR-010, US-01                          | done        |
-| S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                             | S-03             | FR-006                                 | in-progress |
-| S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście           | F-01, S-02       | FR-002, FR-005                         | proposed    |
-| S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                              | S-03             | FR-009, US-01                          | proposed    |
+| ID   | Change ID             | Outcome (user can …)                                                                   | Prerequisites    | PRD refs                               | Status   |
+| ---- | --------------------- | -------------------------------------------------------------------------------------- | ---------------- | -------------------------------------- | -------- |
+| F-01 | adsb-source-verified  | (foundation) wybrane darmowe źródło ADS-B potwierdzone jako dające typ, pozycję i kurs | —                | Open Question 2, Business Logic        | done     |
+| F-02 | minute-cron-heartbeat | (foundation) zadanie cykliczne działa co minutę lokalnie i zostawia ślad każdego biegu | —                | NFR (< 60 s)                           | done     |
+| S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie               | —                | FR-001, Access Control                 | done     |
+| S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                  | —                | FR-003, FR-004, FR-005, Access Control | done     |
+| S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                       | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | done     |
+| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji            | S-03             | FR-010, US-01                          | done     |
+| S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                             | S-03             | FR-006                                 | done     |
+| S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście           | F-01, S-02       | FR-002, FR-005                         | proposed |
+| S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                              | S-03             | FR-009, US-01                          | proposed |
 
 ## Streams
 
@@ -167,7 +167,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Blockers:** —
 - **Unknowns:** —
 - **Risk:** Darmowy projekt bazy usypia się po 7 dniach bezczynności (`infrastructure.md`), więc pauza nie może zatrzymywać zadania cyklicznego, tylko samo wysyłanie; inaczej alerty po urlopie nie wrócą. Poller ze zmiany `first-advance-alert` już to respektuje: pomija użytkowników z `paused = true`, a zadanie cykliczne biegnie dalej.
-- **Status:** in-progress
+- **Status:** done
 
 ### S-06: Czytelny wybór typów samolotów
 
@@ -245,3 +245,4 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **S-03: użytkownik dostaje powiadomienie o samolocie wybranego typu, który według predykcji przeleci w jego promieniu za 2–15 minut, najpóźniej 60 s po pojawieniu się warunku w danych. Powiadomienie zawiera typ, rejestrację, przewidywany czas, kierunek nadlotu i „trasa nieznana”. Przy wykryciu później niż 2 minuty przed przelotem przychodzi z oznaczeniem „już blisko”.** — Archived 2026-10-08 → `context/archive/2026-10-05-first-advance-alert/`. Lesson: —.
 - **S-04: użytkownik nie dostaje drugiego powiadomienia o tej samej maszynie (ten sam adres transpondera lub rejestracja, niezależnie od znaku wywoławczego) w oknie deduplikacji.** — Archived 2026-10-08 → `context/archive/2026-10-05-first-advance-alert/` (wchłonięty przez S-03). Lesson: —.
 - **S-01: użytkownik niezalogowany widzi wyłącznie ekran logowania, a każda inna trasa przekierowuje do logowania; nie da się samodzielnie założyć konta, konta dodaje się ręcznie.** — Archived 2026-10-08 → `context/archive/2026-10-08-invite-only-access/`. Lesson: —.
+- **S-05: użytkownik może wstrzymać alerty (np. na urlop lub noc) i je wznowić; w czasie pauzy nie dostaje powiadomień, a ustawienia pozostają nietknięte.** — Archived 2026-10-08 → `context/archive/2026-10-08-pause-resume-alerts/`. Lesson: —.
