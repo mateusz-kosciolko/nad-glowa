@@ -34,6 +34,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      aircraft_types: {
+        Row: {
+          code: string
+          featured: boolean
+          name: string
+        }
+        Insert: {
+          code: string
+          featured?: boolean
+          name: string
+        }
+        Update: {
+          code?: string
+          featured?: boolean
+          name?: string
+        }
+        Relationships: []
+      }
       alert_notifications: {
         Row: {
           aircraft_hex: string

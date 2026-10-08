@@ -14,6 +14,7 @@
     "smoke": "node --env-file-if-exists=.dev.vars scripts/smoke.mjs",
     "adsb:measure": "node scripts/adsb-measure.mjs",
     "cron:local": "node scripts/cron-local.mjs",
+    "aircraft-types:seed": "node scripts/aircraft-types-seed.mjs",
     "test:db": "supabase test db",
     "db:types": "supabase gen types typescript --local > src/db/database.types.ts",
     "cf:types": "wrangler types"
