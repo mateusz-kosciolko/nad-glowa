@@ -140,6 +140,11 @@ const steps = [
   ["settings redirects anonymous user", () => request("/settings"), { status: 302, location: "/auth/signin" }],
   // No signed-in probe step: in CI it would depend on adsb.fi being up.
   ["adsb probe redirects anonymous user", () => request("/api/adsb/probe"), { status: 302, location: "/auth/signin" }],
+  [
+    "aircraft types search redirects anonymous user",
+    () => request("/api/aircraft-types?q=a400"),
+    { status: 302, location: "/auth/signin" },
+  ],
   ["signup page redirects anonymous user", () => request("/auth/signup"), { status: 302, location: "/auth/signin" }],
   [
     "signup endpoint redirects anonymous user",
@@ -165,6 +170,11 @@ const steps = [
   ["home redirects signed-in user to dashboard", () => request("/"), { status: 302, location: "/dashboard" }],
   ["dashboard renders for signed-in user", () => request("/dashboard"), { status: 200 }],
   ["settings renders for signed-in user", () => request("/settings"), { status: 200 }],
+  [
+    "aircraft types search finds A400",
+    () => request("/api/aircraft-types?q=a400"),
+    { status: 200, bodyIncludes: ["A400", "AIRBUS A-400M"] },
+  ],
   [
     "settings save succeeds",
     () => request("/api/settings", { method: "POST", form: settingsForm }),

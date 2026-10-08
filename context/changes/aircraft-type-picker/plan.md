@@ -354,26 +354,26 @@ Workera (jak dotąd). Aktualizacja słownika w przyszłości: uruchomić generat
 
 #### Automated
 
-- [x] 1.1 Migracja aplikuje się na czystej bazie: `supabase db reset`
-- [x] 1.2 Testy pgTAP przechodzą: `npm run test:db`
-- [x] 1.3 `src/db/database.types.ts` zawiera tabelę `aircraft_types` po `npm run db:types`
-- [x] 1.4 Lint i typy przechodzą: `npm run lint && npx astro sync && npx astro check`
+- [x] 1.1 Migracja aplikuje się na czystej bazie: `supabase db reset` — 081d7ea
+- [x] 1.2 Testy pgTAP przechodzą: `npm run test:db` — 081d7ea
+- [x] 1.3 `src/db/database.types.ts` zawiera tabelę `aircraft_types` po `npm run db:types` — 081d7ea
+- [x] 1.4 Lint i typy przechodzą: `npm run lint && npx astro sync && npx astro check` — 081d7ea
 
 #### Manual
 
-- [x] 1.5 W Supabase Studio tabela `aircraft_types` ma ~2774 wiersze, a 14 wyróżnionych ma czytelne nazwy
+- [x] 1.5 W Supabase Studio tabela `aircraft_types` ma ~2774 wiersze, a 14 wyróżnionych ma czytelne nazwy — 081d7ea
 
 ### Phase 2: Wyszukiwanie typów
 
 #### Automated
 
-- [ ] 2.1 Testy jednostkowe przechodzą: `npm test`
-- [ ] 2.2 Smoke przechodzi na lokalnej bazie i działającym `npm run dev`: `npm run smoke`
-- [ ] 2.3 Lint i typy przechodzą: `npm run lint && npx astro sync && npx astro check`
+- [x] 2.1 Testy jednostkowe przechodzą: `npm test`
+- [x] 2.2 Smoke przechodzi na lokalnej bazie i działającym `npm run dev`: `npm run smoke`
+- [x] 2.3 Lint i typy przechodzą: `npm run lint && npx astro sync && npx astro check`
 
 #### Manual
 
-- [ ] 2.4 Zalogowany `GET /api/aircraft-types?q=c17` zwraca C17 jako pierwszy wynik, a `q=hercules` zwraca C130 i C30J
+- [x] 2.4 Zalogowany `GET /api/aircraft-types?q=c17` zwraca C17 jako pierwszy wynik, a `q=hercules` zwraca C130 i C30J
 
 ### Phase 3: Wyspa wyboru w ustawieniach
 
