@@ -46,7 +46,7 @@ Obserwator z balkonu dowiaduje się o nietypowym samolocie (wojskowym, ciężkim
 | S-01 | invite-only-access    | niezalogowany widzi wyłącznie logowanie; konto zakłada się tylko ręcznie               | —                | FR-001, Access Control                 | ready    |
 | S-02 | alert-settings-basic  | zapisać przybliżoną lokalizację domu, promień i listę typów samolotów                  | —                | FR-003, FR-004, FR-005, Access Control | done     |
 | S-03 | first-advance-alert   | dostać powiadomienie ≥ 2 min przed przelotem pasującego samolotu                       | F-01, F-02, S-02 | US-01, FR-009, NFR (< 60 s)            | done     |
-| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji            | S-03             | FR-010, US-01                          | planning |
+| S-04 | no-repeat-alerts      | nie dostać drugiego powiadomienia o tej samej maszynie w oknie deduplikacji            | S-03             | FR-010, US-01                          | done     |
 | S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                             | S-03             | FR-006                                 | proposed |
 | S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście           | F-01, S-02       | FR-002, FR-005                         | proposed |
 | S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                              | S-03             | FR-009, US-01                          | proposed |
@@ -155,7 +155,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Unknowns:**
   - Długość okna deduplikacji (Open Roadmap Question 4) — Owner: user. Block: no. **Odpowiedź (2026-10-05):** 60 min od wysłania alertu; ta sama maszyna to ten sam adres transpondera (bez adresów z `~`) lub ta sama rejestracja.
 - **Risk:** To zabezpieczenie „bez spamu” z PRD; dopóki go nie ma, produkt nie nadaje się do używania na co dzień, więc ma pierwszeństwo przed pozostałymi elementami po S-03.
-- **Status:** planning — realizowane w zmianie `first-advance-alert` (S-03 wchłonął S-04).
+- **Status:** done — zrealizowane w zmianie `first-advance-alert` (S-03 wchłonął S-04).
 
 ### S-05: Wstrzymanie i wznowienie alertów
 
@@ -204,7 +204,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 | S-01       | invite-only-access    | Zamknij rejestrację i chroń wszystkie trasy      | yes                   | Run `/10x-plan invite-only-access`; zastąp ścieżkę testu smoke                                                                        |
 | S-02       | alert-settings-basic  | Ustawienia alertów: dom, promień, typy           | yes                   | Część danych pokrywają spec `aba254e` i plan `511ba0a` (Task 1); rozszerzyć o ekran ustawień                                          |
 | S-03       | first-advance-alert   | Pierwszy alert przed przelotem nad domem         | yes                   | Run `/10x-plan first-advance-alert`; kanał Telegram (Q3), pobieranie ADS-B lokalnie (Q10)                                             |
-| S-04       | no-repeat-alerts      | Deduplikacja alertów po maszynie                 | no                    | Realizowane w zmianie `first-advance-alert`; okno 60 min (Q4)                                                                         |
+| S-04       | no-repeat-alerts      | Deduplikacja alertów po maszynie                 | no                    | Zrealizowane w zmianie `first-advance-alert`; okno 60 min (Q4)                                                                        |
 | S-05       | pause-resume-alerts   | Pauza i wznowienie alertów                       | no                    | Czeka na S-03                                                                                                                         |
 | S-06       | aircraft-type-picker  | Wybór typów z czytelnymi nazwami i wyszukiwaniem | no                    | Czeka na F-01 i S-02                                                                                                                  |
 | S-07       | route-in-alerts       | Trasa (skąd/dokąd) w alercie                     | no                    | Czeka na S-03; źródło trasy wyjaśnia F-01                                                                                             |
@@ -243,3 +243,4 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **F-01: (foundation) wybrane darmowe publiczne źródło ADS-B jest potwierdzone empirycznie: dla obszaru wokół domu zwraca typ samolotu, identyfikator maszyny, pozycję, kurs i prędkość, jest osiągalne ze środowiska produkcyjnego aplikacji, a decyzja wraz z limitami i warunkami użycia jest zapisana.** — Archived 2026-09-28 → `context/archive/2026-09-28-adsb-source-verified/`. Lesson: —.
 - **F-02: (foundation) zadanie cykliczne uruchamia się co minutę lokalnie, z sieci użytkownika (tam źródła ADS-B odpowiadają), i przy każdym biegu, także pustym, zapisuje ślad (czas biegu), więc cisza „brak ciekawych samolotów” jest odróżnialna od ciszy „zadanie przestało działać”.** — Archived 2026-09-29 → `context/archive/2026-09-28-minute-cron-heartbeat/`. Lesson: —.
 - **S-03: użytkownik dostaje powiadomienie o samolocie wybranego typu, który według predykcji przeleci w jego promieniu za 2–15 minut, najpóźniej 60 s po pojawieniu się warunku w danych. Powiadomienie zawiera typ, rejestrację, przewidywany czas, kierunek nadlotu i „trasa nieznana”. Przy wykryciu później niż 2 minuty przed przelotem przychodzi z oznaczeniem „już blisko”.** — Archived 2026-10-08 → `context/archive/2026-10-05-first-advance-alert/`. Lesson: —.
+- **S-04: użytkownik nie dostaje drugiego powiadomienia o tej samej maszynie (ten sam adres transpondera lub rejestracja, niezależnie od znaku wywoławczego) w oknie deduplikacji.** — Archived 2026-10-08 → `context/archive/2026-10-05-first-advance-alert/` (wchłonięty przez S-03). Lesson: —.
