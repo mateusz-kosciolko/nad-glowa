@@ -1,20 +1,19 @@
 import React, { useState } from "react";
-import { CircleCheck, LocateFixed, MapPin, Plane, Radar, Save, Send } from "lucide-react";
+import { CircleCheck, LocateFixed, MapPin, Radar, Save, Send } from "lucide-react";
 import { FormField } from "@/components/auth/FormField";
 import { SubmitButton } from "@/components/auth/SubmitButton";
 import { ServerError } from "@/components/auth/ServerError";
-import {
-  MAX_AIRCRAFT_TYPES,
-  RADIUS_MAX,
-  RADIUS_MIN,
-  parseAlertSettingsForm,
-  type AlertSettingsInput,
-} from "@/lib/alert-settings";
+import { AircraftTypePicker } from "@/components/settings/AircraftTypePicker";
+import type { AircraftType } from "@/lib/aircraft-types";
+import { RADIUS_MAX, RADIUS_MIN, parseAlertSettingsForm, type AlertSettingsInput } from "@/lib/alert-settings";
 
 interface Props {
   initial: AlertSettingsInput;
   serverError?: string | null;
   saved?: boolean;
+  featuredTypes: AircraftType[];
+  typeNames: Record<string, string>;
+  featuredUnavailable?: boolean;
 }
 
 function coordinateToText(value: number | null) {
@@ -26,11 +25,18 @@ function roundCoordinate(value: number) {
   return (Math.round(value * 100) / 100).toFixed(2);
 }
 
-export default function AlertSettingsForm({ initial, serverError, saved = false }: Props) {
+export default function AlertSettingsForm({
+  initial,
+  serverError,
+  saved = false,
+  featuredTypes,
+  typeNames,
+  featuredUnavailable = false,
+}: Props) {
   const [lat, setLat] = useState(coordinateToText(initial.home_lat));
   const [lon, setLon] = useState(coordinateToText(initial.home_lon));
   const [radius, setRadius] = useState(String(initial.radius_km));
-  const [types, setTypes] = useState(initial.aircraft_types.join(", "));
+  const [types, setTypes] = useState<string[]>(initial.aircraft_types);
   const [chatId, setChatId] = useState(initial.telegram_chat_id === null ? "" : String(initial.telegram_chat_id));
   const [clientError, setClientError] = useState<string | null>(null);
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
@@ -126,16 +132,12 @@ export default function AlertSettingsForm({ initial, serverError, saved = false 
         }
       />
 
-      <FormField
-        id="aircraft_types"
-        label="Aircraft types"
-        value={types}
+      <AircraftTypePicker
+        selected={types}
         onChange={setTypes}
-        placeholder="B744, A400"
-        icon={<Plane className="size-4" />}
-        hint={
-          <p className={hintClass}>ICAO type codes separated by commas (max. {MAX_AIRCRAFT_TYPES}), e.g. B744, A400.</p>
-        }
+        featuredTypes={featuredTypes}
+        typeNames={typeNames}
+        featuredUnavailable={featuredUnavailable}
       />
 
       <FormField

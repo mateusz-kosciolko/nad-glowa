@@ -367,28 +367,28 @@ Workera (jak dotąd). Aktualizacja słownika w przyszłości: uruchomić generat
 
 #### Automated
 
-- [x] 2.1 Testy jednostkowe przechodzą: `npm test`
-- [x] 2.2 Smoke przechodzi na lokalnej bazie i działającym `npm run dev`: `npm run smoke`
-- [x] 2.3 Lint i typy przechodzą: `npm run lint && npx astro sync && npx astro check`
+- [x] 2.1 Testy jednostkowe przechodzą: `npm test` — 0f73fd7
+- [x] 2.2 Smoke przechodzi na lokalnej bazie i działającym `npm run dev`: `npm run smoke` — 0f73fd7
+- [x] 2.3 Lint i typy przechodzą: `npm run lint && npx astro sync && npx astro check` — 0f73fd7
 
 #### Manual
 
-- [x] 2.4 Zalogowany `GET /api/aircraft-types?q=c17` zwraca C17 jako pierwszy wynik, a `q=hercules` zwraca C130 i C30J
+- [x] 2.4 Zalogowany `GET /api/aircraft-types?q=c17` zwraca C17 jako pierwszy wynik, a `q=hercules` zwraca C130 i C30J — 0f73fd7
 
 ### Phase 3: Wyspa wyboru w ustawieniach
 
 #### Automated
 
-- [ ] 3.1 Lint i typy przechodzą: `npm run lint && npx astro sync && npx astro check`
-- [ ] 3.2 Testy jednostkowe przechodzą: `npm test`
-- [ ] 3.3 Build przechodzi: `npm run build`
-- [ ] 3.4 Smoke przechodzi (zapis ustawień z `aircraft_types` dalej działa): `npm run smoke`
+- [x] 3.1 Lint i typy przechodzą: `npm run lint && npx astro sync && npx astro check`
+- [x] 3.2 Testy jednostkowe przechodzą: `npm test`
+- [x] 3.3 Build przechodzi: `npm run build`
+- [x] 3.4 Smoke przechodzi (zapis ustawień z `aircraft_types` dalej działa): `npm run smoke`
 
 #### Manual
 
-- [ ] 3.5 Na `/settings` widać 14 wyróżnionych z nazwami; kliknięcie dodaje chip, ponowne usuwa
-- [ ] 3.6 Wyszukanie „globemaster” dodaje C17 z nazwą; „Add code ZZZZ” dodaje chip „ZZZZ · unknown name”
-- [ ] 3.7 Zapis i ponowne wejście pokazują te same chipy w tej samej kolejności; wcześniej zapisane kody spoza słownika nie giną
-- [ ] 3.8 Przy 20 wybranych dodawanie jest zablokowane z podpowiedzią
-- [ ] 3.9 Klawiatura: Tab dochodzi do przełączników, wyników i przycisków usunięcia; Enter w polu wyszukiwania nie wysyła formularza
-- [ ] 3.10 Na szerokości telefonu (375 px) wybierak mieści się bez przewijania w poziomie
+- [x] 3.5 Na `/settings` widać 14 wyróżnionych z nazwami; kliknięcie dodaje chip, ponowne usuwa
+- [x] 3.6 Wyszukanie „globemaster” dodaje C17 z nazwą; „Add code ZZZZ” dodaje chip „ZZZZ · unknown name”
+- [x] 3.7 Zapis i ponowne wejście pokazują te same chipy w tej samej kolejności; wcześniej zapisane kody spoza słownika nie giną
+- [x] 3.8 Przy 20 wybranych dodawanie jest zablokowane z podpowiedzią
+- [x] 3.9 Klawiatura: Tab dochodzi do przełączników, wyników i przycisków usunięcia; Enter w polu wyszukiwania nie wysyła formularza
+- [x] 3.10 Na szerokości telefonu (375 px) wybierak mieści się bez przewijania w poziomie

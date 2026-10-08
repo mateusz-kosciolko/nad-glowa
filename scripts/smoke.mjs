@@ -183,7 +183,18 @@ const steps = [
   [
     "settings page shows saved values",
     () => request("/settings"),
-    { status: 200, bodyIncludes: ["52.23", "21.01", "B744, A400", "123456789"] },
+    // The picker carries the codes in a hidden field and shows dictionary names on the chips.
+    {
+      status: 200,
+      bodyIncludes: [
+        "52.23",
+        "21.01",
+        'name="aircraft_types" value="B744,A400"',
+        "BOEING 747-400 · B744",
+        "AIRBUS A-400M · A400",
+        "123456789",
+      ],
+    },
   ],
   [
     "settings save rejects radius 0",

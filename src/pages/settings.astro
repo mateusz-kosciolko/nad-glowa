@@ -1,7 +1,8 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import AlertSettingsForm from "@/components/settings/AlertSettingsForm";
-import type { AlertSettingsInput } from "@/lib/alert-settings";
+import type { AircraftType } from "@/lib/aircraft-types";
+import { ICAO_TYPE_PATTERN, type AlertSettingsInput } from "@/lib/alert-settings";
 import { messageForCode } from "@/lib/form-errors";
 import { createClient } from "@/lib/supabase";
 
@@ -15,6 +16,9 @@ const telegramError = messageForCode(Astro.url.searchParams.get("telegram_error"
 
 let initial: AlertSettingsInput | null = null;
 let loadError: string | null = null;
+let featuredTypes: AircraftType[] = [];
+let typeNames: Record<string, string> = {};
+let featuredUnavailable = false;
 
 const supabase = createClient(Astro.request.headers, Astro.cookies);
 if (!user) {
@@ -42,6 +46,27 @@ if (!user) {
       aircraft_types: data.aircraft_types.filter((code): code is string => typeof code === "string"),
       telegram_chat_id: data.telegram_chat_id,
     };
+
+    // Names for the picker: the featured types plus the saved codes. The codes already passed the icao_type domain,
+    // but they go into a PostgREST filter string, so only codes matching the pattern may reach it.
+    const savedCodes = initial.aircraft_types.filter((code) => ICAO_TYPE_PATTERN.test(code));
+    const filter = savedCodes.length > 0 ? `featured.eq.true,code.in.(${savedCodes.join(",")})` : "featured.eq.true";
+    const { data: types, error: typesError } = await supabase
+      .from("aircraft_types")
+      .select("code, name, featured")
+      .or(filter);
+
+    if (typesError) {
+      // eslint-disable-next-line no-console -- server-side detail; the picker shows only a short notice
+      console.error(`Loading aircraft type names failed: ${typesError.message}`);
+      featuredUnavailable = true;
+    } else {
+      typeNames = Object.fromEntries(types.map(({ code, name }) => [code, name]));
+      featuredTypes = types
+        .filter(({ featured }) => featured)
+        .map(({ code, name }) => ({ code, name }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    }
   }
 }
 ---
@@ -55,7 +80,15 @@ if (!user) {
       <p class="mb-6 text-center text-sm text-blue-100/60">Where to watch and which aircraft to alert you about.</p>
       {initial ? (
         <>
-          <AlertSettingsForm initial={initial} serverError={serverError} saved={saved} client:load />
+          <AlertSettingsForm
+            initial={initial}
+            serverError={serverError}
+            saved={saved}
+            featuredTypes={featuredTypes}
+            typeNames={typeNames}
+            featuredUnavailable={featuredUnavailable}
+            client:load
+          />
           {/* A separate form: nested forms are invalid HTML, and the test must not save unsaved edits. */}
           <form method="POST" action="/api/settings/telegram-test" class="mt-6 border-t border-white/10 pt-4">
             <p class="mb-2 text-xs text-blue-100/50">The test message goes to your saved Telegram chat ID.</p>
