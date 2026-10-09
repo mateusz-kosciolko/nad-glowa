@@ -3,13 +3,13 @@ project: "Nad Głową"
 version: 1
 status: draft
 created: 2026-09-25
-updated: 2026-10-08
+updated: 2026-10-09
 prd_version: 1
 main_goal: speed
 top_blocker: decisions
 milestone_id: first-advance-alert-mvp
 milestone_seq: 1
-milestone_status: open
+milestone_status: done
 ---
 
 # Roadmap: Nad Głową
@@ -20,7 +20,7 @@ milestone_status: open
 
 ## Milestone
 
-**M-1: Pierwszy alert nad domem** — Status: open
+**M-1: Pierwszy alert nad domem** — Status: done
 
 - **Intent:** Zaproszony użytkownik ustawia lokalizację domu, promień i typy samolotów, a potem dostaje powiadomienie co najmniej 2 minuty przed przelotem pasującego samolotu. Powiadomienie przychodzi raz na maszynę i da się je wstrzymać. Kamień milowy obejmuje całą ścieżkę wymagań, które PRD oznacza jako must-have.
 - **Source materials:** `context/foundation/prd.md` (v1)
@@ -236,6 +236,8 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Śledzenie błędów poza heartbeatem** — Why parked: cel `speed`; heartbeat z F-02 pokrywa ryzyko cichej awarii, a Workers Logs resztę.
 
 ## Milestone History
+
+- **M-1: Pierwszy alert nad domem** (`first-advance-alert-mvp`) — closed 2026-10-09. Zaproszony użytkownik ustawia dom, promień i typy samolotów, dostaje na Telegram alert ≥ 2 min przed przelotem (raz na maszynę, z trasą, gdy znana) i może go wstrzymać; poller działa lokalnie.
 
 ## Done
 
