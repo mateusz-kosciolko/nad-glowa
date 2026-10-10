@@ -597,10 +597,10 @@ behaviour-preserving and verified by Phase 1.
 
 #### Automated
 
-- [x] 5.1 No `TBD — see §3 Phase 1` placeholder remains in the test plan
-- [x] 5.2 Prettier check passes for the test plan and roadmap
+- [x] 5.1 No `TBD — see §3 Phase 1` placeholder remains in the test plan — 768b3f1
+- [x] 5.2 Prettier check passes for the test plan and roadmap — 768b3f1
 
 #### Manual
 
-- [x] 5.3 §6.1 / §6.2 are self-sufficient for adding a new case
-- [x] 5.4 The roadmap Parked entry states the gap in user terms and names its source
+- [x] 5.3 §6.1 / §6.2 are self-sufficient for adding a new case — 768b3f1
+- [x] 5.4 The roadmap Parked entry states the gap in user terms and names its source — 768b3f1
