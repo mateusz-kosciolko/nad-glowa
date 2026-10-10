@@ -177,3 +177,83 @@ describe("queryRadiusKm", () => {
     expect(queryRadiusKm(30)).toBeCloseTo(307.8, 6);
   });
 });
+
+// Boundary table at a realistic latitude: at 52.23 N a missing or doubled cos(lat) in the east-west conversion
+// moves a 9.8 km pass to ~16 km (missed) or a 10.2 km pass to ~6.2 km (false alert). Every expected value below
+// comes from the fixture geometry and the PRD, never from predictPass output.
+describe("predictPass at Warsaw", () => {
+  const RADIUS_KM = 10;
+  // Closest approach 5 min ahead: the aircraft starts 300 s * 0.1852 km/s = 55.56 km due south of home's parallel.
+  const PASS_LEAD_S = 300;
+
+  // Due south/north by D km along a meridian: a great-circle arc, so dLat = D / R radians (no cos involved).
+  function warsawLatOffsetDeg(km: number): number {
+    return km / EARTH_RADIUS_KM / DEG_TO_RAD;
+  }
+
+  // East/west offset whose great-circle distance from home, measured along home's parallel, is X km.
+  // Haversine with dLat = 0: sin^2(X / 2R) = cos^2(lat) * sin^2(dLon / 2), so dLon = 2 * asin(sin(X / 2R) / cos(lat)).
+  // This inverts spherical haversine, not the flat-frame formula predictPass uses.
+  function warsawLonOffsetDeg(km: number): number {
+    const latRad = WARSAW.lat * DEG_TO_RAD;
+    return (2 * Math.asin(Math.sin(km / (2 * EARTH_RADIUS_KM)) / Math.cos(latRad))) / DEG_TO_RAD;
+  }
+
+  // South of home, flying due north (track 0), offset X km east (+1) or west (-1). The track is a meridian, so the
+  // closest point lies on home's parallel, X km from home, PASS_LEAD_S from now.
+  function northboundPasser(offsetKm: number, side: 1 | -1): AircraftState {
+    return aircraft({
+      lat: WARSAW.lat - warsawLatOffsetDeg(PASS_LEAD_S * SPEED_KM_S),
+      lon: WARSAW.lon + side * warsawLonOffsetDeg(offsetKm),
+      trackDeg: 0,
+    });
+  }
+
+  // Due north of home, flying straight south over it, `seconds` before the overhead pass.
+  function inboundOverWarsaw(seconds: number, overrides: Partial<AircraftState> = {}): AircraftState {
+    return aircraft({
+      lat: WARSAW.lat + warsawLatOffsetDeg(seconds * SPEED_KM_S),
+      lon: WARSAW.lon,
+      trackDeg: 180,
+      ...overrides,
+    });
+  }
+
+  it.each<[string, 1 | -1]>([
+    ["east", 1],
+    ["west", -1],
+  ])("alerts a pass 9.8 km %s of home, 5 min ahead", (_label, side) => {
+    const prediction = predictPass(northboundPasser(9.8, side), WARSAW, RADIUS_KM);
+    expect(prediction).not.toBeNull();
+    expect(Math.abs((prediction?.closestDistanceKm ?? Number.NaN) - 9.8)).toBeLessThanOrEqual(0.05);
+    expect(Math.abs((prediction?.secondsToClosest ?? Number.NaN) - PASS_LEAD_S)).toBeLessThanOrEqual(1);
+    expect(prediction?.alreadyClose).toBe(false);
+  });
+
+  it.each<[string, 1 | -1]>([
+    ["east", 1],
+    ["west", -1],
+  ])("does not alert a pass 10.2 km %s of home (outside the radius)", (_label, side) => {
+    expect(predictPass(northboundPasser(10.2, side), WARSAW, RADIUS_KM)).toBeNull();
+  });
+
+  it("alerts a pass 1 min ahead and marks it already close", () => {
+    const prediction = predictPass(inboundOverWarsaw(60), WARSAW, RADIUS_KM);
+    expect(prediction).not.toBeNull();
+    expect(prediction?.alreadyClose).toBe(true);
+  });
+
+  it("alerts a pass 14 min ahead as a regular alert", () => {
+    const prediction = predictPass(inboundOverWarsaw(14 * 60), WARSAW, RADIUS_KM);
+    expect(prediction).not.toBeNull();
+    expect(prediction?.alreadyClose).toBe(false);
+  });
+
+  it("does not alert a pass 16 min ahead (beyond the 15 min horizon)", () => {
+    expect(predictPass(inboundOverWarsaw(16 * 60), WARSAW, RADIUS_KM)).toBeNull();
+  });
+
+  it("ignores an aircraft on the ground 10 min out", () => {
+    expect(predictPass(inboundOverWarsaw(10 * 60, { onGround: true }), WARSAW, RADIUS_KM)).toBeNull();
+  });
+});

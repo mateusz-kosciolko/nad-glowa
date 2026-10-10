@@ -544,27 +544,27 @@ behaviour-preserving and verified by Phase 1.
 
 #### Automated
 
-- [x] 1.1 `npm run lint` passes
-- [x] 1.2 `npx astro sync && npx astro check` passes
-- [x] 1.3 `npm test` passes with the same test count as before the change
-- [x] 1.4 `npm run build` passes
-- [x] 1.5 `grep -n "astro:env" src/workers/alert-poller.ts` returns nothing
+- [x] 1.1 `npm run lint` passes — 2d87734
+- [x] 1.2 `npx astro sync && npx astro check` passes — 2d87734
+- [x] 1.3 `npm test` passes with the same test count as before the change — 2d87734
+- [x] 1.4 `npm run build` passes — 2d87734
+- [x] 1.5 `grep -n "astro:env" src/workers/alert-poller.ts` returns nothing — 2d87734
 
 #### Manual
 
-- [x] 1.6 One `cron:local` run is recorded in `cron_runs` with the same status as before the change
+- [x] 1.6 One `cron:local` run is recorded in `cron_runs` with the same status as before the change — 2d87734
 
 ### Phase 2: Unit tables — run trace (#1) and match boundaries at Warsaw (#4)
 
 #### Automated
 
-- [ ] 2.1 `npm test` passes, including the new `cron-runs` and Warsaw boundary tests
-- [ ] 2.2 `npm run lint` passes
-- [ ] 2.3 Mutation check: removing the `cos(home.lat)` factor fails at least one Warsaw east/west case
+- [x] 2.1 `npm test` passes, including the new `cron-runs` and Warsaw boundary tests
+- [x] 2.2 `npm run lint` passes
+- [x] 2.3 Mutation check: removing the `cos(home.lat)` factor fails at least one Warsaw east/west case
 
 #### Manual
 
-- [ ] 2.4 Every expected value in the boundary table traces to geometry or a PRD line
+- [x] 2.4 Every expected value in the boundary table traces to geometry or a PRD line
 
 ### Phase 3: Integration harness and risk #1 scenarios
 
