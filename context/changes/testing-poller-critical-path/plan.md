@@ -570,28 +570,28 @@ behaviour-preserving and verified by Phase 1.
 
 #### Automated
 
-- [x] 3.1 `npm run test:integration` passes with the #1 scenarios
-- [x] 3.2 `npm test` passes and does not pick up `*.integration.test.ts`
-- [x] 3.3 `npm run lint` passes
-- [x] 3.4 `npx astro sync && npx astro check` passes
-- [x] 3.5 Mutation check: skipping the type filter and dropping the Telegram failure error each fail a named case
+- [x] 3.1 `npm run test:integration` passes with the #1 scenarios — f1f39cc
+- [x] 3.2 `npm test` passes and does not pick up `*.integration.test.ts` — f1f39cc
+- [x] 3.3 `npm run lint` passes — f1f39cc
+- [x] 3.4 `npx astro sync && npx astro check` passes — f1f39cc
+- [x] 3.5 Mutation check: skipping the type filter and dropping the Telegram failure error each fail a named case — f1f39cc
 
 #### Manual
 
-- [x] 3.6 Failing assertion messages name the failed edge and the expectation
+- [x] 3.6 Failing assertion messages name the failed edge and the expectation — f1f39cc
 
 ### Phase 4: Integration — risk #2 scenarios
 
 #### Automated
 
-- [ ] 4.1 `npm run test:integration` passes with the #1 and #2 scenarios, in under 15 s locally
-- [ ] 4.2 `npm run lint` passes
-- [ ] 4.3 `npx astro sync && npx astro check` passes
-- [ ] 4.4 Mutation check: insert registration, `user_id` filter and 400/403 `break` each fail a named case
+- [x] 4.1 `npm run test:integration` passes with the #1 and #2 scenarios, in under 15 s locally
+- [x] 4.2 `npm run lint` passes
+- [x] 4.3 `npx astro sync && npx astro check` passes
+- [x] 4.4 Mutation check: insert registration, `user_id` filter and 400/403 `break` each fail a named case
 
 #### Manual
 
-- [ ] 4.5 No test asserts behaviour after a 400/403, an insert failure or an overlapping run
+- [x] 4.5 No test asserts behaviour after a 400/403, an insert failure or an overlapping run
 
 ### Phase 5: Cookbook and documentation
 
