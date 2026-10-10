@@ -584,23 +584,23 @@ behaviour-preserving and verified by Phase 1.
 
 #### Automated
 
-- [x] 4.1 `npm run test:integration` passes with the #1 and #2 scenarios, in under 15 s locally
-- [x] 4.2 `npm run lint` passes
-- [x] 4.3 `npx astro sync && npx astro check` passes
-- [x] 4.4 Mutation check: insert registration, `user_id` filter and 400/403 `break` each fail a named case
+- [x] 4.1 `npm run test:integration` passes with the #1 and #2 scenarios, in under 15 s locally — caf9a25
+- [x] 4.2 `npm run lint` passes — caf9a25
+- [x] 4.3 `npx astro sync && npx astro check` passes — caf9a25
+- [x] 4.4 Mutation check: insert registration, `user_id` filter and 400/403 `break` each fail a named case — caf9a25
 
 #### Manual
 
-- [x] 4.5 No test asserts behaviour after a 400/403, an insert failure or an overlapping run
+- [x] 4.5 No test asserts behaviour after a 400/403, an insert failure or an overlapping run — caf9a25
 
 ### Phase 5: Cookbook and documentation
 
 #### Automated
 
-- [ ] 5.1 No `TBD — see §3 Phase 1` placeholder remains in the test plan
-- [ ] 5.2 Prettier check passes for the test plan and roadmap
+- [x] 5.1 No `TBD — see §3 Phase 1` placeholder remains in the test plan
+- [x] 5.2 Prettier check passes for the test plan and roadmap
 
 #### Manual
 
-- [ ] 5.3 §6.1 / §6.2 are self-sufficient for adding a new case
-- [ ] 5.4 The roadmap Parked entry states the gap in user terms and names its source
+- [x] 5.3 §6.1 / §6.2 are self-sufficient for adding a new case
+- [x] 5.4 The roadmap Parked entry states the gap in user terms and names its source

@@ -3,7 +3,7 @@ project: "Nad Głową"
 version: 1
 status: draft
 created: 2026-09-25
-updated: 2026-10-09
+updated: 2026-10-10
 prd_version: 1
 main_goal: speed
 top_blocker: decisions
@@ -231,6 +231,7 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 - **Własny odbiornik ADS-B, funkcje dla spotterów, gwarancja kompletności, tryb „wszystkie samoloty”** — Why parked: PRD Non-Goals.
 - **Pobieranie ADS-B i zadanie cykliczne na serwerze** — Why parked: decyzja użytkownika 2026-09-28 (Open Roadmap Question 10); lokalnie wystarcza do walidacji. Kierunki na później: poller poza Cloudflare (Railway, Fly.io, VPS) zapisujący do Supabase albo zgoda adsb.fi / airplanes.live na dostęp. Plan Workers Paid dopiero wtedy. Warunek przed wdrożeniem pollera (impl-review `first-advance-alert`, F2): budżet czasu biegu (~45 s), blokada biegu (np. `pg_try_advisory_lock` lub wiersz-dzierżawa), żeby nakładające się biegi nie dublowały alertów ani nie przekraczały limitu adsb.fi, oraz grupowanie zapytań dla bliskich sobie domów.
 - **Powiązanie czatu Telegram przez `/start <kod>` i limit wiadomości testowej** — Why parked: zmiana `first-advance-alert` przyjmuje ręcznie wklejany chat ID (impl-review F5); nikt nie weryfikuje, że czat należy do użytkownika, a endpoint testowy nie ma limitu. Ryzyko ogranicza dostęp tylko dla zaproszonych (S-01); wrócić przed otwarciem rejestracji lub wdrożeniem pollera.
+- **Widoczność dryfu formatu ADS-B w śladzie biegu** — Why parked: gdy źródło ADS-B zmieni format tak, że odpowiedź nadal się parsuje, ale nie daje użytecznych samolotów (wpisy bez pozycji pomijane, brak typu), użytkownik przestaje dostawać alerty, a bieg ma status `ok`, nieodróżnialny od „brak ciekawych samolotów”. Pokazanie liczby pominiętych wpisów albo ostrzeżenia „brak samolotów z typem” wymaga progu, którego PRD nie definiuje. Źródło: `context/foundation/test-plan.md`, etap wdrożenia 1 (ryzyko #1), research zmiany `testing-poller-critical-path` (Open Question 2).
 - **Auto-deploy z GitHub Actions** — Why parked: repo nie ma remote'a (`deploy-plan.md`); przy celu `speed` ręczny `wrangler deploy` wystarcza.
 - **Własna domena i pole `site`** — Why parked: `deploy-plan.md`, nie wpływa na żaden wymóg PRD.
 - **Śledzenie błędów poza heartbeatem** — Why parked: cel `speed`; heartbeat z F-02 pokrywa ryzyko cichej awarii, a Workers Logs resztę.
