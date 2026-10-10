@@ -19,6 +19,7 @@ jobs:
       - run: npx astro sync
       - run: npm run lint
       - run: npm test
+      - run: npm run test:integration
       - run: npx astro check
       - run: npm run build
         env:

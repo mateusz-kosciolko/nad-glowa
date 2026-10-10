@@ -21,11 +21,12 @@ Astro 7 SSR app (React 19 islands, Tailwind 4, shadcn/ui) with Supabase Auth, de
 - There is no separate `wrangler dev` step. With `@astrojs/cloudflare` v14, `npm run dev` already runs workerd inside Vite; tutorials recommending `wrangler pages dev ./dist` are obsolete for these pins.
 - If the dev server answers 500 with "The file does not exist at …/node_modules/.vite/deps_ssr/… in the optimize deps directory" (seen after running `astro sync` / `build` alongside it), restart `npm run dev`; it is a stale Vite dep cache, not a code error.
 - `npm test` — Vitest unit tests (@vitest.config.ts) for pure modules only: `src/lib/**/*.test.ts`, run in Node without workerd or the Astro config, so tested modules must not import `astro:*` or Supabase. Import `describe`/`it`/`expect` explicitly from `vitest`.
+- `npm run test:integration` — Vitest integration tests (@vitest.integration.config.ts) for the alert poller: `src/workers/**/*.integration.test.ts`, in Node with only the edges faked (`fetch` per host for adsb.fi, adsbdb and Telegram, plus an in-memory Supabase from `src/workers/poller-fakes.ts`); no network or database. Tested modules must not import `astro:*`; pass the client, clock and token in as parameters.
 - `npm run smoke` — HTTP auth-flow test against a running server (`BASE_URL`, default `http://localhost:4321`); reads `SUPABASE_URL` / `SUPABASE_KEY` / `SUPABASE_SERVICE_KEY` from `.dev.vars`, creates its test account through the local Supabase Admin API and deletes it after the run; refuses to run against a non-local Supabase.
 - `npm run cron:local` — fires the Worker's `scheduled` handler every 60 s via `GET /cdn-cgi/handler/scheduled` (`astro dev` never fires Cron Triggers on its own); needs a running `npm run dev` and `SUPABASE_SERVICE_KEY` in `.dev.vars`. The `/__scheduled` path from `context/foundation/infrastructure.md` belongs to `wrangler dev --test-scheduled` and does not exist here.
 - `npm run cf:types` — regenerates `worker-configuration.d.ts` (Workers runtime types and `Env`) after changing `wrangler.jsonc` or the variable names in `.dev.vars`; commit the result, CI does not generate it.
 
-Three kinds of automated tests: `npm test` (Vitest unit tests for pure `src/lib` modules), `smoke` (HTTP) and `npm run test:db` (pgTAP permission tests in `supabase/tests/`).
+Four kinds of automated tests: `npm test` (Vitest unit tests for pure `src/lib` modules), `npm run test:integration` (alert poller with faked edges), `smoke` (HTTP) and `npm run test:db` (pgTAP permission tests in `supabase/tests/`).
 
 ## Structure & conventions
 

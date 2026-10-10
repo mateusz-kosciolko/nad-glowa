@@ -558,27 +558,27 @@ behaviour-preserving and verified by Phase 1.
 
 #### Automated
 
-- [x] 2.1 `npm test` passes, including the new `cron-runs` and Warsaw boundary tests
-- [x] 2.2 `npm run lint` passes
-- [x] 2.3 Mutation check: removing the `cos(home.lat)` factor fails at least one Warsaw east/west case
+- [x] 2.1 `npm test` passes, including the new `cron-runs` and Warsaw boundary tests — a2f6e31
+- [x] 2.2 `npm run lint` passes — a2f6e31
+- [x] 2.3 Mutation check: removing the `cos(home.lat)` factor fails at least one Warsaw east/west case — a2f6e31
 
 #### Manual
 
-- [x] 2.4 Every expected value in the boundary table traces to geometry or a PRD line
+- [x] 2.4 Every expected value in the boundary table traces to geometry or a PRD line — a2f6e31
 
 ### Phase 3: Integration harness and risk #1 scenarios
 
 #### Automated
 
-- [ ] 3.1 `npm run test:integration` passes with the #1 scenarios
-- [ ] 3.2 `npm test` passes and does not pick up `*.integration.test.ts`
-- [ ] 3.3 `npm run lint` passes
-- [ ] 3.4 `npx astro sync && npx astro check` passes
-- [ ] 3.5 Mutation check: skipping the type filter and dropping the Telegram failure error each fail a named case
+- [x] 3.1 `npm run test:integration` passes with the #1 scenarios
+- [x] 3.2 `npm test` passes and does not pick up `*.integration.test.ts`
+- [x] 3.3 `npm run lint` passes
+- [x] 3.4 `npx astro sync && npx astro check` passes
+- [x] 3.5 Mutation check: skipping the type filter and dropping the Telegram failure error each fail a named case
 
 #### Manual
 
-- [ ] 3.6 Failing assertion messages name the failed edge and the expectation
+- [x] 3.6 Failing assertion messages name the failed edge and the expectation
 
 ### Phase 4: Integration — risk #2 scenarios
 
