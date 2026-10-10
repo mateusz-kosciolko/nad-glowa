@@ -1,9 +1,9 @@
 // One alert run for every active user: fetch nearby aircraft, predict passes, skip duplicates, send, record.
-// Gets the service_role client from the scheduled handler as a parameter, so this module never imports it.
+// Gets the service_role client, the clock and the bot token from the scheduled handler as parameters, so this
+// module never imports the admin client or any astro:* module (it runs under plain Node in integration tests).
 // Error strings end up in cron_runs.error and the log: they name users only by their position in this run
 // and never carry home coordinates, chat IDs or the bot token.
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { TELEGRAM_BOT_TOKEN } from "astro:env/server";
 import type { Database } from "@/db/database.types";
 import { fetchAircraftNear, type AircraftState } from "@/lib/adsb";
 import { DEDUP_WINDOW_MS, formatAlertMessage, isRecentlyAlerted } from "@/lib/alerts";
@@ -40,10 +40,13 @@ function roundKm(km: number): number {
   return Math.round(km * 10) / 10;
 }
 
-export async function runAlertPoll(supabase: SupabaseClient<Database>, now: () => Date): Promise<AlertPollSummary> {
+export async function runAlertPoll(
+  supabase: SupabaseClient<Database>,
+  now: () => Date,
+  token: string | undefined,
+): Promise<AlertPollSummary> {
   const summary: AlertPollSummary = { users: 0, polled: 0, matches: 0, duplicates: 0, sent: 0, routes: 0, errors: [] };
 
-  const token = TELEGRAM_BOT_TOKEN;
   if (!token) {
     summary.errors.push("TELEGRAM_BOT_TOKEN is not configured; no alerts can be sent");
     return summary;

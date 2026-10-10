@@ -6,6 +6,25 @@ export const CRON_RUN_RETENTION_DAYS = 7;
 // Must match the status check in supabase/migrations/20260928180224_cron_runs.sql.
 export type CronRunStatus = "ok" | "error";
 
+// Bounds cron_runs.error when many users fail in the same run.
+export const MAX_RUN_ERROR_CHARS = 500;
+
+// A finished run reports its collected errors; a crashed one, what it threw. Takes the errors structurally,
+// so this module does not import from src/workers.
+export type RunOutcome = { errors: readonly string[] } | { thrown: unknown };
+
+// Maps a run's outcome to the status and error text stored in cron_runs (and logged).
+export function describeRunOutcome(outcome: RunOutcome): { status: CronRunStatus; error: string | null } {
+  if ("thrown" in outcome) {
+    const { thrown } = outcome;
+    return { status: "error", error: thrown instanceof Error ? thrown.message : String(thrown) };
+  }
+  if (outcome.errors.length > 0) {
+    return { status: "error", error: outcome.errors.join("; ").slice(0, MAX_RUN_ERROR_CHARS) };
+  }
+  return { status: "ok", error: null };
+}
+
 export interface CronRun {
   id: number;
   started_at: string;

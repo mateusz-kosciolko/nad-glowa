@@ -1,15 +1,14 @@
 /* eslint-disable no-console -- console is the only output channel of a cron run (wrangler tail / dev terminal) */
-import { CRON_RUN_RETENTION_DAYS, type CronRunStatus } from "@/lib/cron-runs";
+import { TELEGRAM_BOT_TOKEN } from "astro:env/server";
+import { CRON_RUN_RETENTION_DAYS, describeRunOutcome, type CronRunStatus } from "@/lib/cron-runs";
 import { createAdminClient } from "@/lib/supabase-admin";
 import { runAlertPoll, type AlertPollSummary } from "@/workers/alert-poller";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-// Bounds cron_runs.error when many users fail in the same run.
-const MAX_ERROR_CHARS = 500;
 
 // The run's actual work: one alert poll for every active user.
 function runWork(supabase: NonNullable<ReturnType<typeof createAdminClient>>): Promise<AlertPollSummary> {
-  return runAlertPoll(supabase, () => new Date());
+  return runAlertPoll(supabase, () => new Date(), TELEGRAM_BOT_TOKEN);
 }
 
 function describeSummary(summary: AlertPollSummary | null): string {
@@ -49,18 +48,14 @@ export async function handleScheduled(
   }
 
   const startedAt = new Date();
-  let status: CronRunStatus = "ok";
-  let runError: string | null = null;
+  let status: CronRunStatus;
+  let runError: string | null;
   let summary: AlertPollSummary | null = null;
   try {
     summary = await runWork(supabase);
-    if (summary.errors.length > 0) {
-      status = "error";
-      runError = summary.errors.join("; ").slice(0, MAX_ERROR_CHARS);
-    }
+    ({ status, error: runError } = describeRunOutcome({ errors: summary.errors }));
   } catch (error) {
-    status = "error";
-    runError = describeError(error);
+    ({ status, error: runError } = describeRunOutcome({ thrown: error }));
   }
   const durationMs = Math.max(0, Date.now() - startedAt.getTime());
 

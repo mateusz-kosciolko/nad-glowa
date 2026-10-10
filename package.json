@@ -10,6 +10,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
     "format": "prettier --write .",
     "smoke": "node --env-file-if-exists=.dev.vars scripts/smoke.mjs",
     "adsb:measure": "node scripts/adsb-measure.mjs",
