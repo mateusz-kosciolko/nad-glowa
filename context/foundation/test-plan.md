@@ -74,7 +74,8 @@ orkiestrator aktualizuje go w miarę pojawiania się artefaktów na dysku.
 
 Klasyczna baza testów projektu. Profil bazy testów: `sparse` — skonfigurowany
 Vitest, 6 plików unit wyłącznie w `src/lib/`, 4 pliki pgTAP (RLS), jeden smoke
-HTTP; brak testów stron, endpointów i pollera.
+HTTP; brak testów stron, endpointów i pollera. Stan po etapie 1 (2026-10-10): 7 plików
+unit w `src/lib/` oraz integracja pollera (`npm run test:integration`, wiersze poniżej).
 
 | Layer                | Tool                                                                                                             | Version          | Notes                                                                                                                                                            |
 | -------------------- | ---------------------------------------------------------------------------------------------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -133,7 +134,7 @@ ukończeniu odpowiedniego etapu; wcześniej brzmi „TBD — see §3 Phase <N>�
 - **Nowy przypadek dla `predictPass`:** dopisz wiersz do bloku `describe("predictPass at Warsaw")`, używając jego
   helperów: `northboundPasser(offsetKm, side)` (przelot X km na wschód `1` lub zachód `-1` od domu, 5 min przed
   najbliższym punktem), `inboundOverWarsaw(seconds, overrides)` (przelot nad domem za `seconds`),
-  `warsawLatOffsetDeg(km)` / `warsawLonOffsetDeg(km)` (przesunięcia z geometrii sferycznej) oraz `aircraft(overrides)`
+  `kmToLatDeg(km)` / `warsawLonOffsetDeg(km)` (przesunięcia z geometrii sferycznej) oraz `aircraft(overrides)`
   z góry pliku (samolot w powietrzu, 360 kt, świeża pozycja).
 - **Szkielet:**
 
@@ -156,7 +157,7 @@ ukończeniu odpowiedniego etapu; wcześniej brzmi „TBD — see §3 Phase <N>�
 - **Gdzie:** `src/workers/<nazwa>.integration.test.ts`; fałszywe granice w `src/workers/poller-fakes.ts` (importowane
   wyłącznie przez testy integracyjne). Scenariusze `runAlertPoll` dopisuj do
   `src/workers/alert-poller.integration.test.ts`.
-- **Uruchomienie:** `npm run test:integration` (`vitest.integration.config.ts`, Node bez Astro i workerd, ok. 2,5 s);
+- **Uruchomienie:** `npm run test:integration` (`vitest.integration.config.ts`, Node bez Astro i workerd, ok. 1,5 s);
   w CI w jobie `ci` zaraz po `npm test`. `npm test` tych plików nie zbiera.
 - **Reguły:**
   - Fałszujemy tylko granice: `fetch` po hoście (`opendata.adsb.fi`, `api.adsbdb.com`, `api.telegram.org`) i klienta

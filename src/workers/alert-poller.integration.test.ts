@@ -54,6 +54,22 @@ function seedDatabase(settings = [alertUser()]): FakeSupabase {
   return createFakeSupabase({ clock: () => NOW, settings });
 }
 
+// Error strings reach cron_runs.error and the log; alert-poller.ts promises they never carry the bot token, chat IDs
+// or home coordinates.
+function expectNoSecretsIn(errors: readonly string[]): void {
+  const text = errors.join("\n");
+  const secrets = [
+    TOKEN,
+    String(DEFAULT_CHAT_ID),
+    String(SECOND_USER.telegram_chat_id),
+    String(HOME.lat),
+    String(HOME.lon),
+  ];
+  for (const secret of secrets) {
+    expect(text, `run errors must not contain "${secret}"`).not.toContain(secret);
+  }
+}
+
 describe("risk #1: one matching aircraft gives exactly one alert", () => {
   it("sends one correct alert and records it, ignoring another type on the same track", async () => {
     const db = seedDatabase();
@@ -179,6 +195,7 @@ describe("risk #1: a reported failure is visible in the run trace", () => {
     const summary = await runAlertPoll(db.client, () => NOW, token);
 
     expect(summary.errors.join("\n"), "run errors").toContain(failure.fragment);
+    expectNoSecretsIn(summary.errors);
     expect(describeRunOutcome(summary).status, "run status stored in cron_runs").toBe("error");
     expect(http.requestsTo(TELEGRAM_HOST), "Telegram sendMessage attempts").toHaveLength(failure.sends);
     if (failure.token === undefined && "token" in failure) {
@@ -306,6 +323,7 @@ describe("risk #2: failed sends are limited per run", () => {
     expect(http.requestsTo(TELEGRAM_HOST), "Telegram sendMessage attempts").toHaveLength(expectedAttempts);
     const failures = summary.errors.filter((error) => error.includes(description));
     expect(failures, `run errors carrying "${description}"`).toHaveLength(expectedAttempts);
+    expectNoSecretsIn(summary.errors);
     expect(summary.sent, "sent").toBe(0);
     expect(db.notifications, "recorded alert_notifications rows").toEqual([]);
   });
@@ -320,6 +338,7 @@ describe("risk #2: failed sends are limited per run", () => {
     expect(http.requestsTo(TELEGRAM_HOST), "Telegram sendMessage attempts").toHaveLength(1);
     expect(http.requestsTo(ADSB_HOST), "ADS-B requests (none for the skipped user)").toHaveLength(1);
     expect(summary.errors.join("\n"), "run errors").toContain("Telegram rate limit hit; 1 user(s) skipped in this run");
+    expectNoSecretsIn(summary.errors);
     expect(summary.sent, "sent").toBe(0);
     expect(db.notifications, "recorded alert_notifications rows").toEqual([]);
   });

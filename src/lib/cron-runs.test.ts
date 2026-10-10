@@ -26,4 +26,9 @@ describe("describeRunOutcome", () => {
     expect(result.error).toHaveLength(500);
     expect(result.error).toBe(`${first}; ${"b".repeat(199)}`);
   });
+
+  it("cuts a long thrown message to exactly 500 characters", () => {
+    const result = describeRunOutcome({ thrown: new Error("c".repeat(600)) });
+    expect(result).toEqual({ status: "error", error: "c".repeat(500) });
+  });
 });

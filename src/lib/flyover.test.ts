@@ -29,6 +29,7 @@ function aircraft(overrides: Partial<AircraftState> = {}): AircraftState {
   };
 }
 
+// Due south/north by D km along a meridian: a great-circle arc, so dLat = D / R radians (no cos involved).
 function kmToLatDeg(km: number): number {
   return km / EARTH_RADIUS_KM / DEG_TO_RAD;
 }
@@ -186,11 +187,6 @@ describe("predictPass at Warsaw", () => {
   // Closest approach 5 min ahead: the aircraft starts 300 s * 0.1852 km/s = 55.56 km due south of home's parallel.
   const PASS_LEAD_S = 300;
 
-  // Due south/north by D km along a meridian: a great-circle arc, so dLat = D / R radians (no cos involved).
-  function warsawLatOffsetDeg(km: number): number {
-    return km / EARTH_RADIUS_KM / DEG_TO_RAD;
-  }
-
   // East/west offset whose great-circle distance from home, measured along home's parallel, is X km.
   // Haversine with dLat = 0: sin^2(X / 2R) = cos^2(lat) * sin^2(dLon / 2), so dLon = 2 * asin(sin(X / 2R) / cos(lat)).
   // This inverts spherical haversine, not the flat-frame formula predictPass uses.
@@ -203,7 +199,7 @@ describe("predictPass at Warsaw", () => {
   // closest point lies on home's parallel, X km from home, PASS_LEAD_S from now.
   function northboundPasser(offsetKm: number, side: 1 | -1): AircraftState {
     return aircraft({
-      lat: WARSAW.lat - warsawLatOffsetDeg(PASS_LEAD_S * SPEED_KM_S),
+      lat: WARSAW.lat - kmToLatDeg(PASS_LEAD_S * SPEED_KM_S),
       lon: WARSAW.lon + side * warsawLonOffsetDeg(offsetKm),
       trackDeg: 0,
     });
@@ -212,7 +208,7 @@ describe("predictPass at Warsaw", () => {
   // Due north of home, flying straight south over it, `seconds` before the overhead pass.
   function inboundOverWarsaw(seconds: number, overrides: Partial<AircraftState> = {}): AircraftState {
     return aircraft({
-      lat: WARSAW.lat + warsawLatOffsetDeg(seconds * SPEED_KM_S),
+      lat: WARSAW.lat + kmToLatDeg(seconds * SPEED_KM_S),
       lon: WARSAW.lon,
       trackDeg: 180,
       ...overrides,

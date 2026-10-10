@@ -14,5 +14,7 @@ export default defineConfig({
   test: {
     include: ["src/workers/**/*.integration.test.ts"],
     environment: "node",
+    // Restores the fetch stub after every test even if a test file forgets its own vi.unstubAllGlobals().
+    unstubGlobals: true,
   },
 });
