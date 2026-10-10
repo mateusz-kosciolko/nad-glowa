@@ -1,10 +1,10 @@
 ---
 change_id: testing-poller-critical-path
 title: Test rollout phase 1 — poller critical path (one alert, no repeat, match boundaries)
-status: impl_reviewed
+status: archived
 created: 2026-10-09
 updated: 2026-10-10
-archived_at: null
+archived_at: 2026-10-10T08:48:32Z
 ---
 
 ## Notes
