@@ -188,17 +188,17 @@ Replace the ad-hoc check in `src/middleware.ts` with `decideAuth`, emit the log 
 
 #### Automated
 
-- [x] 1.1 New tests fail before the module exists (red), then pass: `npm test`
-- [x] 1.2 Lint passes: `npm run lint`
+- [x] 1.1 New tests fail before the module exists (red), then pass: `npm test` — e0c7625
+- [x] 1.2 Lint passes: `npm run lint` — e0c7625
 
 ### Phase 2: Wire into middleware and verify
 
 #### Automated
 
-- [x] 2.1 Unit tests pass: `npm test`
-- [x] 2.2 Integration tests pass: `npm run test:integration`
-- [x] 2.3 Lint passes: `npm run lint`
-- [x] 2.4 Type check passes: `npx astro sync && npx astro check`
+- [x] 2.1 Unit tests pass: `npm test` — e0c7625
+- [x] 2.2 Integration tests pass: `npm run test:integration` — e0c7625
+- [x] 2.3 Lint passes: `npm run lint` — e0c7625
+- [x] 2.4 Type check passes: `npx astro sync && npx astro check` — e0c7625
 
 #### Manual
 
