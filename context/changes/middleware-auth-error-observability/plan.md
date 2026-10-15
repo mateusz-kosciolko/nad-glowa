@@ -202,4 +202,4 @@ Replace the ad-hoc check in `src/middleware.ts` with `decideAuth`, emit the log 
 
 #### Manual
 
-- [x] 2.5 With the dev server pointed at an unreachable `SUPABASE_URL`, a signed-in private page answers 503 and the terminal shows the `auth.get_user_failed` line
+- [x] 2.5 With the dev server pointed at an unreachable `SUPABASE_URL`, a signed-in private page answers 503 and the terminal shows the `auth.get_user_failed` line — e0c7625
