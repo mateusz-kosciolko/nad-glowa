@@ -44,9 +44,13 @@ const SESSION_REJECTED_CODES = new Set([
 ]);
 
 // Auth is down or throttling: network failure (status 0), 5xx or 429. Redirecting would sign everyone out.
+// AuthUnknownError (no status) is a non-JSON answer outside auth-js's retryable list, e.g. a proxy's HTML 429
+// page or a 505, so it is infrastructure too.
 function isRetryable(error: AuthErrorLike): boolean {
   const status = error.status ?? 0;
-  return error.name === "AuthRetryableFetchError" || status >= 500 || status === 429;
+  return (
+    error.name === "AuthRetryableFetchError" || error.name === "AuthUnknownError" || status >= 500 || status === 429
+  );
 }
 
 export function decideAuth(facts: AuthRequestFacts): AuthDecision {
@@ -86,13 +90,13 @@ export function decideAuth(facts: AuthRequestFacts): AuthDecision {
   return { action: "redirect", log };
 }
 
-// @supabase/ssr stores the session as sb-<ref>-auth-token (chunked as .0, .1, …) plus a PKCE code-verifier cookie.
+// @supabase/ssr stores the session as sb-<ref>-auth-token, chunked as .0, .1, … when large. The PKCE
+// code-verifier cookie is not a session (this app signs in with a password), so it does not count.
+const SESSION_COOKIE_NAME = /^sb-.+-auth-token(\.\d+)?$/;
+
 export function hasSupabaseAuthCookie(cookieHeader: string | null): boolean {
   if (!cookieHeader) {
     return false;
   }
-  return cookieHeader.split(";").some((pair) => {
-    const name = pair.split("=", 1)[0].trim();
-    return name.startsWith("sb-") && name.includes("-auth-token");
-  });
+  return cookieHeader.split(";").some((pair) => SESSION_COOKIE_NAME.test(pair.split("=", 1)[0].trim()));
 }

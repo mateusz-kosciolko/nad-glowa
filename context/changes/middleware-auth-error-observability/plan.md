@@ -159,6 +159,8 @@ Replace the ad-hoc check in `src/middleware.ts` with `decideAuth`, emit the log 
 
 - With the dev server pointed at an unreachable `SUPABASE_URL`, a signed-in private page answers 503 and the terminal shows the `auth.get_user_failed` line
 
+Verification note (2026-10-15): 2.5 was checked with a forged, unexpired `sb-127-auth-token` session cookie instead of a real sign-in, against `SUPABASE_URL=http://127.0.0.1:1` (temporary `.dev.vars.outage` + `CLOUDFLARE_ENV=outage`, port 4399). `/dashboard` → 503 with `Retry-After: 30` and `Cache-Control: no-store`; `/auth/signin` → 200; log `auth.get_user_failed`, `AuthRetryableFetchError`, status 0. The same forged cookie against the real local Supabase gave a redirect plus `bad_jwt` at error level.
+
 ---
 
 ## Testing Strategy

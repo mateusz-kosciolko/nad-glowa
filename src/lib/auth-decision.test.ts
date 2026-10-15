@@ -31,6 +31,7 @@ describe("decideAuth", () => {
     ["a GoTrue 503", { name: "AuthRetryableFetchError", status: 503 }],
     ["a GoTrue 500 API error", { name: "AuthApiError", status: 500, code: "unexpected_failure" }],
     ["a rate limit", { name: "AuthApiError", status: 429, code: "over_request_rate_limit" }],
+    ["a non-JSON error page (proxy 429, 505)", { name: "AuthUnknownError" }],
   ])("answers 503 and logs an error for %s on a private route", (_label, error) => {
     expect(decideAuth(facts({ error, method: "POST", path: "/api/settings" }))).toEqual({
       action: "unavailable",
@@ -38,7 +39,7 @@ describe("decideAuth", () => {
         level: "error",
         event: "auth.get_user_failed",
         name: error.name,
-        status: error.status,
+        status: error.status ?? null,
         code: error.code ?? null,
         method: "POST",
         path: "/api/settings",
@@ -55,7 +56,7 @@ describe("decideAuth", () => {
   it.each<[string, AuthErrorLike]>([
     ["a rejected API key", { name: "AuthApiError", status: 401, code: "no_authorization" }],
     ["an unverifiable JWT", { name: "AuthApiError", status: 403, code: "bad_jwt" }],
-    ["an unknown error", { name: "AuthUnknownError" }],
+    ["an unhandled API error", { name: "AuthApiError", status: 422, code: "validation_failed" }],
   ])("redirects and logs an error for %s", (_label, error) => {
     const decision = decideAuth(facts({ error }));
     expect(decision.action).toBe("redirect");
@@ -111,7 +112,7 @@ describe("hasSupabaseAuthCookie", () => {
   it.each<[string | null, boolean]>([
     ["sb-127-auth-token=abc", true],
     ["theme=dark; sb-127-auth-token.0=abc; sb-127-auth-token.1=def", true],
-    ["sb-abcd-auth-token-code-verifier=xyz", true],
+    ["sb-abcd-auth-token-code-verifier=xyz", false],
     ["theme=dark; sb-something=1", false],
     ["", false],
     [null, false],

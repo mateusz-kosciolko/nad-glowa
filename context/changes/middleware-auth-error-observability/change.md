@@ -1,7 +1,7 @@
 ---
 change_id: middleware-auth-error-observability
 title: Middleware logs getUser() errors and answers 503 on Auth outages
-status: implemented
+status: impl_reviewed
 created: 2026-10-15
 updated: 2026-10-15
 archived_at: null
