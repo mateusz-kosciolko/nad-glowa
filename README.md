@@ -1,8 +1,37 @@
-# 10x Astro Starter
+# Nad Głową
 
-![](./public/template.png)
+Get a Telegram alert a few minutes **before** an interesting aircraft passes over your home, so you have time to step out on the balcony with binoculars. Flight maps only show what is already overhead and you have to keep watching them; this app comes to you.
 
-A modern, opinionated starter template for building fast, accessible web applications.
+**Live app:** https://nad-glowa.mateusz-kosciolko-321.workers.dev (invitation only, see [Creating accounts](#creating-accounts))
+
+## How it works
+
+- **Access:** sign-in only. There is no sign-up; an administrator creates each account, and row-level security keeps every user's data private.
+- **Your settings:** approximate home location, alert radius and the aircraft types you care about (`/settings`).
+- **Prediction:** a job runs every minute, reads live ADS-B positions from adsb.fi and projects each matching aircraft's course to find its closest point to your home.
+- **Alert:** a Telegram message with the aircraft, distance and time, plus the route for civil flights (adsbdb). The same machine alerts at most once per hour, and you can pause alerts from the dashboard.
+- **History:** `/alerts` lists the alerts you received. Entries older than the one-hour deduplication window can be removed.
+
+### Production and the local poller
+
+The web app runs on Cloudflare Workers, but free ADS-B sources refuse requests from Cloudflare (`context/foundation/adsb-source.md`). The minute job therefore runs locally with `npm run cron:local`, and **production sends no automatic alerts**; this was a deliberate scope decision for the MVP (`context/foundation/roadmap.md`, Open Roadmap Question 10).
+
+## Project documents
+
+Product and delivery context lives in `context/`:
+
+- `context/foundation/` - PRD, roadmap, tech stack, infrastructure, test plan
+- `context/changes/` and `context/archive/` - research, plan and review of each change
+- `context/deployment/deploy-plan.md` - production deploy log
+- `context/audits/` - observability audit
+
+## Tests
+
+- `npm test` - unit tests of the pure rules (prediction, deduplication, form parsing)
+- `npm run test:integration` - the alert poller with faked ADS-B, route and Telegram services
+- `npm run test:db` - pgTAP tests of the database permissions, with RLS seen as each user
+- `npm run smoke` - the whole HTTP flow against a running server and a local Supabase
+- `npx playwright test` - browser tests from the user's perspective (needs `E2E_USERNAME` / `E2E_PASSWORD` in `.dev.vars`)
 
 ## Tech Stack
 
@@ -23,8 +52,8 @@ A modern, opinionated starter template for building fast, accessible web applica
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/przeprogramowani/10x-astro-starter.git
-cd 10x-astro-starter
+git clone https://github.com/mateusz-kosciolko/nad-glowa.git
+cd nad-glowa
 ```
 
 2. Install dependencies:
@@ -76,7 +105,7 @@ npm run dev
 
 ## Supabase Configuration
 
-This project uses [Supabase](https://supabase.com/) for authentication. Environment variables are declared via Astro's `astro:env` schema and are treated as **server-only secrets** — they are never exposed to the client.
+This project uses [Supabase](https://supabase.com/) for authentication and data. Environment variables are declared via Astro's `astro:env` schema and are treated as **server-only secrets** — they are never exposed to the client.
 
 ### First-time setup (local, no cloud project needed)
 
@@ -88,19 +117,13 @@ Requires [Docker](https://www.docker.com/) and ~7 GB RAM.
 cp .env.example .env
 ```
 
-2. Initialize the local Supabase project (creates a `supabase/` config folder):
-
-```bash
-npx supabase init
-```
-
-3. Start the local stack (downloads Docker images on first run):
+2. Start the local stack (downloads Docker images on first run):
 
 ```bash
 npx supabase start
 ```
 
-4. Copy the credentials printed by the CLI into your `.env` and `.dev.vars`:
+3. Copy the credentials printed by the CLI into your `.env` and `.dev.vars`:
 
 ```
 SUPABASE_URL=http://127.0.0.1:54321
@@ -113,7 +136,7 @@ Add the `service_role` key to `.dev.vars` only (never to client code). The minut
 SUPABASE_SERVICE_KEY=<service_role key from CLI output>
 ```
 
-5. To stop the stack when done:
+4. To stop the stack when done:
 
 ```bash
 npx supabase stop
@@ -204,8 +227,6 @@ npm run smoke          # BASE_URL defaults to http://localhost:4321
 ```
 
 Because sign-up is closed, the script creates its test account through the Supabase Admin API, seeds its alert history with the same key and deletes the account after the run, even when a step fails. It reads `SUPABASE_URL`, `SUPABASE_KEY` and `SUPABASE_SERVICE_KEY` from `.dev.vars` and needs the `service_role` key of the **local** Supabase. It refuses to run (without sending any request) when `SUPABASE_URL` is not `127.0.0.1`, `localhost` or `::1` — never point it at production.
-
-> **Note:** this script exists primarily to guard the development of the starter itself — it is a fast sanity check that dependency upgrades did not break the build, the Cloudflare adapter or the Supabase auth flow. It is **not** a substitute for a real test suite. Once you build your own product on top of this starter, add proper tests (unit, integration, end-to-end) suited to your application.
 
 ## CI
 
