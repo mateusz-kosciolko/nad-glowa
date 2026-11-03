@@ -16,6 +16,9 @@ const ERROR_MESSAGES: Record<string, string> = {
   telegram_chat_not_found: "Telegram: chat not found. Check the chat ID and press Start in your bot.",
   telegram_blocked: "Telegram: the bot was blocked. Unblock it in Telegram and try again.",
   telegram_failed: "Could not send the Telegram message. Please try again later.",
+  alert_id_invalid: "That alert could not be identified. Please try again.",
+  alert_not_deletable: "This alert cannot be removed yet: it still prevents repeat alerts for the same aircraft.",
+  alert_delete_failed: "Could not remove the alert. Please try again.",
 };
 
 // null when there is no code; an unknown code gets the generic message.

@@ -3,7 +3,7 @@ project: "Nad Głową"
 version: 1
 status: draft
 created: 2026-09-25
-updated: 2026-10-10
+updated: 2026-11-03
 prd_version: 1
 main_goal: speed
 top_blocker: decisions
@@ -25,7 +25,7 @@ milestone_status: done
 - **Intent:** Zaproszony użytkownik ustawia lokalizację domu, promień i typy samolotów, a potem dostaje powiadomienie co najmniej 2 minuty przed przelotem pasującego samolotu. Powiadomienie przychodzi raz na maszynę i da się je wstrzymać. Kamień milowy obejmuje całą ścieżkę wymagań, które PRD oznacza jako must-have.
 - **Source materials:** `context/foundation/prd.md` (v1)
 - **Done when:** każdy F-NN i S-NN poniżej ma status `done`. Pobieranie ADS-B i zadanie cykliczne wystarczy uruchomić lokalnie, z sieci użytkownika; wdrożenie ich na serwer nie jest warunkiem zamknięcia (decyzja 2026-09-28, Open Roadmap Question 10).
-- **Scope anchors:** FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-009, FR-010; US-01; NFR (powiadomienie < 60 s); Access Control. Poza zakresem są FR-007, FR-008 i FR-011 (zob. `## Parked`).
+- **Scope anchors:** FR-001, FR-002, FR-003, FR-004, FR-005, FR-006, FR-009, FR-010; US-01; NFR (powiadomienie < 60 s); Access Control. Poza zakresem są FR-007 i FR-008 (zob. `## Parked`). FR-011 dowiezione później jako S-08.
 
 ## Vision recap
 
@@ -50,6 +50,7 @@ Obserwator z balkonu dowiaduje się o nietypowym samolocie (wojskowym, ciężkim
 | S-05 | pause-resume-alerts   | wstrzymać i wznowić alerty                                                             | S-03             | FR-006                                 | done   |
 | S-06 | aircraft-type-picker  | wybrać typy z krótkiej listy z czytelnymi nazwami i wyszukać w pełnej liście           | F-01, S-02       | FR-002, FR-005                         | done   |
 | S-07 | route-in-alerts       | zobaczyć w alercie o samolocie cywilnym skąd i dokąd leci                              | S-03             | FR-009, US-01                          | done   |
+| S-08 | alert-history         | przeglądać historię swoich alertów i usuwać stare wpisy                                | S-03             | FR-011                                 | done   |
 
 ## Streams
 
@@ -209,6 +210,18 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 | S-06       | aircraft-type-picker  | Wybór typów z czytelnymi nazwami i wyszukiwaniem | no                    | Czeka na F-01 i S-02                                                                                                                  |
 | S-07       | route-in-alerts       | Trasa (skąd/dokąd) w alercie                     | no                    | Czeka na S-03; źródło trasy wyjaśnia F-01                                                                                             |
 
+### S-08: Historia alertów z usuwaniem
+
+- **Outcome:** użytkownik przegląda na `/alerts` własną historię wysłanych alertów i usuwa wpisy starsze niż okno deduplikacji; młodszy wpis pokazuje, od kiedy można go usunąć.
+- **Change ID:** alert-history
+- **PRD refs:** FR-011, Open Question 9
+- **Prerequisites:** S-03
+- **Parallel with:** —
+- **Blockers:** —
+- **Unknowns:** —
+- **Risk:** Dziennik jest też pamięcią deduplikacji, więc usunięcie świeżego wpisu wznowiłoby alert. Regułę wymusza polityka RLS, nie endpoint.
+- **Status:** done
+
 ## Open Roadmap Questions
 
 1. **Czy istniejące płatne alerty (Flightradar24 lub podobne) już rozwiązują ten problem?** — Owner: user. Block: roadmap-wide. PRD każe sprawdzić to przed budową; przy celu `speed` najtaniej zrobić to przed S-03.
@@ -226,13 +239,12 @@ Co już jest w kodzie na dzień 2026-09-25 (zbadane automatycznie i potwierdzone
 
 - **Flaga „interesują mnie samoloty wojskowe” (FR-007)** — Why parked: PRD Non-Goals, nice-to-have.
 - **Wiele reguł alertów (FR-008)** — Why parked: PRD Non-Goals, nice-to-have.
-- **Przeglądanie dziennika obserwacji (FR-011)** — Why parked: PRD Non-Goals, nice-to-have; kandydat na kolejny kamień milowy razem z pytaniem 8.
 - **Wybór kanału powiadomień przez użytkownika** — Why parked: PRD Non-Goals, jeden stały kanał w MVP.
 - **Własny odbiornik ADS-B, funkcje dla spotterów, gwarancja kompletności, tryb „wszystkie samoloty”** — Why parked: PRD Non-Goals.
 - **Pobieranie ADS-B i zadanie cykliczne na serwerze** — Why parked: decyzja użytkownika 2026-09-28 (Open Roadmap Question 10); lokalnie wystarcza do walidacji. Kierunki na później: poller poza Cloudflare (Railway, Fly.io, VPS) zapisujący do Supabase albo zgoda adsb.fi / airplanes.live na dostęp. Plan Workers Paid dopiero wtedy. Warunek przed wdrożeniem pollera (impl-review `first-advance-alert`, F2): budżet czasu biegu (~45 s), blokada biegu (np. `pg_try_advisory_lock` lub wiersz-dzierżawa), żeby nakładające się biegi nie dublowały alertów ani nie przekraczały limitu adsb.fi, oraz grupowanie zapytań dla bliskich sobie domów.
 - **Powiązanie czatu Telegram przez `/start <kod>` i limit wiadomości testowej** — Why parked: zmiana `first-advance-alert` przyjmuje ręcznie wklejany chat ID (impl-review F5); nikt nie weryfikuje, że czat należy do użytkownika, a endpoint testowy nie ma limitu. Ryzyko ogranicza dostęp tylko dla zaproszonych (S-01); wrócić przed otwarciem rejestracji lub wdrożeniem pollera.
 - **Widoczność dryfu formatu ADS-B w śladzie biegu** — Why parked: gdy źródło ADS-B zmieni format tak, że odpowiedź nadal się parsuje, ale nie daje użytecznych samolotów (wpisy bez pozycji pomijane, brak typu), użytkownik przestaje dostawać alerty, a bieg ma status `ok`, nieodróżnialny od „brak ciekawych samolotów”. Pokazanie liczby pominiętych wpisów albo ostrzeżenia „brak samolotów z typem” wymaga progu, którego PRD nie definiuje. Źródło: `context/foundation/test-plan.md`, etap wdrożenia 1 (ryzyko #1), research zmiany `testing-poller-critical-path` (Open Question 2).
-- **Auto-deploy z GitHub Actions** — Why parked: repo nie ma remote'a (`deploy-plan.md`); przy celu `speed` ręczny `wrangler deploy` wystarcza.
+- **Auto-deploy z GitHub Actions** — Why parked: przy celu `speed` ręczny `wrangler deploy` wystarcza (`deploy-plan.md`).
 - **Własna domena i pole `site`** — Why parked: `deploy-plan.md`, nie wpływa na żaden wymóg PRD.
 - **Śledzenie błędów poza heartbeatem** — Why parked: cel `speed`; heartbeat z F-02 pokrywa ryzyko cichej awarii, a Workers Logs resztę.
 

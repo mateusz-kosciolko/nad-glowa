@@ -2,7 +2,8 @@
 // Zero dependencies on purpose. Run against a live server: `npm run smoke` (reads `.dev.vars`; BASE_URL defaults
 // to http://localhost:4321).
 // Runs ONLY against a local Supabase: sign-up is closed, so the test account is created through the GoTrue Admin
-// API with the service_role key and deleted after the run, even when a step fails or the run is interrupted. The
+// API with the service_role key and deleted after the run, even when a step fails or the run is interrupted. The same
+// key seeds the alert history, which only the scheduled handler writes. The
 // script refuses to send any request when SUPABASE_URL does not point at 127.0.0.1, localhost or ::1, or when the
 // key is not the local Supabase CLI demo key.
 
@@ -104,6 +105,31 @@ async function deleteUser(id) {
   if (!response.ok) throw new Error(`admin delete user ${id} -> ${response.status} ${await response.text()}`);
 }
 
+// Alert history rows are written only by the scheduled handler, so the steps seed them directly. The rows go away with
+// the test account (`on delete cascade`).
+async function seedAlert(userId, registration, sentAgoMinutes) {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/alert_notifications`, {
+    method: "POST",
+    headers: { ...adminHeaders, Prefer: "return=representation" },
+    body: JSON.stringify({
+      user_id: userId,
+      aircraft_hex: registration.toLowerCase(),
+      registration,
+      aircraft_type: "A400",
+      sent_at: new Date(Date.now() - sentAgoMinutes * 60_000).toISOString(),
+      closest_at: new Date(Date.now() - sentAgoMinutes * 60_000 + 300_000).toISOString(),
+      closest_distance_km: 4.2,
+      already_close: false,
+    }),
+  });
+  const body = await response.text();
+  if (!response.ok) throw new Error(`seed alert -> ${response.status} ${body}`);
+  return JSON.parse(body)[0].id;
+}
+
+const seededAlerts = { old: null, fresh: null };
+let testUserId;
+
 // Accounts to remove after the run; the direct sign-up step adds one only if Supabase wrongly accepts it.
 const createdUserIds = [];
 
@@ -145,6 +171,7 @@ const steps = [
     () => request("/api/aircraft-types?q=a400"),
     { status: 302, location: "/auth/signin" },
   ],
+  ["alert history redirects anonymous user", () => request("/alerts"), { status: 302, location: "/auth/signin" }],
   ["signup page redirects anonymous user", () => request("/auth/signup"), { status: 302, location: "/auth/signin" }],
   [
     "signup endpoint redirects anonymous user",
@@ -245,6 +272,43 @@ const steps = [
     () => request("/dashboard"),
     { status: 200, bodyIncludes: ["Alerts: active"] },
   ],
+  // Alert history: an old entry can be removed; one inside the dedup window cannot, or the alert would repeat.
+  ["alert history is empty at first", () => request("/alerts"), { status: 200, bodyIncludes: ["No alerts yet"] }],
+  [
+    "alert history shows seeded alerts",
+    async () => {
+      seededAlerts.old = await seedAlert(testUserId, "SP-OLD", 120);
+      seededAlerts.fresh = await seedAlert(testUserId, "SP-NEW", 5);
+      return request("/alerts");
+    },
+    { status: 200, bodyIncludes: ["SP-OLD", "SP-NEW", "Remove", "Can be removed after"] },
+  ],
+  [
+    "alert delete removes an old entry",
+    () => request("/api/alerts/delete", { method: "POST", form: { id: String(seededAlerts.old) } }),
+    { status: 302, location: "/alerts?deleted=1" },
+  ],
+  [
+    "alert history no longer shows the removed entry",
+    () => request("/alerts?deleted=1"),
+    { status: 200, bodyIncludes: ["SP-NEW", "Alert removed."], bodyExcludes: ["SP-OLD"] },
+  ],
+  [
+    "alert delete refuses an entry inside the dedup window",
+    () => request("/api/alerts/delete", { method: "POST", form: { id: String(seededAlerts.fresh) } }),
+    { status: 302, location: "/alerts?alerts_error=alert_not_deletable" },
+  ],
+  ["alert history still shows the fresh entry", () => request("/alerts"), { status: 200, bodyIncludes: ["SP-NEW"] }],
+  [
+    "alert delete rejects an invalid id",
+    () => request("/api/alerts/delete", { method: "POST", form: { id: "abc" } }),
+    { status: 302, location: "/alerts?alerts_error=alert_id_invalid" },
+  ],
+  [
+    "alert history ignores free text in alerts_error",
+    () => request(`/alerts?alerts_error=${encodeURIComponent("<script>evil</script>")}`),
+    { status: 200, bodyIncludes: ["Something went wrong. Please try again."], bodyExcludes: ["evil"] },
+  ],
   // Error parameters carry codes; a crafted value must not reach the page.
   [
     "dashboard ignores free text in alerts_error",
@@ -257,6 +321,11 @@ const steps = [
     { status: 302, location: "/auth/signin" },
   ],
   ["dashboard redirects after signout", () => request("/dashboard"), { status: 302, location: "/auth/signin" }],
+  [
+    "alert delete redirects after signout",
+    () => request("/api/alerts/delete", { method: "POST", form: { id: "1" } }),
+    { status: 302, location: "/auth/signin" },
+  ],
   [
     "settings save redirects after signout",
     () => request("/api/settings", { method: "POST", form: settingsForm }),
@@ -299,7 +368,8 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
 
 let failed = 0;
 try {
-  createdUserIds.push(await createTestUser());
+  testUserId = await createTestUser();
+  createdUserIds.push(testUserId);
   for (const [name, run, expected] of steps) {
     const actual = await run();
     const missing = (expected.bodyIncludes ?? []).filter((text) => !actual.body.includes(text));

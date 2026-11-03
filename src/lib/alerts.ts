@@ -3,7 +3,8 @@ import type { AircraftState } from "@/lib/adsb";
 import type { PassPrediction } from "@/lib/flyover";
 import { formatRoute, type Route } from "@/lib/routes";
 
-// The same aircraft is alerted at most once per window.
+// The same aircraft is alerted at most once per window. Changing it needs a migration too: the delete policy on
+// alert_notifications keeps entries for the same 60 minutes.
 export const DEDUP_WINDOW_MS = 60 * 60_000;
 
 // Alert times are shown in the users' local time.

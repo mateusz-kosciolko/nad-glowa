@@ -1,0 +1,100 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { canDeleteAlert, deletableAt, formatAlertTime } from "@/lib/alert-history";
+import { messageForCode } from "@/lib/form-errors";
+import { createClient } from "@/lib/supabase";
+
+const HISTORY_LIMIT = 100;
+
+const { user } = Astro.locals;
+const now = new Date();
+
+const supabase = createClient(Astro.request.headers, Astro.cookies);
+// Under RLS with the user's session: only the caller's own entries. Null when the list cannot be read.
+let alerts:
+  | {
+      id: number;
+      registration: string | null;
+      aircraft_hex: string;
+      aircraft_type: string;
+      sent_at: string;
+      closest_at: string;
+      closest_distance_km: number;
+    }[]
+  | null = null;
+
+if (supabase && user) {
+  const { data, error } = await supabase
+    .from("alert_notifications")
+    .select("id, registration, aircraft_hex, aircraft_type, sent_at, closest_at, closest_distance_km")
+    .eq("user_id", user.id)
+    .order("sent_at", { ascending: false })
+    .limit(HISTORY_LIMIT);
+  if (error) {
+    // eslint-disable-next-line no-console -- server-side detail; the page shows a fixed message
+    console.error(`Reading the alert history failed: ${error.message}`);
+  } else {
+    alerts = data;
+  }
+}
+
+// The URL carries only error codes; never render the raw parameter.
+const alertsError = messageForCode(Astro.url.searchParams.get("alerts_error"));
+const deleted = Astro.url.searchParams.get("deleted") === "1";
+---
+
+<Layout title="Alert history">
+  <div class="bg-cosmic flex min-h-screen items-center justify-center p-4">
+    <div class="w-full max-w-2xl rounded-2xl border border-white/10 bg-white/10 p-8 text-white backdrop-blur-xl">
+      <h1 class="mb-4 bg-gradient-to-r from-blue-200 to-purple-200 bg-clip-text text-3xl font-bold text-transparent">
+        Alert history
+      </h1>
+      {deleted && <p class="mb-3 text-sm text-green-300">Alert removed.</p>}
+      {alertsError && <p class="mb-3 text-sm text-red-300">{alertsError}</p>}
+      {alerts === null && <p class="text-sm text-red-300">Could not load your alert history. Please try again.</p>}
+      {alerts?.length === 0 && <p class="text-sm text-blue-100/80">No alerts yet. Sent alerts will appear here.</p>}
+      {alerts && alerts.length > 0 && (
+        <ul class="space-y-2">
+          {alerts.map((alert) => (
+            <li class="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm">
+              <div>
+                <p class="font-semibold">
+                  {alert.aircraft_type} · {alert.registration ?? alert.aircraft_hex}
+                </p>
+                <p class="text-xs text-blue-100/70">
+                  Sent {formatAlertTime(alert.sent_at)} · closest {alert.closest_distance_km} km at{" "}
+                  {formatAlertTime(alert.closest_at)}
+                </p>
+              </div>
+              {canDeleteAlert(alert.sent_at, now) ? (
+                <form method="POST" action="/api/alerts/delete">
+                  <input type="hidden" name="id" value={alert.id} />
+                  <button
+                    type="submit"
+                    aria-label={`Remove alert about ${alert.registration ?? alert.aircraft_hex}`}
+                    class="rounded-lg border border-white/20 bg-white/10 px-3 py-1 text-xs whitespace-nowrap transition-colors hover:bg-white/20"
+                  >
+                    Remove
+                  </button>
+                </form>
+              ) : (
+                <p class="text-right text-xs text-blue-100/50">
+                  Can be removed after {formatAlertTime(deletableAt(alert.sent_at))}
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+      {alerts?.length === HISTORY_LIMIT && (
+        <p class="mt-3 text-xs text-blue-100/50">Showing the latest {HISTORY_LIMIT} alerts.</p>
+      )}
+      <a
+        href="/dashboard"
+        class="mt-6 inline-block rounded-lg border border-white/20 bg-white/10 px-4 py-2 text-sm transition-colors hover:bg-white/20"
+      >
+        Back to dashboard
+      </a>
+    </div>
+  </div>
+</Layout>

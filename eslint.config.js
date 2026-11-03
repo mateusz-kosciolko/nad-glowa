@@ -135,7 +135,7 @@ const adminClientConfig = defineConfig({
   rules: { "no-restricted-imports": "off", "no-restricted-syntax": "off" },
 });
 
-// Poza src/ klucz service_role wolno czytać wyłącznie w scripts/smoke.mjs (lokalna Supabase, Admin API).
+// Poza src/ klucz service_role wolno czytać wyłącznie w scripts/smoke.mjs (lokalna Supabase: Admin API i seed historii alertów).
 const SCRIPT_SERVICE_KEY_MESSAGE =
   "Klucz service_role omija RLS. W scripts/ czyta go wyłącznie scripts/smoke.mjs (lokalna Supabase przez Admin API).";
 const scriptsServiceKeyBoundary = defineConfig({

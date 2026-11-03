@@ -95,7 +95,7 @@ Planespotters photographing aircraft (e.g. near airports) who need advance notic
 
 ### Sighting log
 
-- FR-011: User can browse the sighting log. Priority: nice-to-have
+- FR-011: User can browse the sighting log and remove entries older than the deduplication window. Priority: nice-to-have (delivered: `/alerts`)
   > Socrates: No counter-argument; stays nice-to-have.
 
 Removed during challenge round: "User can choose 'all aircraft' (catch-all)" — useful mainly for testing, contradicts the "unusual aircraft" premise and the no-spam guardrail; testing can use a common type instead.
@@ -123,7 +123,7 @@ Login required to access the application. Flat user model — no roles, no admin
 - **No own ADS-B receiver** — public data sources only; no hardware (SDR, antennas) and no feeding own data.
 - **No planespotter / community features** — no shared lists, group alerts, photos, or airports as locations; the secondary persona is outside the MVP.
 - **No completeness guarantee** — the product does not promise to catch every unusual aircraft (military aircraft without ADS-B, data gaps, straight-line prediction errors).
-- **Deferred nice-to-haves** — military flag (FR-007), multiple rules (FR-008) and sighting log browsing (FR-011) are outside the MVP.
+- **Deferred nice-to-haves** — military flag (FR-007) and multiple rules (FR-008) are outside the MVP; sighting log browsing (FR-011) was added after it.
 - **No choice of notification channel** — one fixed channel in the MVP.
 - **No "all aircraft" mode** — removed during shaping; it contradicts the "unusual aircraft" premise and the no-spam guardrail.
 

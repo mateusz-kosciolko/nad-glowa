@@ -167,11 +167,12 @@ The user can sign in right away. A trigger creates the account's `alert_settings
 
 ### Auth routes
 
-| Route          | Description                                                         |
-| -------------- | ------------------------------------------------------------------- |
-| `/auth/signin` | Email/password sign-in form (the only page open to anonymous users) |
-| `/`            | Redirects to `/dashboard`                                           |
-| `/dashboard`   | Dashboard for signed-in users                                       |
+| Route          | Description                                                            |
+| -------------- | ---------------------------------------------------------------------- |
+| `/auth/signin` | Email/password sign-in form (the only page open to anonymous users)    |
+| `/`            | Redirects to `/dashboard`                                              |
+| `/dashboard`   | Dashboard for signed-in users                                          |
+| `/alerts`      | History of the user's alerts; entries older than 60 min can be removed |
 
 Route protection is handled in `src/middleware.ts` and is closed by default: every route requires a signed-in user unless its exact path is listed in `PUBLIC_ROUTES` there (sign-in page plus the sign-in and sign-out endpoints). Anonymous requests to any other path are redirected to `/auth/signin`.
 
@@ -202,7 +203,7 @@ npm run dev            # or: npm run build && npm run preview
 npm run smoke          # BASE_URL defaults to http://localhost:4321
 ```
 
-Because sign-up is closed, the script creates its test account through the Supabase Admin API and deletes it after the run, even when a step fails. It reads `SUPABASE_URL`, `SUPABASE_KEY` and `SUPABASE_SERVICE_KEY` from `.dev.vars` and needs the `service_role` key of the **local** Supabase. It refuses to run (without sending any request) when `SUPABASE_URL` is not `127.0.0.1`, `localhost` or `::1` — never point it at production.
+Because sign-up is closed, the script creates its test account through the Supabase Admin API, seeds its alert history with the same key and deletes the account after the run, even when a step fails. It reads `SUPABASE_URL`, `SUPABASE_KEY` and `SUPABASE_SERVICE_KEY` from `.dev.vars` and needs the `service_role` key of the **local** Supabase. It refuses to run (without sending any request) when `SUPABASE_URL` is not `127.0.0.1`, `localhost` or `::1` — never point it at production.
 
 > **Note:** this script exists primarily to guard the development of the starter itself — it is a fast sanity check that dependency upgrades did not break the build, the Cloudflare adapter or the Supabase auth flow. It is **not** a substitute for a real test suite. Once you build your own product on top of this starter, add proper tests (unit, integration, end-to-end) suited to your application.
 
