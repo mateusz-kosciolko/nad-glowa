@@ -1,10 +1,10 @@
 ---
 project: nad-glowa
-deployed_at: 2026-10-08
+deployed_at: 2026-11-03
 platform: Cloudflare Workers (Static Assets)
 worker_name: nad-glowa
 production_url: https://nad-glowa.mateusz-kosciolko-321.workers.dev
-version_id: 49b00703-d4b0-47bd-8e38-006acf3f1189
+version_id: eb0cef99-5fbd-40fe-b5bd-284c189da8c0
 status: deployed-probe-blocked
 ---
 
@@ -45,6 +45,13 @@ Sign In / Providers → „Allow new users to sign up” wyłączone przez czło
 **włączony** — lokalnie `[auth.email] enable_signup = false` wyłączyło logowanie e-mailem w ogóle, więc na
 produkcji wyłączony jest tylko przełącznik globalny.
 
+2026-11-03 — zmiana `alert-history` (commit `da7900e`), wersja `eb0cef99-…`: strona `/alerts` i `POST /api/alerts/delete`.
+Wchodzi też kod od poprzedniego wdrożenia (`f6bcdb15-…`, 2026-10-08 19:33 UTC): `route-in-alerts`, seamy pollera
+i poprawka `getUser()` (503 przy awarii Auth). Na produkcyjnej Supabase `npx supabase db push` (`--dry-run` wcześniej)
+zastosował `20261103100000_alert_history` (granty i polityki select/delete dla właściciela). Projekt Supabase był
+uśpiony (`INACTIVE`), wznowiony przez człowieka w panelu: **plan darmowy usypia bazę po około tygodniu bez ruchu**, a
+wtedy logowanie na produkcji przestaje działać.
+
 **Alerty nie działają na produkcji** — kod pollera ADS-B, predykcji i wysyłki na Telegram (`first-advance-alert`)
 jest wdrożony od 2026-10-08, ale nie ma Cron Triggera (`triggers.crons` w `wrangler.jsonc`) ani sekretu
 `TELEGRAM_BOT_TOKEN`, więc handler `scheduled` nie biegnie, a dashboard pokazuje „No cron runs yet”. Oba źródła
@@ -56,7 +63,7 @@ ADS-B odmawiają żądań z produkcyjnego Workera (`context/foundation/adsb-sour
 | Platforma           | Cloudflare Workers with Static Assets (**nie** Pages)              |
 | Nazwa Workera       | `nad-glowa`                                                        |
 | URL produkcyjny     | https://nad-glowa.mateusz-kosciolko-321.workers.dev                |
-| Aktywny Version ID  | `49b00703-d4b0-47bd-8e38-006acf3f1189`                             |
+| Aktywny Version ID  | `eb0cef99-5fbd-40fe-b5bd-284c189da8c0`                             |
 | Konto Cloudflare    | `mateusz.kosciolko@gmail.com` (`321276ecf944b4a3f73a126d4bbaa3b0`) |
 | Plan Cloudflare     | Free                                                               |
 | Projekt Supabase    | `nwphfexokrngshgmhucf`, region EU                                  |
@@ -120,7 +127,9 @@ npx wrangler deployments list                  # historia
 ```
 
 Poniżej minuty, bez rebuildu — wersje są niezmiennymi uploadami. Aktywna jest
-`49b00703-d4b0-47bd-8e38-006acf3f1189` (2026-10-08, `invite-only-access`). Poprzednie:
+`eb0cef99-5fbd-40fe-b5bd-284c189da8c0` (2026-11-03, `alert-history`). Poprzednie:
+`f6bcdb15-b9a9-42c8-bd2e-a0af3897d62e` (2026-10-08 19:33 UTC, ostatnia wersja przed `alert-history`),
+`49b00703-d4b0-47bd-8e38-006acf3f1189` (2026-10-08, `invite-only-access`),
 `67f7e569-9798-4a5b-b236-e448d39db000` (2026-09-28, sonda ADS-B z diagnostyką `upstream` + stopka),
 `f3e7fff6-07a7-43f6-aadd-5a84afd8a9ac` (2026-09-28, sonda bez diagnostyki + stopka),
 `32455abe-e7eb-4c06-8587-09c98ca5612d` (2026-09-28, `/settings`), `146f9abe-61c7-42b3-a3a7-98fd104e45fd`
