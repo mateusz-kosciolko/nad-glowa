@@ -60,11 +60,11 @@ wyłącznie jednym wierszem ustawień; to odpowiedź na Open Question 9 z PRD (k
 
 #### Automated
 
-- [x] 1.1 Lint, testy, typecheck i build czyste
-- [x] 1.2 Testy bazy przechodzą z nowymi asercjami
-- [x] 1.3 Smoke przechodzi z krokami historii
-- [x] 1.4 E2E przechodzi z wejściem w historię
+- [x] 1.1 Lint, testy, typecheck i build czyste — 087cd8f
+- [x] 1.2 Testy bazy przechodzą z nowymi asercjami — 087cd8f
+- [x] 1.3 Smoke przechodzi z krokami historii — 087cd8f
+- [x] 1.4 E2E przechodzi z wejściem w historię — 087cd8f
 
 #### Manual
 
-- [x] 1.5 Usunięcie starego wpisu w przeglądarce, świeży bez przycisku
+- [x] 1.5 Usunięcie starego wpisu w przeglądarce, świeży bez przycisku — 087cd8f
